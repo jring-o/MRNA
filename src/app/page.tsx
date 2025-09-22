@@ -22,7 +22,7 @@ export default function Home() {
                 <Link href="/apply">Apply to Participate</Link>
               </Button>
               <Button variant="outline" size="lg" asChild>
-                <Link href="/blog">Learn More</Link>
+                <Link href="/status">Check Application Status</Link>
               </Button>
             </div>
           </div>
