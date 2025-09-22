@@ -1,5 +1,4 @@
--- Enable necessary extensions
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- Enable necessary extensions (Supabase already has uuid extension enabled)
 
 -- Create custom types
 CREATE TYPE application_status AS ENUM ('pending', 'accepted', 'rejected', 'waitlisted');
@@ -22,7 +21,7 @@ CREATE TABLE public.users (
 
 -- Create applications table
 CREATE TABLE public.applications (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   status application_status NOT NULL DEFAULT 'pending',
   role TEXT NOT NULL,
@@ -38,7 +37,7 @@ CREATE TABLE public.applications (
 
 -- Create blog_posts table
 CREATE TABLE public.blog_posts (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   content TEXT NOT NULL,
   author_id UUID NOT NULL REFERENCES public.users(id),
@@ -51,7 +50,7 @@ CREATE TABLE public.blog_posts (
 
 -- Create tasks table
 CREATE TABLE public.tasks (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   description TEXT,
   assignee_id UUID REFERENCES public.users(id),
@@ -65,7 +64,7 @@ CREATE TABLE public.tasks (
 
 -- Create breakout_rooms table
 CREATE TABLE public.breakout_rooms (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   description TEXT,
   drive_folder_url TEXT,
@@ -78,7 +77,7 @@ CREATE TABLE public.breakout_rooms (
 
 -- Create room_participants table
 CREATE TABLE public.room_participants (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   room_id UUID NOT NULL REFERENCES public.breakout_rooms(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   joined_at TIMESTAMPTZ DEFAULT NOW(),
@@ -87,7 +86,7 @@ CREATE TABLE public.room_participants (
 
 -- Create daily_reflections table
 CREATE TABLE public.daily_reflections (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   workshop_day INTEGER NOT NULL CHECK (workshop_day BETWEEN 1 AND 4),
   reflection_type reflection_type NOT NULL,
@@ -99,7 +98,7 @@ CREATE TABLE public.daily_reflections (
 
 -- Create photo_gallery table
 CREATE TABLE public.photo_gallery (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.users(id),
   image_url TEXT NOT NULL,
   caption TEXT,
@@ -111,7 +110,7 @@ CREATE TABLE public.photo_gallery (
 
 -- Create comments table
 CREATE TABLE public.comments (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.users(id),
   content TEXT NOT NULL,
   target_type TEXT NOT NULL CHECK (target_type IN ('photo', 'reflection', 'task', 'room')),
@@ -123,7 +122,7 @@ CREATE TABLE public.comments (
 
 -- Create schema_iterations table
 CREATE TABLE public.schema_iterations (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   version TEXT NOT NULL,
   title TEXT NOT NULL,
   description TEXT,
