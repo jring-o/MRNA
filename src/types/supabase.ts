@@ -4,6 +4,8 @@
  * after setting up your Supabase project
  */
 
+export type UserRole = 'admin' | 'participant' | 'applicant'
+
 export type Database = {
   public: {
     Tables: {
@@ -12,31 +14,31 @@ export type Database = {
           id: string
           email: string
           name: string
-          role: 'admin' | 'participant' | 'applicant'
           organization: string | null
           created_at: string
           last_login: string | null
           profile_image_url: string | null
+          updated_at: string
         }
         Insert: {
           id?: string
           email: string
           name: string
-          role?: 'admin' | 'participant' | 'applicant'
           organization?: string | null
           created_at?: string
           last_login?: string | null
           profile_image_url?: string | null
+          updated_at?: string
         }
         Update: {
           id?: string
           email?: string
           name?: string
-          role?: 'admin' | 'participant' | 'applicant'
           organization?: string | null
           created_at?: string
           last_login?: string | null
           profile_image_url?: string | null
+          updated_at?: string
         }
       }
       applications: {
