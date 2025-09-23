@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -12,7 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, CheckCircle2, Clock, XCircle, AlertCircle, Mail } from 'lucide-react'
 
-export default function StatusPage() {
+function StatusPageContent() {
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
@@ -319,5 +319,21 @@ export default function StatusPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function StatusPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-12 px-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">Loading...</h1>
+          </div>
+        </div>
+      </div>
+    }>
+      <StatusPageContent />
+    </Suspense>
   )
 }

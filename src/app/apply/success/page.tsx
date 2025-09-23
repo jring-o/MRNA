@@ -1,12 +1,13 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { CheckCircle2, Mail, Calendar, ArrowRight } from 'lucide-react'
 
-export default function ApplicationSuccessPage() {
+function ApplicationSuccessContent() {
   const searchParams = useSearchParams()
   const email = searchParams.get('email') || ''
 
@@ -140,5 +141,19 @@ export default function ApplicationSuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ApplicationSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center px-4">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900">Loading...</h1>
+        </div>
+      </div>
+    }>
+      <ApplicationSuccessContent />
+    </Suspense>
   )
 }

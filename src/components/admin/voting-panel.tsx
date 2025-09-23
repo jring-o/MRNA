@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -42,13 +42,7 @@ export function VotingPanel({ application, currentUserId, onVoteChange }: Voting
 
   const supabase = createClient()
 
-  useEffect(() => {
-    loadVotes()
-    loadVotingConfig()
-    loadAdminUsers()
-  }, [application.id])
-
-  const loadVotes = async () => {
+  const loadVotes = useCallback(async () => {
     const { data, error } = await supabase
       .from('application_votes')
       .select(`
@@ -69,9 +63,9 @@ export function VotingPanel({ application, currentUserId, onVoteChange }: Voting
       setCurrentUserVote(userVote)
       setVoteComment(userVote.comment || '')
     }
-  }
+  }, [application.id, currentUserId, supabase])
 
-  const loadVotingConfig = async () => {
+  const loadVotingConfig = useCallback(async () => {
     const { data, error } = await supabase
       .from('voting_config')
       .select('*')
@@ -83,9 +77,9 @@ export function VotingPanel({ application, currentUserId, onVoteChange }: Voting
     }
 
     setVotingConfig(data)
-  }
+  }, [supabase])
 
-  const loadAdminUsers = async () => {
+  const loadAdminUsers = useCallback(async () => {
     // Get all admin users from auth metadata
     const { data, error } = await supabase.rpc('get_admin_users')
 
@@ -102,7 +96,13 @@ export function VotingPanel({ application, currentUserId, onVoteChange }: Voting
     } else {
       setAdminUsers(data || [])
     }
-  }
+  }, [supabase, votes])
+
+  useEffect(() => {
+    loadVotes()
+    loadVotingConfig()
+    loadAdminUsers()
+  }, [loadVotes, loadVotingConfig, loadAdminUsers])
 
   const submitVote = async (voteType: VoteType) => {
     setIsSubmitting(true)

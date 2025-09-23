@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -61,32 +61,7 @@ export function CommentsPanel({
 
   const supabase = createClient()
 
-  useEffect(() => {
-    loadComments()
-
-    // Subscribe to realtime updates
-    const channel = supabase
-      .channel(`comments:${applicationId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'application_comments',
-          filter: `application_id=eq.${applicationId}`,
-        },
-        () => {
-          loadComments()
-        }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [applicationId])
-
-  const loadComments = async () => {
+  const loadComments = useCallback(async () => {
     // Get all comments for this application
     const { data, error } = await supabase
       .from('application_comments')
@@ -149,7 +124,32 @@ export function CommentsPanel({
     sortReplies(rootComments)
 
     setComments(rootComments)
-  }
+  }, [applicationId, isApplicantView, supabase])
+
+  useEffect(() => {
+    loadComments()
+
+    // Subscribe to realtime updates
+    const channel = supabase
+      .channel(`comments:${applicationId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'application_comments',
+          filter: `application_id=eq.${applicationId}`,
+        },
+        () => {
+          loadComments()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [applicationId, loadComments, supabase])
 
   const submitComment = async (parentId: string | null = null) => {
     const content = parentId ? newComment : newComment

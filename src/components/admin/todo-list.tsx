@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -104,43 +104,7 @@ export function AdminTodoList({ initialTodos, admins, currentUserId }: AdminTodo
 
   const supabase = createClient()
 
-  useEffect(() => {
-    // Subscribe to real-time updates for todos
-    const todosChannel = supabase
-      .channel('admin_todos_changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'admin_todos' },
-        () => {
-          loadTodos()
-        }
-      )
-      .subscribe()
-
-    // Subscribe to real-time updates for comments
-    const commentsChannel = supabase
-      .channel('admin_todo_comments_changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'admin_todo_comments' },
-        () => {
-          // Reload comments for expanded todos
-          expandedTodos.forEach(todoId => loadComments(todoId))
-        }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(todosChannel)
-      supabase.removeChannel(commentsChannel)
-    }
-  }, [expandedTodos])
-
-  useEffect(() => {
-    applyFilters()
-  }, [todos, activeFilter, statusFilter, priorityFilter])
-
-  const loadTodos = async () => {
+  const loadTodos = useCallback(async () => {
     const { data: todosData } = await supabase
       .from('admin_todos_with_users')
       .select('*')
@@ -173,9 +137,9 @@ export function AdminTodoList({ initialTodos, admins, currentUserId }: AdminTodo
       }))
       setTodos(validTodos as TodoWithUsers[])
     }
-  }
+  }, [supabase])
 
-  const loadComments = async (todoId: string) => {
+  const loadComments = useCallback(async (todoId: string) => {
     const { data } = await supabase
       .from('admin_todo_comments')
       .select(`
@@ -188,9 +152,9 @@ export function AdminTodoList({ initialTodos, admins, currentUserId }: AdminTodo
     if (data) {
       setTodoComments(prev => ({ ...prev, [todoId]: data }))
     }
-  }
+  }, [supabase])
 
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = [...todos]
 
     // Apply main filter
@@ -229,7 +193,45 @@ export function AdminTodoList({ initialTodos, admins, currentUserId }: AdminTodo
     })
 
     setFilteredTodos(filtered)
-  }
+  }, [todos, activeFilter, statusFilter, priorityFilter, currentUserId])
+
+  useEffect(() => {
+    loadTodos()
+
+    // Subscribe to real-time updates for todos
+    const todosChannel = supabase
+      .channel('admin_todos_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'admin_todos' },
+        () => {
+          loadTodos()
+        }
+      )
+      .subscribe()
+
+    // Subscribe to real-time updates for comments
+    const commentsChannel = supabase
+      .channel('admin_todo_comments_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'admin_todo_comments' },
+        () => {
+          // Reload comments for expanded todos
+          expandedTodos.forEach(todoId => loadComments(todoId))
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(todosChannel)
+      supabase.removeChannel(commentsChannel)
+    }
+  }, [expandedTodos, loadComments, loadTodos, supabase])
+
+  useEffect(() => {
+    applyFilters()
+  }, [applyFilters])
 
   const createTodo = async () => {
     if (!newTodo.title.trim()) {
