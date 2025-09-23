@@ -10,11 +10,11 @@ import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import {
   Copy,
-  Mail,
   CheckCircle2,
   Link,
   RefreshCw,
   AlertCircle,
+  Send,
 } from 'lucide-react'
 
 interface InviteTokenGeneratorProps {
@@ -33,6 +33,8 @@ export function InviteTokenGenerator({
   const [, setInviteToken] = useState<string | null>(null)
   const [inviteUrl, setInviteUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [sendingEmail, setSendingEmail] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
   const [copied, setCopied] = useState(false)
 
   const supabase = createClient()
@@ -70,41 +72,40 @@ export function InviteTokenGenerator({
   }
 
   const sendInviteEmail = async () => {
-    if (!inviteUrl) return
+    setSendingEmail(true)
+    try {
+      const response = await fetch('/api/emails/send-invite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          applicationId,
+          applicantEmail: applicationEmail,
+          applicantName,
+        }),
+      })
 
-    // This would normally integrate with your email service
-    // For now, we'll just copy the template to clipboard
-    const emailTemplate = `Subject: Welcome to the Modular Research Attribution Workshop!
+      const data = await response.json()
 
-Dear ${applicantName},
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send email')
+      }
 
-Congratulations! Your application to the Modular Research Attribution Workshop has been accepted.
+      // Update the invite URL from the response
+      if (data.inviteLink) {
+        setInviteUrl(data.inviteLink)
+        setInviteToken(data.inviteLink.split('token=')[1]?.split('&')[0] || null)
+      }
 
-We're thrilled to welcome you as a participant in the Spring 2026 workshop. To get started, please create your account using your personal invitation link:
-
-${inviteUrl}
-
-This link is unique to you and will expire in 30 days. Once you've created your account, you'll have access to:
-
-• Participant directory and profiles
-• Workshop schedule and logistics information
-• Pre-workshop collaboration tools
-• Shared resources and documents
-
-Important Details:
-• Workshop Dates: Spring 2026 (4 days)
-• Format: In-person intensive collaboration
-• Location: [To be announced]
-
-If you have any questions or encounter any issues with registration, please don't hesitate to contact us.
-
-We look forward to working with you!
-
-Best regards,
-The Workshop Organizing Team`
-
-    await navigator.clipboard.writeText(emailTemplate)
-    toast.success('Email template copied to clipboard!')
+      setEmailSent(true)
+      toast.success('Acceptance email sent successfully!')
+    } catch (error) {
+      console.error('Error sending email:', error)
+      toast.error('Failed to send email. Please try again.')
+    } finally {
+      setSendingEmail(false)
+    }
   }
 
   const checkExistingToken = async () => {
@@ -216,9 +217,24 @@ The Workshop Organizing Team`
                 variant="outline"
                 className="flex-1"
                 onClick={sendInviteEmail}
+                disabled={sendingEmail || emailSent}
               >
-                <Mail className="mr-2 h-4 w-4" />
-                Copy Email Template
+                {sendingEmail ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Sending Email...
+                  </>
+                ) : emailSent ? (
+                  <>
+                    <CheckCircle2 className="mr-2 h-4 w-4 text-green-600" />
+                    Email Sent
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-2 h-4 w-4" />
+                    Send Acceptance Email
+                  </>
+                )}
               </Button>
               <Button
                 variant="outline"

@@ -179,15 +179,37 @@ export default function ApplyPage() {
         ],
       }
 
-      const { error: applicationError } = await supabase
+      const { data: newApplication, error: applicationError } = await supabase
         .from('applications')
         .insert(applicationData)
+        .select()
+        .single()
 
       if (applicationError) {
         console.error('Application error:', applicationError)
         setError('Failed to submit application. Please try again.')
         setIsSubmitting(false)
         return
+      }
+
+      // Send confirmation email
+      try {
+        await fetch('/api/emails/send-confirmation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            applicationId: newApplication.id,
+            applicantEmail: data.email,
+            applicantName: data.name,
+            organization: data.organization || '',
+            submittedAt: new Date().toISOString(),
+          }),
+        })
+      } catch (emailError) {
+        // Don't block submission if email fails
+        console.error('Failed to send confirmation email:', emailError)
       }
 
       // Redirect to success page with email for status checking
