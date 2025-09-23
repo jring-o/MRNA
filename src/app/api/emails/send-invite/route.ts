@@ -24,12 +24,39 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { applicationId, applicantEmail, applicantName } = body
 
+    // Debug logging
+    console.log('Received invite request:', { applicationId, applicantEmail, applicantName })
+
     if (!applicationId || !applicantEmail || !applicantName) {
+      console.error('Missing fields:', {
+        hasApplicationId: !!applicationId,
+        hasEmail: !!applicantEmail,
+        hasName: !!applicantName,
+        applicationId,
+        body
+      })
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       )
     }
+
+    // First, verify the application exists
+    const { data: application, error: appError } = await supabase
+      .from('applications')
+      .select('id, email, name, status')
+      .eq('id', applicationId)
+      .single()
+
+    if (appError || !application) {
+      console.error('Application not found:', { applicationId, error: appError })
+      return NextResponse.json(
+        { error: `Application with ID ${applicationId} not found` },
+        { status: 404 }
+      )
+    }
+
+    console.log('Found application:', application)
 
     // Generate invite token
     const token = crypto.randomUUID()

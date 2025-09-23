@@ -104,12 +104,9 @@ function SignUpContent() {
       return
     }
 
-    if (authData?.user && !authData.user.confirmed_at) {
-      router.push('/signup/confirm')
-    } else {
-      router.push('/dashboard')
-      router.refresh()
-    }
+    // Since we disabled email confirmation, always go to dashboard
+    router.push('/dashboard')
+    router.refresh()
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

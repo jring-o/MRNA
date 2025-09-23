@@ -16,8 +16,8 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  // Get user role from app_metadata
-  const role = user.app_metadata?.role || 'applicant'
+  // Get user role from app_metadata (secure) or user_metadata (fallback)
+  const role = user.app_metadata?.role || user.user_metadata?.role || 'applicant'
   const isAdmin = role === 'admin'
 
   // Dashboard is only for participants (including admins who are also participants)
