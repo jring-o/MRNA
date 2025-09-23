@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
     // Send rejection email using React Email template
     const { data, error } = await resend.emails.send({
-      from: 'Modular Research Workshop <workshop@modularresearch.org>',
+      from: 'Modular Research Workshop <onboarding@resend.dev>',
       to: [applicantEmail],
       subject: 'Update on Your Modular Research Workshop Application',
       react: ApplicationRejectedEmail({
