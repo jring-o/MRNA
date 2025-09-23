@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   Users,
   FileText,
@@ -17,7 +17,6 @@ import {
   TrendingUp,
   CheckCircle2,
   Clock,
-  AlertCircle,
   ArrowRight,
   Zap,
   Target,
@@ -273,9 +272,9 @@ export default async function DashboardPage() {
             {/* Welcome Card */}
             <Card className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white">
               <CardHeader>
-                <CardTitle className="text-2xl">Congratulations! You're In!</CardTitle>
+                <CardTitle className="text-2xl">Congratulations! You&apos;re In!</CardTitle>
                 <CardDescription className="text-blue-100">
-                  You've been selected for the Spring 2026 Modular Research Attribution Workshop
+                  You&apos;ve been selected for the Spring 2026 Modular Research Attribution Workshop
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -462,7 +461,7 @@ export default async function DashboardPage() {
                       <Users className="h-5 w-5 text-gray-400" />
                       <div>
                         <p className="font-medium">Past Participants</p>
-                        <p className="text-sm text-gray-500">See who's attended previous workshops</p>
+                        <p className="text-sm text-gray-500">See who&apos;s attended previous workshops</p>
                       </div>
                     </div>
                     <ArrowRight className="h-4 w-4 text-gray-400 group-hover:translate-x-1 transition-transform" />

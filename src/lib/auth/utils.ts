@@ -38,6 +38,6 @@ export async function isParticipant(): Promise<boolean> {
 /**
  * Get user's role from app_metadata
  */
-export function getUserRole(user: any): UserRole {
+export function getUserRole(user: { app_metadata?: { role?: string } } | null): UserRole {
   return (user?.app_metadata?.role as UserRole) || 'applicant'
 }

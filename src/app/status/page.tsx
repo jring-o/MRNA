@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,11 +13,20 @@ import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, CheckCircle2, Clock, XCircle, AlertCircle, Mail } from 'lucide-react'
 
 export default function StatusPage() {
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [application, setApplication] = useState<any>(null)
+  const [application, setApplication] = useState<Record<string, unknown> | null>(null)
   const [checked, setChecked] = useState(false)
+
+  // Pre-fill email from URL if provided
+  useEffect(() => {
+    const emailParam = searchParams.get('email')
+    if (emailParam) {
+      setEmail(emailParam)
+    }
+  }, [searchParams])
 
   const checkStatus = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,25 +37,11 @@ export default function StatusPage() {
     try {
       const supabase = createClient()
 
-      // First, get the user by email
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id, name, organization')
-        .eq('email', email)
-        .single()
-
-      if (userError || !userData) {
-        setError('No application found for this email address.')
-        setLoading(false)
-        setChecked(true)
-        return
-      }
-
-      // Then get their application
+      // Query application directly by email (no account needed)
       const { data: applicationData, error: applicationError } = await supabase
         .from('applications')
         .select('*')
-        .eq('user_id', userData.id)
+        .eq('email', email)
         .single()
 
       if (applicationError || !applicationData) {
@@ -55,10 +51,7 @@ export default function StatusPage() {
         return
       }
 
-      setApplication({
-        ...applicationData,
-        user: userData
-      })
+      setApplication(applicationData)
       setChecked(true)
     } catch (err) {
       console.error('Status check error:', err)
@@ -199,7 +192,7 @@ export default function StatusPage() {
                   No Application Found
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  We couldn't find an application associated with {email}
+                  We couldn&apos;t find an application associated with {email}
                 </p>
                 <div className="space-y-3">
                   <Button variant="outline" onClick={() => { setChecked(false); setEmail(''); }} className="w-full">
@@ -221,17 +214,17 @@ export default function StatusPage() {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-2xl">{application.user.name}</CardTitle>
+                    <CardTitle className="text-2xl">{application.name as string}</CardTitle>
                     <CardDescription className="text-base">
-                      {application.user.organization} • {application.role}
+                      {application.organization as string} • {application.role as string}
                     </CardDescription>
                   </div>
-                  {getStatusBadge(application.status)}
+                  {getStatusBadge(application.status as string)}
                 </div>
               </CardHeader>
               <CardContent>
                 {(() => {
-                  const message = getStatusMessage(application.status)
+                  const message = getStatusMessage(application.status as string)
                   if (!message) return null
 
                   return (
@@ -256,7 +249,7 @@ export default function StatusPage() {
                       <div className="ml-3">
                         <p className="text-sm font-medium text-gray-900">Application Submitted</p>
                         <p className="text-xs text-gray-500">
-                          {new Date(application.submitted_at).toLocaleDateString('en-US', {
+                          {new Date(application.submitted_at as string).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
@@ -267,7 +260,7 @@ export default function StatusPage() {
                       </div>
                     </div>
 
-                    {application.reviewed_at && (
+                    {(application.reviewed_at as string) && (
                       <div className="flex items-start">
                         <div className="flex-shrink-0">
                           <CheckCircle2 className="w-5 h-5 text-green-500" />
@@ -275,7 +268,7 @@ export default function StatusPage() {
                         <div className="ml-3">
                           <p className="text-sm font-medium text-gray-900">Application Reviewed</p>
                           <p className="text-xs text-gray-500">
-                            {new Date(application.reviewed_at).toLocaleDateString('en-US', {
+                            {new Date(application.reviewed_at as string).toLocaleDateString('en-US', {
                               year: 'numeric',
                               month: 'long',
                               day: 'numeric'
@@ -293,7 +286,7 @@ export default function StatusPage() {
             <Card className="shadow-xl">
               <CardContent className="pt-6">
                 <div className="space-y-3">
-                  {application.status === 'accepted' && (
+                  {(application.status as string) === 'accepted' && (
                     <Button asChild className="w-full">
                       <Link href="/login">
                         Access Participant Dashboard

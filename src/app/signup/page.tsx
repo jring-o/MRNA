@@ -85,7 +85,7 @@ export default function SignUpPage() {
           </div>
 
           <div className="space-y-6">
-            <h3 className="text-xl font-semibold mb-4">What you'll gain:</h3>
+            <h3 className="text-xl font-semibold mb-4">What you&apos;ll gain:</h3>
             {benefits.map((benefit, index) => (
               <div key={index} className="flex items-start space-x-3">
                 <CheckCircle2 className="w-6 h-6 flex-shrink-0 text-blue-200 mt-0.5" />

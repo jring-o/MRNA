@@ -27,6 +27,27 @@ import {
   Link as LinkIcon
 } from 'lucide-react'
 
+// Custom word count validator function
+const wordCount = (min: number, max: number, minMessage: string, maxMessage: string) => {
+  return z.string().superRefine((val, ctx) => {
+    const words = val?.trim().split(/\s+/).filter(word => word.length > 0).length || 0
+
+    if (words < min && min > 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: minMessage,
+      })
+    }
+
+    if (words > max) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: maxMessage,
+      })
+    }
+  })
+}
+
 // Form validation schema
 const applicationSchema = z.object({
   // Personal Information
@@ -35,14 +56,22 @@ const applicationSchema = z.object({
   organization: z.string().min(2, 'Organization is required'),
   role: z.string().min(2, 'Role/Title is required'),
 
-  // Application Content
-  reason_for_applying: z.string()
-    .min(50, 'Please provide at least 50 words')
-    .max(500, 'Maximum 500 words allowed'),
-  requirements_for_protocol: z.string()
-    .min(30, 'Please provide at least 30 words')
-    .max(300, 'Maximum 300 words allowed'),
-  relevant_experience: z.string().max(300, 'Maximum 300 words allowed').optional(),
+  // Application Content - Now with proper word count validation
+  reason_for_applying: wordCount(
+    50, 500,
+    'Please provide at least 50 words',
+    'Maximum 500 words allowed'
+  ),
+  requirements_for_protocol: wordCount(
+    30, 300,
+    'Please provide at least 30 words',
+    'Maximum 300 words allowed'
+  ),
+  relevant_experience: wordCount(
+    0, 300,
+    '',
+    'Maximum 300 words allowed'
+  ).optional().or(z.literal('')),
   links: z.array(z.string().url().or(z.literal(''))).max(3).optional(),
 
   // Logistics
@@ -118,58 +147,30 @@ export default function ApplyPage() {
     try {
       const supabase = createClient()
 
-      // First, check if user is authenticated
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      // Check if an application already exists for this email
+      const { data: existingApp } = await supabase
+        .from('applications')
+        .select('id')
+        .eq('email', data.email)
+        .single()
 
-      if (authError || !user) {
-        // Create account with the provided email
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email: data.email,
-          password: Math.random().toString(36).slice(-12), // Generate random password
-        })
-
-        if (signUpError) {
-          setError('Failed to create account. Please try again.')
-          setIsSubmitting(false)
-          return
-        }
-      }
-
-      // Get user again after potential signup
-      const { data: { user: currentUser } } = await supabase.auth.getUser()
-
-      if (!currentUser) {
-        setError('Authentication failed. Please try logging in.')
+      if (existingApp) {
+        setError('An application has already been submitted with this email address. Please check your application status.')
         setIsSubmitting(false)
         return
       }
 
-      // Create or update user profile
-      const { error: profileError } = await supabase
-        .from('users')
-        .upsert({
-          id: currentUser.id,
-          email: data.email,
-          name: data.name,
-          organization: data.organization,
-        })
-
-      if (profileError) {
-        console.error('Profile error:', profileError)
-        setError('Failed to create user profile. Please try again.')
-        setIsSubmitting(false)
-        return
-      }
-
-      // Submit application
+      // Submit application directly (no account required)
       const applicationData = {
-        user_id: currentUser.id,
+        // Include email, name, org directly in application
+        email: data.email,
+        name: data.name,
+        organization: data.organization,
         role: data.role,
         reason_for_applying: data.reason_for_applying,
         requirements_for_protocol: data.requirements_for_protocol,
         relevant_experience: data.relevant_experience || null,
         // Store additional data in admin_notes temporarily
-        // In production, you'd add proper columns for these
         admin_notes: [
           `Links: ${data.links?.filter(l => l).join(', ') || 'None'}`,
           `Travel Requirements: ${data.travel_requirements || 'None'}`,
@@ -184,14 +185,13 @@ export default function ApplyPage() {
 
       if (applicationError) {
         console.error('Application error:', applicationError)
-        setError('Failed to submit application. You may have already applied.')
+        setError('Failed to submit application. Please try again.')
         setIsSubmitting(false)
         return
       }
 
-      // Redirect to dashboard
-      router.push('/dashboard')
-      router.refresh()
+      // Redirect to success page with email for status checking
+      router.push(`/apply/success?email=${encodeURIComponent(data.email)}`)
     } catch (err) {
       console.error('Submission error:', err)
       setError('An unexpected error occurred. Please try again.')
@@ -505,7 +505,7 @@ export default function ApplyPage() {
                       <li>• Applications are reviewed on a rolling basis</li>
                       <li>• You&apos;ll receive a confirmation email after submission</li>
                       <li>• Decisions will be communicated within 2-3 weeks</li>
-                      <li>• Your application creates an account for tracking status</li>
+                      <li>• You can check your status anytime using your email</li>
                     </ul>
                   </div>
                 </div>

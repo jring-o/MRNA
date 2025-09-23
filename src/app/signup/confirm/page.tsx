@@ -7,10 +7,10 @@ export default function ConfirmSignupPage() {
             Check your email!
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            We've sent you a confirmation link to verify your email address.
+            We&apos;ve sent you a confirmation link to verify your email address.
           </p>
           <p className="mt-4 text-sm text-gray-600">
-            Once confirmed, you'll be able to log in and access the workshop platform.
+            Once confirmed, you&apos;ll be able to log in and access the workshop platform.
           </p>
         </div>
       </div>
