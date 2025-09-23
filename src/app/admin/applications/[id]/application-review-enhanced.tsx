@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { toast } from 'sonner'
 import { VotingPanel } from '@/components/admin/voting-panel'
 import { CommentsPanel } from '@/components/admin/comments-panel'
+import { InviteTokenGenerator } from '@/components/admin/invite-token-generator'
 import type { ApplicationWithVoting } from '@/types/database'
 import {
   ArrowLeft,
@@ -112,7 +113,7 @@ export function ApplicationReview({
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `application-${application.name.replace(/\s+/g, '-').toLowerCase()}-${application.id.slice(0, 8)}.json`
+    a.download = `application-${(application.name || 'unknown').replace(/\s+/g, '-').toLowerCase()}-${application.id.slice(0, 8)}.json`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -151,7 +152,7 @@ export function ApplicationReview({
                 </div>
                 <div className="flex items-center text-sm text-gray-500">
                   <Calendar className="mr-1 h-4 w-4" />
-                  Submitted {new Date(application.submitted_at).toLocaleDateString()}
+                  Submitted {application.submitted_at ? new Date(application.submitted_at).toLocaleDateString() : 'Unknown'}
                 </div>
                 {hasVotingData && (
                   <div className="flex items-center text-sm text-gray-500">
@@ -429,6 +430,14 @@ export function ApplicationReview({
                 )}
               </CardContent>
             </Card>
+
+            {/* Invite Token Generator for accepted applications */}
+            <InviteTokenGenerator
+              applicationId={application.id}
+              applicationEmail={application.email || ''}
+              applicationStatus={application.status}
+              applicantName={application.name || ''}
+            />
           </TabsContent>
         </Tabs>
       </div>

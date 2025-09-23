@@ -9,8 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Mail, Lock, ArrowRight, Beaker, Users, Sparkles } from 'lucide-react'
+import { Mail, Lock, ArrowRight, Beaker, Users, Sparkles, Info } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -104,107 +103,116 @@ export default function LoginPage() {
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome back
+              Participant Login
             </h2>
             <p className="text-gray-600">
               Sign in to access the workshop platform
             </p>
           </div>
 
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Sign In</TabsTrigger>
-              <TabsTrigger value="signup" onClick={() => router.push('/signup')}>
-                Sign Up
-              </TabsTrigger>
-            </TabsList>
+          <Card className="border-0 shadow-xl">
+            <form onSubmit={handleLogin}>
+              <CardHeader className="pb-4">
+                <CardTitle>Sign in to your account</CardTitle>
+                <CardDescription>
+                  For accepted workshop participants only
+                </CardDescription>
+              </CardHeader>
 
-            <TabsContent value="login" className="mt-6">
-              <Card className="border-0 shadow-xl">
-                <form onSubmit={handleLogin}>
-                  <CardHeader className="pb-4">
-                    <CardTitle>Sign in to your account</CardTitle>
-                    <CardDescription>
-                      Enter your email and password to continue
-                    </CardDescription>
-                  </CardHeader>
+              <CardContent className="space-y-4">
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
 
-                  <CardContent className="space-y-4">
-                    {error && (
-                      <Alert variant="destructive">
-                        <AlertDescription>{error}</AlertDescription>
-                      </Alert>
-                    )}
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    Only accepted participants have accounts. If you haven&apos;t applied yet,
+                    please <Link href="/apply" className="font-medium text-blue-600 hover:text-blue-500">submit an application</Link> first.
+                  </AlertDescription>
+                </Alert>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email address</Label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="you@example.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="pl-10"
-                          required
-                        />
-                      </div>
-                    </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email address</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
 
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="password">Password</Label>
-                        <Link href="/reset-password" className="text-sm text-blue-600 hover:text-blue-500">
-                          Forgot password?
-                        </Link>
-                      </div>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="password"
-                          type="password"
-                          placeholder="••••••••"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="pl-10"
-                          required
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    <Link href="/reset-password" className="text-sm text-blue-600 hover:text-blue-500">
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+              </CardContent>
 
-                  <CardFooter className="flex flex-col space-y-4">
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      size="lg"
-                      disabled={loading}
-                    >
-                      {loading ? (
-                        <>
-                          <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                          Signing in...
-                        </>
-                      ) : (
-                        <>
-                          Sign in
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </>
-                      )}
+              <CardFooter className="flex flex-col space-y-4">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  size="lg"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Signing in...
+                    </>
+                  ) : (
+                    <>
+                      Sign in
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+
+                <div className="space-y-2 text-center">
+                  <p className="text-sm text-gray-600">
+                    Not a participant yet?
+                  </p>
+                  <div className="flex flex-col space-y-2">
+                    <Button variant="outline" asChild>
+                      <Link href="/apply">Apply for the Workshop</Link>
                     </Button>
+                    <Button variant="outline" asChild>
+                      <Link href="/status">Check Application Status</Link>
+                    </Button>
+                  </div>
+                </div>
 
-                    <p className="text-center text-sm text-gray-600">
-                      Don&apos;t have an account?{' '}
-                      <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
-                        Sign up for the workshop
-                      </Link>
-                    </p>
-                  </CardFooter>
-                </form>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                <p className="text-xs text-center text-gray-500 pt-2">
+                  Accounts are created only after your application has been accepted.
+                  You will receive an invitation email with instructions to set up your account.
+                </p>
+              </CardFooter>
+            </form>
+          </Card>
         </div>
       </div>
     </div>

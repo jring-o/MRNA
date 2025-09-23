@@ -336,6 +336,47 @@ export type Database = {
           },
         ]
       }
+      invite_tokens: {
+        Row: {
+          id: string
+          email: string
+          token: string
+          application_id: string | null
+          used: boolean
+          used_at: string | null
+          created_at: string | null
+          expires_at: string | null
+        }
+        Insert: {
+          id?: string
+          email: string
+          token: string
+          application_id?: string | null
+          used?: boolean
+          used_at?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+        }
+        Update: {
+          id?: string
+          email?: string
+          token?: string
+          application_id?: string | null
+          used?: boolean
+          used_at?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invite_tokens_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           author_id: string
@@ -869,6 +910,14 @@ export type Database = {
       link_application_to_user: {
         Args: { p_email: string; p_user_id: string }
         Returns: boolean
+      }
+      validate_invite_token: {
+        Args: { p_token: string; p_email: string }
+        Returns: boolean
+      }
+      generate_invite_token: {
+        Args: { p_application_id: string }
+        Returns: string
       }
     }
     Enums: {

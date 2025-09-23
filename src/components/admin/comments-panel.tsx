@@ -268,7 +268,7 @@ export function CommentsPanel({
     }
 
     const isAuthor = comment.author_id === currentUserId
-    const canEdit = isAuthor && canEditComment(comment) && !isApplicantView
+    const canEdit = isAuthor && canEditComment(comment, currentUserId) && !isApplicantView
     const canDelete = isAuthor && !isApplicantView
     const hasReplies = comment.replies.length > 0
     const isExpanded = expandedThreads.has(comment.id)
@@ -279,7 +279,7 @@ export function CommentsPanel({
         <div className="flex items-start space-x-3 p-3 bg-white border rounded-lg hover:shadow-sm transition-shadow">
           <Avatar className="h-8 w-8">
             <AvatarFallback>
-              {comment.author?.name?.substring(0, 2).toUpperCase() || 'UN'}
+              {comment.author_name?.substring(0, 2).toUpperCase() || 'UN'}
             </AvatarFallback>
           </Avatar>
 
@@ -288,7 +288,7 @@ export function CommentsPanel({
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium">{comment.author?.name || 'Unknown'}</span>
+                  <span className="text-sm font-medium">{comment.author_name || 'Unknown'}</span>
                   {comment.is_internal && !isApplicantView && (
                     <Badge variant="outline" className="text-xs">
                       <EyeOff className="mr-1 h-3 w-3" />

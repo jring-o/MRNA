@@ -1,20 +1,21 @@
-/**
- * Extended database types for voting and commenting system
- */
+import type { Database, UserRole } from './supabase'
 
-export type VoteType = 'approve' | 'reject' | 'abstain'
+// Re-export types from supabase
+export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
+export type Inserts<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
+export type Updates<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']
+export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T]
 
-export type ApplicationStatus = 'pending' | 'accepted' | 'rejected' | 'waitlisted'
+// Re-export UserRole
+export type { UserRole }
 
-export interface ApplicationVote {
-  id: string
-  application_id: string
-  admin_id: string
-  vote: VoteType
-  comment?: string | null
-  created_at: string | null
-  updated_at: string | null
-  // Joined fields
+// Application types
+export type Application = Tables<'applications'>
+export type ApplicationStatus = Database['public']['Enums']['application_status']
+
+// Voting types
+export type VoteType = Database['public']['Enums']['vote_type']
+export type ApplicationVote = Tables<'application_votes'> & {
   admin?: {
     id: string
     name: string
@@ -22,105 +23,54 @@ export interface ApplicationVote {
   }
 }
 
-export interface ApplicationComment {
+export type VotingConfig = Tables<'voting_config'>
+
+export type ApplicationWithVoting = Application & {
+  total_votes: number | null
+  approve_votes: number | null
+  reject_votes: number | null
+  abstain_votes: number | null
+  voting_completed: boolean | null
+  voting_summary: string | null
+  average_score: number | null
+}
+
+// Comment types
+export type ApplicationComment = {
   id: string
   application_id: string
   author_id: string
+  author_name?: string
   content: string
-  parent_id?: string | null
-  is_internal: boolean | null
-  created_at: string | null
-  edited_at?: string | null
-  deleted_at?: string | null
-  // Joined fields
+  parent_id: string | null
+  is_internal: boolean
+  created_at: string
+  edited_at: string | null
+  deleted_at: string | null
+  depth?: number
+}
+
+// Blog types
+export type BlogPost = Tables<'blog_posts'> & {
   author?: {
     id: string
     name: string
     email: string
-    profile_image_url?: string | null
   }
-  replies?: ApplicationComment[]
-  depth?: number
+  tags?: Array<{ name: string }>
+  categories?: Array<{ name: string }>
 }
 
-export interface VotingConfig {
-  id: string
-  min_votes_required: number | null
-  approval_threshold: number | null
-  auto_approve_enabled: boolean | null
-  auto_reject_enabled: boolean | null
-  rejection_threshold: number | null
-  created_at: string | null
-  updated_at: string | null
+// User types
+export type User = Tables<'users'>
+
+// Helper functions for voting
+export function calculateVotePercentage(voteCount: number | null, totalVotes: number | null): number {
+  if (!totalVotes || totalVotes === 0 || !voteCount) return 0
+  return Math.round((voteCount / totalVotes) * 100)
 }
 
-export interface ApplicationWithVoting {
-  id: string
-  user_id?: string | null
-  email: string
-  name: string
-  organization?: string
-  role: string
-  status: ApplicationStatus
-  reason_for_applying: string
-  requirements_for_protocol?: string | null
-  relevant_experience?: string | null
-  admin_notes?: string[] | null
-  submitted_at: string
-  reviewed_at?: string | null
-  reviewed_by?: string | null
-  // Voting fields
-  total_votes: number
-  approve_votes: number
-  reject_votes: number
-  abstain_votes: number
-  voting_completed: boolean
-  voting_completed_at?: string | null
-  // Relations
-  votes?: ApplicationVote[]
-  comments?: ApplicationComment[]
-}
-
-export interface VotingSummary {
-  id: string
-  name: string
-  email: string
-  status: ApplicationStatus
-  total_votes: number
-  approve_votes: number
-  reject_votes: number
-  abstain_votes: number
-  voting_completed: boolean
-  approval_percentage: number
-  rejection_percentage: number
-  votes: {
-    admin_id: string
-    admin_name: string
-    vote: VoteType
-    voted_at: string
-  }[]
-}
-
-// Helper functions for vote calculations
-export const calculateVotePercentage = (votes: number, total: number): number => {
-  if (total === 0) return 0
-  return Math.round((votes / total) * 100 * 10) / 10
-}
-
-export const getVoteColor = (vote: VoteType): string => {
-  switch (vote) {
-    case 'approve':
-      return 'text-green-600'
-    case 'reject':
-      return 'text-red-600'
-    case 'abstain':
-      return 'text-gray-500'
-    default:
-      return 'text-gray-500'
-  }
-}
-
-export const getVoteBadgeClass = (vote: VoteType): string => {
+export function getVoteBadgeClass(vote: VoteType): string {
   switch (vote) {
     case 'approve':
       return 'bg-green-100 text-green-800 border-green-300'
@@ -133,10 +83,50 @@ export const getVoteBadgeClass = (vote: VoteType): string => {
   }
 }
 
-export const canEditComment = (comment: ApplicationComment): boolean => {
+// Helper function for comments
+export function canEditComment(comment: ApplicationComment, currentUserId: string): boolean {
+  // Users can edit their own comments within 5 minutes of creation
+  if (comment.author_id !== currentUserId) return false
   if (comment.deleted_at) return false
-  if (!comment.created_at) return false
+
   const createdAt = new Date(comment.created_at)
-  const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000)
-  return createdAt > fifteenMinutesAgo
+  const now = new Date()
+  const fiveMinutesInMs = 5 * 60 * 1000
+
+  return (now.getTime() - createdAt.getTime()) < fiveMinutesInMs
 }
+
+// Todo types
+export type AdminTodo = Tables<'admin_todos'> & {
+  created_by_user?: {
+    id: string
+    name: string
+    email: string
+  }
+  assigned_to_user?: {
+    id: string
+    name: string
+    email: string
+  }
+  completed_by_user?: {
+    id: string
+    name: string
+    email: string
+  }
+}
+
+export type TodoPriority = Database['public']['Enums']['todo_priority']
+export type TodoStatus = Database['public']['Enums']['todo_status']
+
+// Reflection types (commented out - table not in generated types yet)
+// export type ReflectionType = Database['public']['Enums']['reflection_type']
+// export type Reflection = Tables<'reflections'> & {
+//   user?: {
+//     id: string
+//     name: string
+//     email: string
+//   }
+// }
+
+// Invite token types
+export type InviteToken = Tables<'invite_tokens'>

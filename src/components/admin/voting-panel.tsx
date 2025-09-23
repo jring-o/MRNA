@@ -200,7 +200,7 @@ export function VotingPanel({ application, currentUserId, onVoteChange }: Voting
   const rejectionPercentage = calculateVotePercentage(application.reject_votes, application.total_votes)
   const abstainPercentage = calculateVotePercentage(application.abstain_votes, application.total_votes)
 
-  const hasMetThreshold = votingConfig && votingConfig.min_votes_required !== null && application.total_votes >= votingConfig.min_votes_required
+  const hasMetThreshold = votingConfig && votingConfig.min_votes_required !== null && application.total_votes !== null && application.total_votes >= votingConfig.min_votes_required
   const hasApprovalConsensus = votingConfig && votingConfig.approval_threshold !== null && approvalPercentage >= (votingConfig.approval_threshold * 100)
   const hasRejectionConsensus = votingConfig && votingConfig.rejection_threshold !== null && rejectionPercentage >= (votingConfig.rejection_threshold * 100)
 
