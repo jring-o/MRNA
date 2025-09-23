@@ -237,10 +237,11 @@ export function ApplicationReview({
 
         {/* Application Content Tabs */}
         <Tabs defaultValue="application" className="space-y-4">
-          <TabsList className={hasVotingData ? "grid w-full grid-cols-5" : "grid w-full grid-cols-4"}>
+          <TabsList className={hasVotingData ? "grid w-full grid-cols-6" : "grid w-full grid-cols-5"}>
             <TabsTrigger value="application">Application</TabsTrigger>
             {hasVotingData && <TabsTrigger value="voting">Voting</TabsTrigger>}
             <TabsTrigger value="comments">Comments</TabsTrigger>
+            <TabsTrigger value="invite">Invite</TabsTrigger>
             <TabsTrigger value="logistics">Logistics</TabsTrigger>
             <TabsTrigger value="account">Account</TabsTrigger>
           </TabsList>
