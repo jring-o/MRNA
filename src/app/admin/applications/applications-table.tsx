@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Checkbox } from '@/components/ui/checkbox'
+import { SendEmailDialog } from '@/components/admin/send-email-dialog'
 import { toast } from 'sonner'
 import {
   Search,
@@ -43,6 +44,8 @@ import {
   ChevronUp,
   ChevronDown,
   ChevronsUpDown,
+  Send,
+  RefreshCw,
 } from 'lucide-react'
 
 type Application = {
@@ -79,8 +82,36 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
   const [sortField, setSortField] = useState<SortField>('submitted_at')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
   const [isUpdating, setIsUpdating] = useState(false)
+  const [emailSentMap, setEmailSentMap] = useState<Map<string, boolean>>(new Map())
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false)
+  const [emailApplicants, setEmailApplicants] = useState<Application[]>([])
 
   const supabase = createClient()
+
+  // Check for existing invite tokens on mount
+  useEffect(() => {
+    const checkExistingTokens = async () => {
+      const acceptedApps = applications.filter(app => app.status === 'accepted')
+      if (acceptedApps.length === 0) return
+
+      const { data: tokens } = await supabase
+        .from('invite_tokens')
+        .select('application_id')
+        .in('application_id', acceptedApps.map(app => app.id))
+
+      if (tokens) {
+        const sentMap = new Map<string, boolean>()
+        tokens.forEach(token => {
+          if (token.application_id) {
+            sentMap.set(token.application_id, true)
+          }
+        })
+        setEmailSentMap(sentMap)
+      }
+    }
+
+    checkExistingTokens()
+  }, [applications, supabase])
 
   // Filter and sort applications
   const filteredApplications = useMemo(() => {
@@ -193,6 +224,63 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
     } finally {
       setIsUpdating(false)
     }
+  }
+
+  // Send acceptance email to single applicant
+  const sendAcceptanceEmail = async (applicant: Application) => {
+    try {
+      const response = await fetch('/api/emails/send-invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          applicationId: applicant.id,
+          applicantEmail: applicant.email,
+          applicantName: applicant.name,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to send email')
+      }
+
+      // Mark as sent in local state
+      setEmailSentMap(prev => new Map(prev).set(applicant.id, true))
+      return true
+    } catch (error) {
+      console.error('Error sending email:', error)
+      throw error
+    }
+  }
+
+  // Send acceptance emails to multiple applicants
+  const sendBulkAcceptanceEmails = async () => {
+    const results = await Promise.allSettled(
+      emailApplicants
+        .filter(app => app.status === 'accepted')
+        .map(app => sendAcceptanceEmail(app))
+    )
+
+    const successful = results.filter(r => r.status === 'fulfilled').length
+    const failed = results.filter(r => r.status === 'rejected').length
+
+    if (failed > 0) {
+      toast.warning(`Sent ${successful} email(s), ${failed} failed`)
+    } else {
+      toast.success(`Successfully sent ${successful} acceptance email(s)`)
+    }
+  }
+
+  // Open email dialog for single applicant
+  const openEmailDialog = (applicant: Application) => {
+    setEmailApplicants([applicant])
+    setEmailDialogOpen(true)
+  }
+
+  // Open email dialog for selected applicants
+  const openBulkEmailDialog = () => {
+    const selected = applications.filter(app => selectedIds.has(app.id))
+    setEmailApplicants(selected)
+    setEmailDialogOpen(true)
   }
 
   // Export to CSV
@@ -343,6 +431,16 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
               >
                 Reject All
               </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={openBulkEmailDialog}
+                disabled={isUpdating}
+                className="border-blue-600 text-blue-600 hover:bg-blue-50"
+              >
+                <Send className="mr-2 h-4 w-4" />
+                Send Acceptance Emails
+              </Button>
             </div>
             <Button
               size="sm"
@@ -449,6 +547,26 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
+                      {application.status === 'accepted' && (
+                        <>
+                          <DropdownMenuItem
+                            onClick={() => openEmailDialog(application)}
+                          >
+                            {emailSentMap.get(application.id) ? (
+                              <>
+                                <RefreshCw className="mr-2 h-4 w-4 text-blue-600" />
+                                Resend Acceptance Email
+                              </>
+                            ) : (
+                              <>
+                                <Send className="mr-2 h-4 w-4 text-blue-600" />
+                                Send Acceptance Email
+                              </>
+                            )}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                        </>
+                      )}
                       <DropdownMenuItem
                         onClick={() => updateStatus(application.id, 'accepted')}
                         disabled={isUpdating}
@@ -489,6 +607,15 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
       <div className="text-sm text-gray-600 text-right">
         Showing {filteredApplications.length} of {applications.length} applications
       </div>
+
+      {/* Email Confirmation Dialog */}
+      <SendEmailDialog
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+        applicants={emailApplicants}
+        onSend={sendBulkAcceptanceEmails}
+        isResend={emailApplicants.length === 1 && emailSentMap.get(emailApplicants[0]?.id) === true}
+      />
     </div>
   )
 }
