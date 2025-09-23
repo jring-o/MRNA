@@ -86,7 +86,7 @@ function SignUpContent() {
     }
 
     // Sign up the user
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    const { error: authError } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
       options: {
