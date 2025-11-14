@@ -23,7 +23,7 @@ export const ApplicationReceivedEmail = ({
   applicationId = 'APP-2026-001',
   submittedAt = new Date().toLocaleDateString(),
 }: ApplicationReceivedEmailProps) => {
-  const previewText = `Your application to the Modular Research Attribution Workshop has been received`
+  const previewText = `Your application to MIRA has been received`
 
   return (
     <Html>
@@ -41,7 +41,7 @@ export const ApplicationReceivedEmail = ({
             </Text>
 
             <Text style={paragraph}>
-              Thank you for applying to the <strong>Modular Research Attribution Workshop</strong>.
+              Thank you for applying to <strong>MIRA, Modular Interoperable Research Attribution</strong>.
               We have successfully received your application and it is now under review.
             </Text>
 
@@ -68,8 +68,8 @@ export const ApplicationReceivedEmail = ({
               <ul style={list}>
                 <li><strong>Review Period:</strong> 2-3 weeks</li>
                 <li><strong>Notifications:</strong> By end of February 2026</li>
-                <li><strong>Workshop Dates:</strong> May 12-15, 2026</li>
-                <li><strong>Location:</strong> Columbia University, New York City</li>
+                <li><strong>Workshop Dates:</strong> June 7-11, 2026</li>
+                <li><strong>Location:</strong> The Deerstone Eco Hideaway, Ireland</li>
               </ul>
             </Section>
 
@@ -99,15 +99,15 @@ export const ApplicationReceivedEmail = ({
             <Text style={paragraph}>
               Best regards,
               <br />
-              <strong>The Modular Research Workshop Team</strong>
+              <strong>The MIRA Team</strong>
             </Text>
           </Section>
 
           <Section style={footer}>
             <Text style={footerText}>
-              Modular Research Attribution Workshop
+              MIRA - Modular Interoperable Research Attribution
               <br />
-              Spring 2026 • Columbia University
+              June 2026 • The Deerstone Eco Hideaway, Ireland
             </Text>
           </Section>
         </Container>

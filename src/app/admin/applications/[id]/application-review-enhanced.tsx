@@ -363,7 +363,7 @@ export function ApplicationReview({
                   </div>
                   <div>
                     <h3 className="font-semibold text-sm text-gray-700 mb-1">Workshop Days</h3>
-                    <p className="text-sm text-gray-600">Spring 2026 (4 days)</p>
+                    <p className="text-sm text-gray-600">June 7-11, 2026 (5 days)</p>
                   </div>
                 </div>
 

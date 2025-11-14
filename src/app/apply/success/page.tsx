@@ -22,7 +22,7 @@ function ApplicationSuccessContent() {
             </div>
             <CardTitle className="text-3xl">Application Submitted!</CardTitle>
             <CardDescription className="text-lg">
-              Thank you for applying to the Modular Research Attribution Workshop
+              Thank you for applying to MIRA, Modular Interoperable Research Attribution
             </CardDescription>
           </CardHeader>
 
@@ -95,7 +95,7 @@ function ApplicationSuccessContent() {
                   <ul className="text-sm text-gray-600 mt-2 space-y-1">
                     <li>• Application deadline: Fall 2025</li>
                     <li>• Decisions announced: 2-3 weeks after submission</li>
-                    <li>• Workshop dates: Spring 2026 (4 days)</li>
+                    <li>• Workshop dates: June 7-11, 2026 (5 days)</li>
                   </ul>
                 </div>
               </div>

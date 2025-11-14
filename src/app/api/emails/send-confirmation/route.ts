@@ -40,9 +40,9 @@ export async function POST(request: Request) {
 
     // Send confirmation email to applicant
     const { data: applicantData, error: applicantError } = await resend.emails.send({
-      from: 'Modular Research Workshop <onboarding@resend.dev>',
+      from: 'MIRA <onboarding@resend.dev>',
       to: [applicantEmail],
-      subject: 'Application Received - Modular Research Workshop',
+      subject: 'Application Received - MIRA',
       react: ApplicationReceivedEmail({
         applicantName,
         applicationId,

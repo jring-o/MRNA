@@ -34,15 +34,15 @@ export default function Home() {
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center space-y-2">
-              <div className="text-4xl font-bold text-workshop-primary">Spring 2026</div>
+              <div className="text-4xl font-bold text-workshop-primary">June 7-11, 2026</div>
               <div className="text-gray-600">Workshop Date</div>
             </div>
             <div className="text-center space-y-2">
-              <div className="text-4xl font-bold text-workshop-primary">18-22</div>
-              <div className="text-gray-600">Participants</div>
+              <div className="text-4xl font-bold text-workshop-primary">Ireland</div>
+              <div className="text-gray-600">The Deerstone Eco Hideaway</div>
             </div>
             <div className="text-center space-y-2">
-              <div className="text-4xl font-bold text-workshop-primary">4 Days</div>
+              <div className="text-4xl font-bold text-workshop-primary">5 Days</div>
               <div className="text-gray-600">Intensive Collaboration</div>
             </div>
           </div>
@@ -74,11 +74,11 @@ export default function Home() {
             </div>
             <div className="flex gap-4 items-start">
               <div className="flex-shrink-0 w-32 text-right font-semibold text-workshop-primary">
-                Spring 2026
+                June 7-11, 2026
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-lg mb-1">4-Day Intensive Workshop</h3>
-                <p className="text-gray-600">Design, prototype, and test shared frameworks</p>
+                <h3 className="font-semibold text-lg mb-1">5-Day Intensive Workshop</h3>
+                <p className="text-gray-600">Design, prototype, and test shared frameworks in Ireland</p>
               </div>
             </div>
             <div className="flex gap-4 items-start">

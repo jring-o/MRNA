@@ -205,10 +205,10 @@ export function ParticipantDashboard({
               <h2 className="text-2xl font-semibold text-gray-900">Welcome back, {userName}</h2>
               <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
                 <Calendar className="h-4 w-4 text-blue-600" />
-                <span className="font-medium">May 12-15, 2026</span>
+                <span className="font-medium">June 7-11, 2026</span>
                 <span className="text-gray-400">•</span>
                 <MapPin className="h-4 w-4 text-blue-600" />
-                <span className="font-medium">Columbia University, NYC</span>
+                <span className="font-medium">The Deerstone Eco Hideaway, Ireland</span>
               </div>
             </div>
           </div>
@@ -301,12 +301,12 @@ export function ParticipantDashboard({
                 Workshop Schedule
               </CardTitle>
               <CardDescription>
-                4-day intensive workshop program
+                5-day intensive workshop program
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {[1, 2, 3, 4].map((day) => (
+                {[1, 2, 3, 4, 5].map((day) => (
                   <div key={day}>
                     <h3 className="font-semibold text-lg mb-3 flex items-center">
                       <div className="h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mr-3">
@@ -375,9 +375,9 @@ export function ParticipantDashboard({
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="font-medium">Columbia University</p>
-                  <p className="text-sm text-gray-600">Schapiro Center for Engineering and Physical Science Research</p>
-                  <p className="text-sm text-gray-600">530 West 120th Street, New York, NY 10027</p>
+                  <p className="font-medium">The Deerstone Eco Hideaway</p>
+                  <p className="text-sm text-gray-600">Eco-friendly retreat venue</p>
+                  <p className="text-sm text-gray-600">Ireland</p>
                 </div>
                 <Button variant="outline" className="w-full">
                   <ExternalLink className="mr-2 h-4 w-4" />
@@ -399,26 +399,26 @@ export function ParticipantDashboard({
                   <div className="flex items-start space-x-2">
                     <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
                     <div className="text-sm">
-                      <strong>Airports:</strong> JFK, Newark (EWR), or LaGuardia (LGA)
+                      <strong>Airports:</strong> Dublin Airport (DUB), Cork Airport (ORK), or Shannon Airport (SNN)
                     </div>
                   </div>
                   <div className="flex items-start space-x-2">
                     <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
                     <div className="text-sm">
-                      <strong>Train:</strong> Penn Station (Amtrak) - 20 min to venue via subway
+                      <strong>Ground Transport:</strong> Details will be provided upon acceptance
                     </div>
                   </div>
                   <div className="flex items-start space-x-2">
                     <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
                     <div className="text-sm">
-                      <strong>Subway:</strong> 1 train to 116th Street - Columbia University
+                      <strong>Website:</strong> <a href="https://thedeerstone.ie/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">thedeerstone.ie</a>
                     </div>
                   </div>
                 </div>
                 <Alert>
                   <Info className="h-4 w-4" />
                   <AlertDescription className="text-sm">
-                    Travel stipends up to $500 are available for participants traveling from outside the NYC metro area.
+                    Travel stipends up to $500 are available for participants traveling internationally.
                   </AlertDescription>
                 </Alert>
               </CardContent>

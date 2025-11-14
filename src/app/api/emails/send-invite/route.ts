@@ -63,14 +63,14 @@ export async function POST(request: Request) {
 
     // Send email using React Email template
     const { data, error } = await resend.emails.send({
-      from: 'Modular Research Workshop <onboarding@resend.dev>',
+      from: 'MIRA <onboarding@resend.dev>',
       to: [applicantEmail],
-      subject: '🎉 You\'ve Been Accepted to the Modular Research Workshop!',
+      subject: '🎉 You\'ve Been Accepted to MIRA!',
       react: ApplicationAcceptedEmail({
         applicantName,
         inviteLink,
-        workshopDates: 'May 12-15, 2026',
-        workshopLocation: 'Columbia University, New York City',
+        workshopDates: 'June 7-11, 2026',
+        workshopLocation: 'The Deerstone Eco Hideaway, Ireland',
       }),
     })
 

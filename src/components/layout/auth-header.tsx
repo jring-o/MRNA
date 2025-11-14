@@ -19,7 +19,7 @@ export async function AuthHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="container mx-auto flex h-16 items-center px-4">
         <Link href="/" className="mr-8 font-bold text-xl text-workshop-primary">
-          Workshop 2026
+          MIRA 2026
         </Link>
 
         <nav className="flex gap-6 flex-1">

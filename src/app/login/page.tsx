@@ -47,10 +47,10 @@ export default function LoginPage() {
         <div className="relative z-10 flex flex-col justify-between text-white">
           <div>
             <h1 className="text-4xl font-bold mb-2">
-              Modular Research Attribution
+              MIRA
             </h1>
             <p className="text-blue-100 text-lg">
-              Spring 2026 Workshop
+              June 7-11, 2026 - Ireland
             </p>
           </div>
 
@@ -93,7 +93,7 @@ export default function LoginPage() {
           </div>
 
           <div className="text-sm text-blue-100">
-            © 2026 Modular Research Network Attribution
+            © 2026 MIRA - Modular Interoperable Research Attribution
           </div>
         </div>
       </div>

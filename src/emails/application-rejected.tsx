@@ -19,7 +19,7 @@ interface ApplicationRejectedEmailProps {
 export const ApplicationRejectedEmail = ({
   applicantName = 'Researcher',
 }: ApplicationRejectedEmailProps) => {
-  const previewText = `Update on your Modular Research Attribution Workshop application`
+  const previewText = `Update on your MIRA application`
 
   return (
     <Html>
@@ -28,7 +28,7 @@ export const ApplicationRejectedEmail = ({
       <Body style={main}>
         <Container style={container}>
           <Section style={header}>
-            <Heading style={h1}>Modular Research Attribution Workshop</Heading>
+            <Heading style={h1}>MIRA</Heading>
           </Section>
 
           <Section style={content}>
@@ -37,14 +37,14 @@ export const ApplicationRejectedEmail = ({
             </Text>
 
             <Text style={paragraph}>
-              Thank you for your interest in the Modular Research Attribution Workshop and for taking the time
+              Thank you for your interest in MIRA, Modular Interoperable Research Attribution, and for taking the time
               to submit your application. We were impressed by the quality and diversity of applications we received
               from researchers around the world.
             </Text>
 
             <Text style={paragraph}>
               After careful consideration by our selection committee, we regret to inform you that we are unable
-              to offer you a place in the Spring 2026 workshop. With only 20 spots available and hundreds of
+              to offer you a place in the June 2026 workshop. With only 20 spots available and hundreds of
               strong applications, the selection process was extremely competitive.
             </Text>
 
@@ -88,15 +88,15 @@ export const ApplicationRejectedEmail = ({
             <Text style={paragraph}>
               Best wishes for your continued research,
               <br />
-              <strong>The Modular Research Workshop Team</strong>
+              <strong>The MIRA Team</strong>
             </Text>
           </Section>
 
           <Section style={footer}>
             <Text style={footerText}>
-              Modular Research Attribution Workshop
+              MIRA - Modular Interoperable Research Attribution
               <br />
-              Spring 2026 • Columbia University
+              June 2026 • The Deerstone Eco Hideaway, Ireland
             </Text>
           </Section>
         </Container>

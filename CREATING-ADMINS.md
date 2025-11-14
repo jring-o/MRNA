@@ -35,7 +35,7 @@ Step 1: Create an invite token for yourself
     '{role}',
     '"admin"'
   )
-  WHERE email = 'jon@scios.tech';  -- CHANGE THIS: Use the same email from Step 1
+  WHERE email = 'akamatsm@uw.edu';  -- CHANGE THIS: Use the same email from Step 1
 
   Step 3: Log out and log back in
 --

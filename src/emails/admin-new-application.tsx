@@ -46,7 +46,7 @@ export const AdminNewApplicationEmail = ({
 
           <Section style={content}>
             <Text style={paragraph}>
-              A new application has been submitted for the Modular Research Attribution Workshop.
+              A new application has been submitted for MIRA, Modular Interoperable Research Attribution.
             </Text>
 
             <Section style={applicantBox}>
@@ -107,7 +107,7 @@ export const AdminNewApplicationEmail = ({
 
           <Section style={footer}>
             <Text style={footerText}>
-              Modular Research Workshop Admin
+              MIRA Admin
               <br />
               <Link href="https://mrna-nine.vercel.app/admin" style={footerLink}>
                 Go to Admin Dashboard

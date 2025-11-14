@@ -45,7 +45,7 @@ export default async function DashboardPage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                Modular Research Workshop
+                MIRA
               </h1>
             </div>
             <div className="flex items-center space-x-4">

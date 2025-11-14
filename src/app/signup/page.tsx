@@ -169,7 +169,7 @@ function SignUpContent() {
               Welcome to the Workshop!
             </h1>
             <p className="text-blue-100 text-lg mb-8">
-              You&apos;ve been accepted to the Modular Research Attribution Workshop
+              You&apos;ve been accepted to MIRA, Modular Interoperable Research Attribution
             </p>
           </div>
 
@@ -206,11 +206,11 @@ function SignUpContent() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-blue-200">Date</p>
-                  <p className="font-semibold">Spring 2026</p>
+                  <p className="font-semibold">June 7-11, 2026</p>
                 </div>
                 <div>
                   <p className="text-blue-200">Duration</p>
-                  <p className="font-semibold">4 Days</p>
+                  <p className="font-semibold">5 Days</p>
                 </div>
                 <div>
                   <p className="text-blue-200">Format</p>
@@ -360,7 +360,7 @@ function SignUpContent() {
 
                 <p className="text-xs text-center text-gray-500">
                   By creating an account, you confirm your participation in the
-                  Spring 2026 workshop and agree to collaborate respectfully.
+                  June 2026 workshop and agree to collaborate respectfully.
                 </p>
               </CardFooter>
             </form>

@@ -25,10 +25,10 @@ interface ApplicationAcceptedEmailProps {
 export const ApplicationAcceptedEmail = ({
   applicantName = 'Researcher',
   inviteLink = 'https://mrna-nine.vercel.app/signup',
-  workshopDates = 'May 12-15, 2026',
-  workshopLocation = 'Columbia University, New York City',
+  workshopDates = 'June 7-11, 2026',
+  workshopLocation = 'The Deerstone Eco Hideaway, Ireland',
 }: ApplicationAcceptedEmailProps) => {
-  const previewText = `Congratulations! You've been accepted to the Modular Research Attribution Workshop`
+  const previewText = `Congratulations! You've been accepted to MIRA - Modular Interoperable Research Attribution`
 
   return (
     <Html>
@@ -42,8 +42,8 @@ export const ApplicationAcceptedEmail = ({
 
           <Section style={content}>
             <Text style={paragraph}>
-              We are thrilled to inform you that you have been <strong>accepted</strong> to participate in the
-              Modular Research Attribution Workshop!
+              We are thrilled to inform you that you have been <strong>accepted</strong> to participate in
+              MIRA, Modular Interoperable Research Attribution!
             </Text>
 
             <Text style={paragraph}>
@@ -130,15 +130,15 @@ export const ApplicationAcceptedEmail = ({
             <Text style={paragraph}>
               Warm regards,
               <br />
-              <strong>The Modular Research Workshop Team</strong>
+              <strong>The MIRA Team</strong>
             </Text>
           </Section>
 
           <Section style={footer}>
             <Text style={footerText}>
-              Modular Research Attribution Workshop
+              MIRA - Modular Interoperable Research Attribution
               <br />
-              Spring 2026 • Columbia University
+              June 2026 • The Deerstone Eco Hideaway, Ireland
             </Text>
           </Section>
         </Container>
