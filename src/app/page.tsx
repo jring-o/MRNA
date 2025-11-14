@@ -32,14 +32,18 @@ export default function Home() {
       {/* Key Information */}
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center space-y-2">
-              <div className="text-4xl font-bold text-workshop-primary">June 7-11, 2026</div>
-              <div className="text-gray-600">Workshop Date</div>
+              <div className="text-4xl font-bold text-workshop-primary">June 7-11</div>
+              <div className="text-gray-600">2026</div>
             </div>
             <div className="text-center space-y-2">
               <div className="text-4xl font-bold text-workshop-primary">Ireland</div>
               <div className="text-gray-600">The Deerstone Eco Hideaway</div>
+            </div>
+            <div className="text-center space-y-2">
+              <div className="text-4xl font-bold text-workshop-primary">22</div>
+              <div className="text-gray-600">Participants</div>
             </div>
             <div className="text-center space-y-2">
               <div className="text-4xl font-bold text-workshop-primary">5 Days</div>
