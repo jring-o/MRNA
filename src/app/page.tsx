@@ -69,7 +69,25 @@ export default function Home() {
             </div>
             <div className="flex gap-4 items-start">
               <div className="flex-shrink-0 w-32 text-right font-semibold text-workshop-primary">
-                Early 2026
+                January 1, 2026
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg mb-1">Application Deadline</h3>
+                <p className="text-gray-600">Final day to submit your application</p>
+              </div>
+            </div>
+            <div className="flex gap-4 items-start">
+              <div className="flex-shrink-0 w-32 text-right font-semibold text-workshop-primary">
+                January 15, 2026
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg mb-1">Decisions Announced</h3>
+                <p className="text-gray-600">All applicants notified of their application status</p>
+              </div>
+            </div>
+            <div className="flex gap-4 items-start">
+              <div className="flex-shrink-0 w-32 text-right font-semibold text-workshop-primary">
+                Jan-June 2026
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-lg mb-1">Pre-Workshop Preparation</h3>

@@ -55,7 +55,7 @@ function ApplicationSuccessContent() {
                   <div className="ml-3">
                     <p className="text-sm font-medium text-gray-900">Application Review</p>
                     <p className="text-sm text-gray-600">
-                      Our team will carefully review your application over the next 2-3 weeks
+                      Our team will carefully review all applications after the January 1, 2026 deadline
                     </p>
                   </div>
                 </div>
@@ -67,7 +67,7 @@ function ApplicationSuccessContent() {
                   <div className="ml-3">
                     <p className="text-sm font-medium text-gray-900">Decision Notification</p>
                     <p className="text-sm text-gray-600">
-                      You&apos;ll receive an email with our decision and next steps
+                      All applicants will be notified on <strong>January 15, 2026</strong> via email
                     </p>
                   </div>
                 </div>
@@ -93,9 +93,9 @@ function ApplicationSuccessContent() {
                 <div className="ml-3">
                   <h3 className="text-sm font-semibold text-gray-900">Important Dates</h3>
                   <ul className="text-sm text-gray-600 mt-2 space-y-1">
-                    <li>• Application deadline: Fall 2025</li>
-                    <li>• Decisions announced: 2-3 weeks after submission</li>
-                    <li>• Workshop dates: June 7-11, 2026 (5 days)</li>
+                    <li>• <strong>Application deadline:</strong> January 1, 2026</li>
+                    <li>• <strong>Decisions announced:</strong> January 15, 2026</li>
+                    <li>• <strong>Workshop dates:</strong> June 7-11, 2026 (5 days)</li>
                   </ul>
                 </div>
               </div>

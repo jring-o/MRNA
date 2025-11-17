@@ -966,9 +966,9 @@ export default function ApplyPage() {
                   <div className="rounded-lg bg-gray-50 p-4">
                     <h3 className="text-sm font-medium text-gray-900 mb-2">Before you submit:</h3>
                     <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Applications are reviewed on a rolling basis</li>
+                      <li>• <strong>Application deadline:</strong> January 1, 2026</li>
                       <li>• You&apos;ll receive a confirmation email after submission</li>
-                      <li>• Decisions will be communicated within 2-3 weeks</li>
+                      <li>• <strong>Decisions announced:</strong> January 15, 2026</li>
                       <li>• You can check your status anytime using your email</li>
                     </ul>
                   </div>
