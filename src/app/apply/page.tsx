@@ -10,9 +10,11 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
-import { useForm } from 'react-hook-form'
+import { Checkbox } from '@/components/ui/checkbox'
+import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
+import type { Classification } from '@/types/database'
 import {
   ArrowLeft,
   ArrowRight,
@@ -24,20 +26,14 @@ import {
   Info,
   AlertCircle,
   Building,
-  Link as LinkIcon
+  Plus,
+  Trash2
 } from 'lucide-react'
 
 // Custom word count validator function
-const wordCount = (min: number, max: number, minMessage: string, maxMessage: string) => {
-  return z.string().superRefine((val, ctx) => {
+const wordCount = (max: number, maxMessage: string) => {
+  return z.string().min(1, 'This field is required').superRefine((val, ctx) => {
     const words = val?.trim().split(/\s+/).filter(word => word.length > 0).length || 0
-
-    if (words < min && min > 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: minMessage,
-      })
-    }
 
     if (words > max) {
       ctx.addIssue({
@@ -48,46 +44,81 @@ const wordCount = (min: number, max: number, minMessage: string, maxMessage: str
   })
 }
 
-// Form validation schema
-const applicationSchema = z.object({
-  // Personal Information
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  organization: z.string().min(2, 'Organization is required'),
-  role: z.string().min(2, 'Role/Title is required'),
+// Form validation schema - dynamic based on classifications
+const createApplicationSchema = (classifications: string[]) => {
+  const baseSchema = {
+    // Page 1: Personal Information & Classifications
+    name: z.string().min(2, 'Name must be at least 2 characters'),
+    email: z.string().email('Invalid email address'),
+    organization: z.string().min(2, 'Organization is required'),
+    role: z.string().min(2, 'Role/Title is required'),
+    classifications: z.array(z.string()).min(1, 'Select at least one classification'),
+    classification_other: z.string().optional(),
 
-  // Application Content - Now with proper word count validation
-  reason_for_applying: wordCount(
-    50, 500,
-    'Please provide at least 50 words',
-    'Maximum 500 words allowed'
-  ),
-  requirements_for_protocol: wordCount(
-    30, 300,
-    'Please provide at least 30 words',
-    'Maximum 300 words allowed'
-  ),
-  relevant_experience: wordCount(
-    0, 300,
-    '',
-    'Maximum 300 words allowed'
-  ).optional().or(z.literal('')),
-  links: z.array(z.string().url().or(z.literal(''))).max(3).optional(),
+    // Page 2: Universal Questions (all applicants)
+    importance_of_schema: wordCount(200, 'Maximum 200 words allowed'),
+    excited_projects: wordCount(200, 'Maximum 200 words allowed'),
+    work_links: z.array(z.object({
+      url: z.string().url('Invalid URL format').or(z.literal('')),
+      role: z.string().min(1, 'Role description is required'),
+    })).min(1, 'At least one link is required').max(5, 'Maximum 5 links allowed'),
+    workshop_contribution: wordCount(200, 'Maximum 200 words allowed'),
+    research_elements: wordCount(200, 'Maximum 200 words allowed'),
 
-  // Logistics
-  availability_confirmed: z.boolean().refine(val => val === true, {
-    message: 'You must confirm availability'
-  }),
-  travel_requirements: z.string().optional(),
-  dietary_restrictions: z.string().optional(),
-})
+    // Page 3: Logistics
+    availability_confirmed: z.boolean().refine(val => val === true, {
+      message: 'You must confirm availability'
+    }),
+    travel_requirements: z.string().optional(),
+    dietary_restrictions: z.string().optional(),
+  }
 
-type ApplicationFormData = z.infer<typeof applicationSchema>
+  // Conditionally add role-specific fields
+  const roleSpecificFields: any = {}
+
+  if (classifications.includes('researcher')) {
+    roleSpecificFields.researcher_use_case = wordCount(200, 'Maximum 200 words allowed')
+    roleSpecificFields.researcher_future_impact = wordCount(200, 'Maximum 200 words allowed')
+  }
+
+  if (classifications.includes('designer')) {
+    roleSpecificFields.designer_ux_considerations = wordCount(200, 'Maximum 200 words allowed')
+  }
+
+  if (classifications.includes('engineer')) {
+    roleSpecificFields.engineer_working_on = wordCount(200, 'Maximum 200 words allowed')
+    roleSpecificFields.engineer_schema_considerations = wordCount(200, 'Maximum 200 words allowed')
+  }
+
+  if (classifications.includes('conceptionalist')) {
+    roleSpecificFields.conceptionalist_unlock = wordCount(200, 'Maximum 200 words allowed')
+    roleSpecificFields.conceptionalist_enable = wordCount(200, 'Maximum 200 words allowed')
+  }
+
+  // Check if 'other' selected and require classification_other
+  if (classifications.includes('other')) {
+    baseSchema.classification_other = z.string()
+      .min(1, 'Please specify your classification')
+      .max(15, 'Maximum 15 characters allowed')
+  }
+
+  return z.object({ ...baseSchema, ...roleSpecificFields })
+}
+
+type ApplicationFormData = z.infer<ReturnType<typeof createApplicationSchema>>
 
 const steps = [
-  { id: 1, name: 'Personal Info', icon: User },
-  { id: 2, name: 'Application', icon: FileText },
+  { id: 1, name: 'Personal Info & Classification', icon: User },
+  { id: 2, name: 'Application Questions', icon: FileText },
   { id: 3, name: 'Logistics', icon: Calendar },
+]
+
+const classificationOptions: { value: Classification; label: string }[] = [
+  { value: 'researcher', label: 'Researcher' },
+  { value: 'engineer', label: 'Engineer' },
+  { value: 'designer', label: 'Designer' },
+  { value: 'conceptionalist', label: 'Conceptionalist' },
+  { value: 'other', label: 'Other' },
 ]
 
 export default function ApplyPage() {
@@ -95,29 +126,51 @@ export default function ApplyPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [wordCounts, setWordCounts] = useState({
-    reason_for_applying: 0,
-    requirements_for_protocol: 0,
-    relevant_experience: 0,
-  })
+  const [selectedClassifications, setSelectedClassifications] = useState<string[]>([])
+  const [wordCounts, setWordCounts] = useState<Record<string, number>>({})
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     trigger,
+    watch,
+    control,
+    setValue,
   } = useForm<ApplicationFormData>({
-    resolver: zodResolver(applicationSchema),
+    resolver: zodResolver(createApplicationSchema(selectedClassifications)),
     mode: 'onChange',
     defaultValues: {
-      links: ['', '', ''],
+      classifications: [],
+      work_links: [{ url: '', role: '' }],
       availability_confirmed: false,
     }
   })
 
-  const updateWordCount = (field: keyof typeof wordCounts, value: string) => {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'work_links',
+  })
+
+  const watchClassifications = watch('classifications')
+
+  const updateWordCount = (field: string, value: string) => {
     const words = value?.trim().split(/\s+/).filter(word => word.length > 0).length || 0
     setWordCounts(prev => ({ ...prev, [field]: words }))
+  }
+
+  const handleClassificationChange = (classification: string, checked: boolean) => {
+    const current = watchClassifications || []
+    let updated: string[]
+
+    if (checked) {
+      updated = [...current, classification]
+    } else {
+      updated = current.filter(c => c !== classification)
+    }
+
+    setValue('classifications', updated)
+    setSelectedClassifications(updated)
   }
 
   const nextStep = async () => {
@@ -125,9 +178,33 @@ export default function ApplyPage() {
     let fieldsToValidate: (keyof ApplicationFormData)[] = []
 
     if (currentStep === 1) {
-      fieldsToValidate = ['name', 'email', 'organization', 'role']
+      fieldsToValidate = ['name', 'email', 'organization', 'role', 'classifications']
+      if (selectedClassifications.includes('other')) {
+        fieldsToValidate.push('classification_other')
+      }
     } else if (currentStep === 2) {
-      fieldsToValidate = ['reason_for_applying', 'requirements_for_protocol']
+      // Validate universal questions
+      fieldsToValidate = [
+        'importance_of_schema',
+        'excited_projects',
+        'work_links',
+        'workshop_contribution',
+        'research_elements',
+      ]
+
+      // Validate role-specific questions based on classifications
+      if (selectedClassifications.includes('researcher')) {
+        fieldsToValidate.push('researcher_use_case', 'researcher_future_impact')
+      }
+      if (selectedClassifications.includes('designer')) {
+        fieldsToValidate.push('designer_ux_considerations')
+      }
+      if (selectedClassifications.includes('engineer')) {
+        fieldsToValidate.push('engineer_working_on', 'engineer_schema_considerations')
+      }
+      if (selectedClassifications.includes('conceptionalist')) {
+        fieldsToValidate.push('conceptionalist_unlock', 'conceptionalist_enable')
+      }
     }
 
     const isValid = await trigger(fieldsToValidate)
@@ -160,22 +237,42 @@ export default function ApplyPage() {
         return
       }
 
-      // Submit application directly (no account required)
-      const applicationData = {
-        // Include email, name, org directly in application
+      // Filter out empty work links
+      const validWorkLinks = data.work_links.filter(link => link.url && link.role)
+
+      // Submit application
+      const applicationData: any = {
+        // Personal info
         email: data.email,
         name: data.name,
         organization: data.organization,
         role: data.role,
-        reason_for_applying: data.reason_for_applying,
-        requirements_for_protocol: data.requirements_for_protocol,
-        relevant_experience: data.relevant_experience || null,
-        // Store additional data in admin_notes temporarily
+
+        // Classifications
+        classifications: data.classifications,
+        classification_other: data.classification_other || null,
+
+        // Universal questions
+        importance_of_schema: data.importance_of_schema,
+        excited_projects: data.excited_projects,
+        work_links: validWorkLinks,
+        workshop_contribution: data.workshop_contribution,
+        research_elements: data.research_elements,
+
+        // Role-specific questions (conditionally included)
+        researcher_use_case: data.classifications.includes('researcher') ? data.researcher_use_case : null,
+        researcher_future_impact: data.classifications.includes('researcher') ? data.researcher_future_impact : null,
+        designer_ux_considerations: data.classifications.includes('designer') ? data.designer_ux_considerations : null,
+        engineer_working_on: data.classifications.includes('engineer') ? data.engineer_working_on : null,
+        engineer_schema_considerations: data.classifications.includes('engineer') ? data.engineer_schema_considerations : null,
+        conceptionalist_unlock: data.classifications.includes('conceptionalist') ? data.conceptionalist_unlock : null,
+        conceptionalist_enable: data.classifications.includes('conceptionalist') ? data.conceptionalist_enable : null,
+
+        // Logistics stored in admin_notes for now
         admin_notes: [
-          `Links: ${data.links?.filter(l => l).join(', ') || 'None'}`,
+          `Availability Confirmed: ${data.availability_confirmed ? 'Yes' : 'No'}`,
           `Travel Requirements: ${data.travel_requirements || 'None'}`,
           `Dietary Restrictions: ${data.dietary_restrictions || 'None'}`,
-          `Availability Confirmed: ${data.availability_confirmed ? 'Yes' : 'No'}`
         ],
       }
 
@@ -288,13 +385,13 @@ export default function ApplyPage() {
           <Card className="shadow-xl">
             <CardHeader>
               <CardTitle>
-                {currentStep === 1 && 'Personal Information'}
-                {currentStep === 2 && 'Application Details'}
+                {currentStep === 1 && 'Personal Information & Classification'}
+                {currentStep === 2 && 'Application Questions'}
                 {currentStep === 3 && 'Logistics & Confirmation'}
               </CardTitle>
               <CardDescription>
-                {currentStep === 1 && 'Tell us about yourself and your current role'}
-                {currentStep === 2 && 'Share your motivation and relevant experience'}
+                {currentStep === 1 && 'Tell us about yourself and how you classify your work'}
+                {currentStep === 2 && 'Share your perspectives and motivations'}
                 {currentStep === 3 && 'Confirm availability and provide logistics information'}
               </CardDescription>
             </CardHeader>
@@ -307,154 +404,487 @@ export default function ApplyPage() {
                 </Alert>
               )}
 
-              {/* Step 1: Personal Information */}
+              {/* Step 1: Personal Information & Classifications */}
               {currentStep === 1 && (
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Full Name *</Label>
-                    <Input
-                      id="name"
-                      {...register('name')}
-                      placeholder="Jane Smith"
-                      className={errors.name ? 'border-red-500' : ''}
-                    />
-                    {errors.name && (
-                      <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="email">Email Address *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      {...register('email')}
-                      placeholder="jane@university.edu"
-                      className={errors.email ? 'border-red-500' : ''}
-                    />
-                    {errors.email && (
-                      <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="organization">Organization/Institution *</Label>
-                    <div className="relative">
-                      <Building className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <div className="space-y-6">
+                  {/* Personal Info */}
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="name">Full Name *</Label>
                       <Input
-                        id="organization"
-                        {...register('organization')}
-                        placeholder="MIT Media Lab"
-                        className={`pl-10 ${errors.organization ? 'border-red-500' : ''}`}
+                        id="name"
+                        {...register('name')}
+                        placeholder="Jane Smith"
+                        className={errors.name ? 'border-red-500' : ''}
                       />
+                      {errors.name && (
+                        <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
+                      )}
                     </div>
-                    {errors.organization && (
-                      <p className="text-sm text-red-500 mt-1">{errors.organization.message}</p>
-                    )}
+
+                    <div>
+                      <Label htmlFor="email">Email Address *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        {...register('email')}
+                        placeholder="jane@university.edu"
+                        className={errors.email ? 'border-red-500' : ''}
+                      />
+                      {errors.email && (
+                        <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <Label htmlFor="organization">Organization/Institution *</Label>
+                      <div className="relative">
+                        <Building className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input
+                          id="organization"
+                          {...register('organization')}
+                          placeholder="MIT Media Lab"
+                          className={`pl-10 ${errors.organization ? 'border-red-500' : ''}`}
+                        />
+                      </div>
+                      {errors.organization && (
+                        <p className="text-sm text-red-500 mt-1">{errors.organization.message}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <Label htmlFor="role">Current Role/Title *</Label>
+                      <Input
+                        id="role"
+                        {...register('role')}
+                        placeholder="Research Scientist"
+                        className={errors.role ? 'border-red-500' : ''}
+                      />
+                      {errors.role && (
+                        <p className="text-sm text-red-500 mt-1">{errors.role.message}</p>
+                      )}
+                    </div>
                   </div>
 
+                  <Separator />
+
+                  {/* Classifications */}
                   <div>
-                    <Label htmlFor="role">Current Role/Title *</Label>
-                    <Input
-                      id="role"
-                      {...register('role')}
-                      placeholder="Research Scientist"
-                      className={errors.role ? 'border-red-500' : ''}
-                    />
-                    {errors.role && (
-                      <p className="text-sm text-red-500 mt-1">{errors.role.message}</p>
+                    <Label className="text-base">How would you classify yourself? *</Label>
+                    <p className="text-sm text-gray-500 mb-4">Select one or more that apply</p>
+
+                    <div className="space-y-3">
+                      {classificationOptions.map((option) => (
+                        <div key={option.value} className="flex items-start space-x-3">
+                          <Checkbox
+                            id={option.value}
+                            checked={watchClassifications?.includes(option.value)}
+                            onCheckedChange={(checked) =>
+                              handleClassificationChange(option.value, checked as boolean)
+                            }
+                            className="mt-1"
+                          />
+                          <div className="flex-1">
+                            <Label
+                              htmlFor={option.value}
+                              className="text-sm font-normal cursor-pointer"
+                            >
+                              {option.label}
+                            </Label>
+
+                            {/* Show text input for "Other" */}
+                            {option.value === 'other' && watchClassifications?.includes('other') && (
+                              <Input
+                                {...register('classification_other')}
+                                placeholder="Specify your classification (max 15 characters)"
+                                className={`mt-2 ${errors.classification_other ? 'border-red-500' : ''}`}
+                                maxLength={15}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {errors.classifications && (
+                      <p className="text-sm text-red-500 mt-2">{errors.classifications.message}</p>
+                    )}
+                    {errors.classification_other && (
+                      <p className="text-sm text-red-500 mt-2">{errors.classification_other.message}</p>
                     )}
                   </div>
                 </div>
               )}
 
-              {/* Step 2: Application Content */}
+              {/* Step 2: Application Questions */}
               {currentStep === 2 && (
-                <div className="space-y-6">
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <Label htmlFor="reason_for_applying">Why do you want to participate? *</Label>
-                      <span className="text-xs text-gray-500">
-                        {wordCounts.reason_for_applying}/500 words
-                      </span>
+                <div className="space-y-8">
+                  {/* Universal Questions Section */}
+                  <div className="space-y-6">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <h3 className="font-semibold text-blue-900 mb-1">Questions for All Applicants</h3>
+                      <p className="text-sm text-blue-700">Everyone answers these questions</p>
                     </div>
-                    <textarea
-                      id="reason_for_applying"
-                      {...register('reason_for_applying', {
-                        onChange: (e) => updateWordCount('reason_for_applying', e.target.value)
-                      })}
-                      className={`w-full min-h-[150px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                        errors.reason_for_applying ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="Describe your motivation for participating in this workshop and how it aligns with your research goals..."
-                    />
-                    {errors.reason_for_applying && (
-                      <p className="text-sm text-red-500 mt-1">{errors.reason_for_applying.message}</p>
-                    )}
+
+                    {/* Question 1 */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <Label htmlFor="importance_of_schema">
+                          Why is an interoperable Research attribution Schema important to you? *
+                        </Label>
+                        <span className="text-xs text-gray-500">
+                          {wordCounts.importance_of_schema || 0}/200 words
+                        </span>
+                      </div>
+                      <textarea
+                        id="importance_of_schema"
+                        {...register('importance_of_schema', {
+                          onChange: (e) => updateWordCount('importance_of_schema', e.target.value)
+                        })}
+                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          errors.importance_of_schema ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Share why this matters to you..."
+                      />
+                      {errors.importance_of_schema && (
+                        <p className="text-sm text-red-500 mt-1">{errors.importance_of_schema.message}</p>
+                      )}
+                    </div>
+
+                    {/* Question 2 */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <Label htmlFor="excited_projects">
+                          What other science, science infrastructure, open science, modular research, etc. projects are you excited about? *
+                        </Label>
+                        <span className="text-xs text-gray-500">
+                          {wordCounts.excited_projects || 0}/200 words
+                        </span>
+                      </div>
+                      <textarea
+                        id="excited_projects"
+                        {...register('excited_projects', {
+                          onChange: (e) => updateWordCount('excited_projects', e.target.value)
+                        })}
+                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          errors.excited_projects ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Tell us about projects that inspire you..."
+                      />
+                      {errors.excited_projects && (
+                        <p className="text-sm text-red-500 mt-1">{errors.excited_projects.message}</p>
+                      )}
+                    </div>
+
+                    {/* Question 3: Work Links */}
+                    <div>
+                      <Label>Links to what you&apos;re working on *</Label>
+                      <p className="text-sm text-gray-500 mb-3">Add 1-5 links with a description of your role</p>
+                      <div className="space-y-3">
+                        {fields.map((field, index) => (
+                          <div key={field.id} className="flex gap-2 items-start">
+                            <div className="flex-1 space-y-2">
+                              <Input
+                                {...register(`work_links.${index}.url` as const)}
+                                placeholder="https://example.com/your-project"
+                                className={errors.work_links?.[index]?.url ? 'border-red-500' : ''}
+                              />
+                              <Input
+                                {...register(`work_links.${index}.role` as const)}
+                                placeholder="Your role (e.g., Lead Developer, PI, Designer)"
+                                className={errors.work_links?.[index]?.role ? 'border-red-500' : ''}
+                              />
+                            </div>
+                            {fields.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                onClick={() => remove(index)}
+                                className="mt-0"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                        {fields.length < 5 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => append({ url: '', role: '' })}
+                            className="w-full"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add another link
+                          </Button>
+                        )}
+                      </div>
+                      {errors.work_links && (
+                        <p className="text-sm text-red-500 mt-1">
+                          {typeof errors.work_links.message === 'string'
+                            ? errors.work_links.message
+                            : 'Please provide valid links and role descriptions'}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Question 4 */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <Label htmlFor="workshop_contribution">
+                          What would you add to this workshop if you came (specific experience, perspective, etc)? *
+                        </Label>
+                        <span className="text-xs text-gray-500">
+                          {wordCounts.workshop_contribution || 0}/200 words
+                        </span>
+                      </div>
+                      <textarea
+                        id="workshop_contribution"
+                        {...register('workshop_contribution', {
+                          onChange: (e) => updateWordCount('workshop_contribution', e.target.value)
+                        })}
+                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          errors.workshop_contribution ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="What unique perspective or skills would you bring..."
+                      />
+                      {errors.workshop_contribution && (
+                        <p className="text-sm text-red-500 mt-1">{errors.workshop_contribution.message}</p>
+                      )}
+                    </div>
+
+                    {/* Question 5 */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <Label htmlFor="research_elements">
+                          What elements or outputs of the research process would you define? For example: A Claim, a dataset, etc. *
+                        </Label>
+                        <span className="text-xs text-gray-500">
+                          {wordCounts.research_elements || 0}/200 words
+                        </span>
+                      </div>
+                      <textarea
+                        id="research_elements"
+                        {...register('research_elements', {
+                          onChange: (e) => updateWordCount('research_elements', e.target.value)
+                        })}
+                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          errors.research_elements ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Define the key elements you'd want to track..."
+                      />
+                      {errors.research_elements && (
+                        <p className="text-sm text-red-500 mt-1">{errors.research_elements.message}</p>
+                      )}
+                    </div>
                   </div>
 
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <Label htmlFor="requirements_for_protocol">
-                        What requirements would you have for an attribution protocol? *
-                      </Label>
-                      <span className="text-xs text-gray-500">
-                        {wordCounts.requirements_for_protocol}/300 words
-                      </span>
-                    </div>
-                    <textarea
-                      id="requirements_for_protocol"
-                      {...register('requirements_for_protocol', {
-                        onChange: (e) => updateWordCount('requirements_for_protocol', e.target.value)
-                      })}
-                      className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                        errors.requirements_for_protocol ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="Describe specific features or capabilities you would need in a research attribution system..."
-                    />
-                    {errors.requirements_for_protocol && (
-                      <p className="text-sm text-red-500 mt-1">{errors.requirements_for_protocol.message}</p>
-                    )}
-                  </div>
+                  {/* Role-Specific Questions */}
+                  {selectedClassifications.includes('researcher') && (
+                    <div className="space-y-6">
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-blue-900 mb-1">Questions for Researchers</h3>
+                        <p className="text-sm text-blue-700">Because you selected Researcher</p>
+                      </div>
 
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <Label htmlFor="relevant_experience">
-                        Relevant Experience (Optional)
-                      </Label>
-                      <span className="text-xs text-gray-500">
-                        {wordCounts.relevant_experience}/300 words
-                      </span>
-                    </div>
-                    <textarea
-                      id="relevant_experience"
-                      {...register('relevant_experience', {
-                        onChange: (e) => updateWordCount('relevant_experience', e.target.value)
-                      })}
-                      className="w-full min-h-[120px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Share any relevant experience with attribution systems, collaborative research, or protocol design..."
-                    />
-                    {errors.relevant_experience && (
-                      <p className="text-sm text-red-500 mt-1">{errors.relevant_experience.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <Label>Links to Previous Work (Optional)</Label>
-                    <p className="text-sm text-gray-500 mb-2">Add up to 3 URLs to relevant publications or projects</p>
-                    <div className="space-y-2">
-                      {[0, 1, 2].map((index) => (
-                        <div key={index} className="relative">
-                          <LinkIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                          <Input
-                            {...register(`links.${index}` as const)}
-                            placeholder="https://example.com/your-work"
-                            className="pl-10"
-                          />
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <Label htmlFor="researcher_use_case">
+                            What is your immediate use-case for modular research sharing and/or attribution? *
+                          </Label>
+                          <span className="text-xs text-gray-500">
+                            {wordCounts.researcher_use_case || 0}/200 words
+                          </span>
                         </div>
-                      ))}
+                        <textarea
+                          id="researcher_use_case"
+                          {...register('researcher_use_case', {
+                            onChange: (e) => updateWordCount('researcher_use_case', e.target.value)
+                          })}
+                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            errors.researcher_use_case ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="Describe your current use case..."
+                        />
+                        {errors.researcher_use_case && (
+                          <p className="text-sm text-red-500 mt-1">{errors.researcher_use_case.message}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <Label htmlFor="researcher_future_impact">
+                            What impact might more granular research sharing and attribution have for you or your collaborations in the future? *
+                          </Label>
+                          <span className="text-xs text-gray-500">
+                            {wordCounts.researcher_future_impact || 0}/200 words
+                          </span>
+                        </div>
+                        <textarea
+                          id="researcher_future_impact"
+                          {...register('researcher_future_impact', {
+                            onChange: (e) => updateWordCount('researcher_future_impact', e.target.value)
+                          })}
+                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            errors.researcher_future_impact ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="Describe the potential future impact..."
+                        />
+                        {errors.researcher_future_impact && (
+                          <p className="text-sm text-red-500 mt-1">{errors.researcher_future_impact.message}</p>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {selectedClassifications.includes('designer') && (
+                    <div className="space-y-6">
+                      <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-pink-900 mb-1">Questions for Designers</h3>
+                        <p className="text-sm text-pink-700">Because you selected Designer</p>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <Label htmlFor="designer_ux_considerations">
+                            What are the most important considerations when doing UX/design for researchers and pulling/publishing data across multiple platforms with differing schemas? *
+                          </Label>
+                          <span className="text-xs text-gray-500">
+                            {wordCounts.designer_ux_considerations || 0}/200 words
+                          </span>
+                        </div>
+                        <textarea
+                          id="designer_ux_considerations"
+                          {...register('designer_ux_considerations', {
+                            onChange: (e) => updateWordCount('designer_ux_considerations', e.target.value)
+                          })}
+                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            errors.designer_ux_considerations ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="Share your design perspectives..."
+                        />
+                        {errors.designer_ux_considerations && (
+                          <p className="text-sm text-red-500 mt-1">{errors.designer_ux_considerations.message}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedClassifications.includes('engineer') && (
+                    <div className="space-y-6">
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-purple-900 mb-1">Questions for Engineers</h3>
+                        <p className="text-sm text-purple-700">Because you selected Engineer</p>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <Label htmlFor="engineer_working_on">
+                            What are you working on that would use an interoperable research attribution schema - How? *
+                          </Label>
+                          <span className="text-xs text-gray-500">
+                            {wordCounts.engineer_working_on || 0}/200 words
+                          </span>
+                        </div>
+                        <textarea
+                          id="engineer_working_on"
+                          {...register('engineer_working_on', {
+                            onChange: (e) => updateWordCount('engineer_working_on', e.target.value)
+                          })}
+                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            errors.engineer_working_on ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="Describe your engineering work..."
+                        />
+                        {errors.engineer_working_on && (
+                          <p className="text-sm text-red-500 mt-1">{errors.engineer_working_on.message}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <Label htmlFor="engineer_schema_considerations">
+                            What are the most important considerations when designing and implementing a shared schema or crosswalks across multiple platforms/tools? *
+                          </Label>
+                          <span className="text-xs text-gray-500">
+                            {wordCounts.engineer_schema_considerations || 0}/200 words
+                          </span>
+                        </div>
+                        <textarea
+                          id="engineer_schema_considerations"
+                          {...register('engineer_schema_considerations', {
+                            onChange: (e) => updateWordCount('engineer_schema_considerations', e.target.value)
+                          })}
+                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            errors.engineer_schema_considerations ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="Share your technical perspectives..."
+                        />
+                        {errors.engineer_schema_considerations && (
+                          <p className="text-sm text-red-500 mt-1">{errors.engineer_schema_considerations.message}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedClassifications.includes('conceptionalist') && (
+                    <div className="space-y-6">
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-amber-900 mb-1">Questions for Conceptionalists</h3>
+                        <p className="text-sm text-amber-700">Because you selected Conceptionalist</p>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <Label htmlFor="conceptionalist_unlock">
+                            What would an interoperable attribution schema unlock for one of your existing projects? *
+                          </Label>
+                          <span className="text-xs text-gray-500">
+                            {wordCounts.conceptionalist_unlock || 0}/200 words
+                          </span>
+                        </div>
+                        <textarea
+                          id="conceptionalist_unlock"
+                          {...register('conceptionalist_unlock', {
+                            onChange: (e) => updateWordCount('conceptionalist_unlock', e.target.value)
+                          })}
+                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            errors.conceptionalist_unlock ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="Describe what would be unlocked..."
+                        />
+                        {errors.conceptionalist_unlock && (
+                          <p className="text-sm text-red-500 mt-1">{errors.conceptionalist_unlock.message}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <Label htmlFor="conceptionalist_enable">
+                            What new projects might an interoperable attribution schema enable, broadly speaking? *
+                          </Label>
+                          <span className="text-xs text-gray-500">
+                            {wordCounts.conceptionalist_enable || 0}/200 words
+                          </span>
+                        </div>
+                        <textarea
+                          id="conceptionalist_enable"
+                          {...register('conceptionalist_enable', {
+                            onChange: (e) => updateWordCount('conceptionalist_enable', e.target.value)
+                          })}
+                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            errors.conceptionalist_enable ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="Describe potential new projects..."
+                        />
+                        {errors.conceptionalist_enable && (
+                          <p className="text-sm text-red-500 mt-1">{errors.conceptionalist_enable.message}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -572,7 +1002,7 @@ export default function ApplyPage() {
 
         {/* Footer Links */}
         <div className="mt-8 text-center text-sm text-gray-600">
-          <Link href="/login" className="text-blue-600 hover:text-blue-500">
+          <Link href="/status" className="text-blue-600 hover:text-blue-500">
             Already applied? Check your status
           </Link>
           {' • '}

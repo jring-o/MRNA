@@ -13,7 +13,8 @@ import { toast } from 'sonner'
 import { VotingPanel } from '@/components/admin/voting-panel'
 import { CommentsPanel } from '@/components/admin/comments-panel'
 import { InviteTokenGenerator } from '@/components/admin/invite-token-generator'
-import type { ApplicationWithVoting } from '@/types/database'
+import type { ApplicationWithVoting, WorkLink } from '@/types/database'
+import { parseWorkLinks, getClassificationDisplayName, getClassificationBadgeClass } from '@/types/database'
 import {
   ArrowLeft,
   Clock,
@@ -28,6 +29,7 @@ import {
   Download,
   Users,
   Vote,
+  Layers,
 } from 'lucide-react'
 
 // Extended Application type that includes voting fields and relations
@@ -118,14 +120,38 @@ export function ApplicationReview({
     URL.revokeObjectURL(url)
   }
 
-  // Parse admin notes from the admin_notes array (if any legacy data exists)
-  const parsedLinks = application.admin_notes?.find(note => note.startsWith('Links:'))?.replace('Links: ', '').split(', ').filter(l => l !== 'None') || []
+  // Parse work links from JSONB
+  const workLinks = parseWorkLinks(application.work_links)
+
+  // Parse admin notes for logistics data
   const travelReqs = application.admin_notes?.find(note => note.startsWith('Travel Requirements:'))?.replace('Travel Requirements: ', '') || 'None'
   const dietaryReqs = application.admin_notes?.find(note => note.startsWith('Dietary Restrictions:'))?.replace('Dietary Restrictions: ', '') || 'None'
   const availability = application.admin_notes?.find(note => note.startsWith('Availability Confirmed:'))?.includes('Yes') || false
 
   // Check if voting is enabled (we have voting data)
   const hasVotingData = application.total_votes !== undefined && application.total_votes !== null
+
+  // Helper to display classifications
+  const getClassificationBadges = (classifications: string[], classificationOther: string | null) => {
+    if (!classifications || classifications.length === 0) return null
+
+    return (
+      <div className="flex flex-wrap gap-2">
+        {classifications.map((classification) => (
+          <Badge
+            key={classification}
+            variant="outline"
+            className={getClassificationBadgeClass(classification)}
+          >
+            <Layers className="mr-1 h-3 w-3" />
+            {classification === 'other' && classificationOther
+              ? classificationOther
+              : getClassificationDisplayName(classification)}
+          </Badge>
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -246,87 +272,277 @@ export function ApplicationReview({
           </TabsList>
 
           <TabsContent value="application" className="space-y-4">
+            {/* Classifications Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Layers className="mr-2 h-5 w-5" />
+                  Classifications
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {getClassificationBadges(application.classifications || [], application.classification_other || null)}
+              </CardContent>
+            </Card>
+
+            {/* Universal Questions */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <FileText className="mr-2 h-5 w-5" />
-                  Application Responses
+                  Universal Questions
                 </CardTitle>
+                <CardDescription>Questions answered by all applicants</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
                   <h3 className="font-semibold mb-2 text-gray-700">
-                    Why do you want to participate?
+                    Why is an interoperable Research attribution Schema important to you?
                   </h3>
                   <div className="prose prose-sm max-w-none">
-                    <p className="text-gray-600 whitespace-pre-wrap">{application.reason_for_applying}</p>
+                    <p className="text-gray-600 whitespace-pre-wrap">{application.importance_of_schema || 'No response'}</p>
                   </div>
-                  <div className="mt-2 text-xs text-gray-500">
-                    {application.reason_for_applying.split(/\s+/).length} words
-                  </div>
+                  {application.importance_of_schema && (
+                    <div className="mt-2 text-xs text-gray-500">
+                      {application.importance_of_schema.split(/\s+/).filter(w => w).length} words
+                    </div>
+                  )}
                 </div>
 
                 <Separator />
 
                 <div>
                   <h3 className="font-semibold mb-2 text-gray-700">
-                    What requirements would you have for an attribution protocol?
+                    What other science/infrastructure/open science projects are you excited about?
                   </h3>
                   <div className="prose prose-sm max-w-none">
-                    <p className="text-gray-600 whitespace-pre-wrap">
-                      {application.requirements_for_protocol || 'No response provided'}
-                    </p>
+                    <p className="text-gray-600 whitespace-pre-wrap">{application.excited_projects || 'No response'}</p>
                   </div>
-                  {application.requirements_for_protocol && (
+                  {application.excited_projects && (
                     <div className="mt-2 text-xs text-gray-500">
-                      {application.requirements_for_protocol.split(/\s+/).length} words
+                      {application.excited_projects.split(/\s+/).filter(w => w).length} words
                     </div>
                   )}
                 </div>
 
-                {application.relevant_experience && (
-                  <>
-                    <Separator />
-                    <div>
-                      <h3 className="font-semibold mb-2 text-gray-700">
-                        Relevant Experience
-                      </h3>
-                      <div className="prose prose-sm max-w-none">
-                        <p className="text-gray-600 whitespace-pre-wrap">{application.relevant_experience}</p>
-                      </div>
-                      <div className="mt-2 text-xs text-gray-500">
-                        {application.relevant_experience.split(/\s+/).length} words
-                      </div>
-                    </div>
-                  </>
-                )}
+                <Separator />
 
-                {parsedLinks.length > 0 && (
-                  <>
-                    <Separator />
-                    <div>
-                      <h3 className="font-semibold mb-2 text-gray-700 flex items-center">
-                        <LinkIcon className="mr-2 h-4 w-4" />
-                        Links to Previous Work
-                      </h3>
-                      <div className="space-y-1">
-                        {parsedLinks.map((link, index) => (
+                <div>
+                  <h3 className="font-semibold mb-2 text-gray-700 flex items-center">
+                    <LinkIcon className="mr-2 h-4 w-4" />
+                    Links to what you&apos;re working on
+                  </h3>
+                  {workLinks.length > 0 ? (
+                    <div className="space-y-3">
+                      {workLinks.map((link, index) => (
+                        <div key={index} className="border-l-2 border-blue-500 pl-3">
                           <a
-                            key={index}
-                            href={link}
+                            href={link.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="block text-blue-600 hover:underline text-sm"
+                            className="text-blue-600 hover:underline font-medium text-sm block"
                           >
-                            {link}
+                            {link.url}
                           </a>
-                        ))}
-                      </div>
+                          <p className="text-xs text-gray-500 mt-1">Role: {link.role}</p>
+                        </div>
+                      ))}
                     </div>
-                  </>
-                )}
+                  ) : (
+                    <p className="text-sm text-gray-500">No links provided</p>
+                  )}
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h3 className="font-semibold mb-2 text-gray-700">
+                    What would you add to this workshop if you came?
+                  </h3>
+                  <div className="prose prose-sm max-w-none">
+                    <p className="text-gray-600 whitespace-pre-wrap">{application.workshop_contribution || 'No response'}</p>
+                  </div>
+                  {application.workshop_contribution && (
+                    <div className="mt-2 text-xs text-gray-500">
+                      {application.workshop_contribution.split(/\s+/).filter(w => w).length} words
+                    </div>
+                  )}
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h3 className="font-semibold mb-2 text-gray-700">
+                    What elements or outputs of the research process would you define?
+                  </h3>
+                  <div className="prose prose-sm max-w-none">
+                    <p className="text-gray-600 whitespace-pre-wrap">{application.research_elements || 'No response'}</p>
+                  </div>
+                  {application.research_elements && (
+                    <div className="mt-2 text-xs text-gray-500">
+                      {application.research_elements.split(/\s+/).filter(w => w).length} words
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
+
+            {/* Role-Specific Questions */}
+            {application.classifications?.includes('researcher') && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <FileText className="mr-2 h-5 w-5 text-blue-600" />
+                    Researcher Questions
+                  </CardTitle>
+                  <CardDescription>Specific to Researcher classification</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h3 className="font-semibold mb-2 text-gray-700">
+                      Immediate use-case for modular research sharing/attribution?
+                    </h3>
+                    <div className="prose prose-sm max-w-none">
+                      <p className="text-gray-600 whitespace-pre-wrap">{application.researcher_use_case || 'No response'}</p>
+                    </div>
+                    {application.researcher_use_case && (
+                      <div className="mt-2 text-xs text-gray-500">
+                        {application.researcher_use_case.split(/\s+/).filter(w => w).length} words
+                      </div>
+                    )}
+                  </div>
+
+                  <Separator />
+
+                  <div>
+                    <h3 className="font-semibold mb-2 text-gray-700">
+                      Future impact of granular research sharing?
+                    </h3>
+                    <div className="prose prose-sm max-w-none">
+                      <p className="text-gray-600 whitespace-pre-wrap">{application.researcher_future_impact || 'No response'}</p>
+                    </div>
+                    {application.researcher_future_impact && (
+                      <div className="mt-2 text-xs text-gray-500">
+                        {application.researcher_future_impact.split(/\s+/).filter(w => w).length} words
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {application.classifications?.includes('designer') && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <FileText className="mr-2 h-5 w-5 text-pink-600" />
+                    Designer Questions
+                  </CardTitle>
+                  <CardDescription>Specific to Designer classification</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div>
+                    <h3 className="font-semibold mb-2 text-gray-700">
+                      Important considerations for UX/design across platforms?
+                    </h3>
+                    <div className="prose prose-sm max-w-none">
+                      <p className="text-gray-600 whitespace-pre-wrap">{application.designer_ux_considerations || 'No response'}</p>
+                    </div>
+                    {application.designer_ux_considerations && (
+                      <div className="mt-2 text-xs text-gray-500">
+                        {application.designer_ux_considerations.split(/\s+/).filter(w => w).length} words
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {application.classifications?.includes('engineer') && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <FileText className="mr-2 h-5 w-5 text-purple-600" />
+                    Engineer Questions
+                  </CardTitle>
+                  <CardDescription>Specific to Engineer classification</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h3 className="font-semibold mb-2 text-gray-700">
+                      What are you working on that would use the schema - How?
+                    </h3>
+                    <div className="prose prose-sm max-w-none">
+                      <p className="text-gray-600 whitespace-pre-wrap">{application.engineer_working_on || 'No response'}</p>
+                    </div>
+                    {application.engineer_working_on && (
+                      <div className="mt-2 text-xs text-gray-500">
+                        {application.engineer_working_on.split(/\s+/).filter(w => w).length} words
+                      </div>
+                    )}
+                  </div>
+
+                  <Separator />
+
+                  <div>
+                    <h3 className="font-semibold mb-2 text-gray-700">
+                      Important considerations for designing shared schema/crosswalks?
+                    </h3>
+                    <div className="prose prose-sm max-w-none">
+                      <p className="text-gray-600 whitespace-pre-wrap">{application.engineer_schema_considerations || 'No response'}</p>
+                    </div>
+                    {application.engineer_schema_considerations && (
+                      <div className="mt-2 text-xs text-gray-500">
+                        {application.engineer_schema_considerations.split(/\s+/).filter(w => w).length} words
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {application.classifications?.includes('conceptionalist') && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <FileText className="mr-2 h-5 w-5 text-amber-600" />
+                    Conceptionalist Questions
+                  </CardTitle>
+                  <CardDescription>Specific to Conceptionalist classification</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h3 className="font-semibold mb-2 text-gray-700">
+                      What would schema unlock for existing projects?
+                    </h3>
+                    <div className="prose prose-sm max-w-none">
+                      <p className="text-gray-600 whitespace-pre-wrap">{application.conceptionalist_unlock || 'No response'}</p>
+                    </div>
+                    {application.conceptionalist_unlock && (
+                      <div className="mt-2 text-xs text-gray-500">
+                        {application.conceptionalist_unlock.split(/\s+/).filter(w => w).length} words
+                      </div>
+                    )}
+                  </div>
+
+                  <Separator />
+
+                  <div>
+                    <h3 className="font-semibold mb-2 text-gray-700">
+                      What new projects might schema enable?
+                    </h3>
+                    <div className="prose prose-sm max-w-none">
+                      <p className="text-gray-600 whitespace-pre-wrap">{application.conceptionalist_enable || 'No response'}</p>
+                    </div>
+                    {application.conceptionalist_enable && (
+                      <div className="mt-2 text-xs text-gray-500">
+                        {application.conceptionalist_enable.split(/\s+/).filter(w => w).length} words
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {hasVotingData && (

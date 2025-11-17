@@ -31,6 +31,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { SendEmailDialog } from '@/components/admin/send-email-dialog'
 import { toast } from 'sonner'
+import { getClassificationDisplayName, getClassificationBadgeClass } from '@/types/database'
 import {
   Search,
   Filter,
@@ -56,9 +57,8 @@ type Application = {
   organization: string | null
   role: string
   status: 'pending' | 'accepted' | 'rejected' | 'waitlisted'
-  reason_for_applying: string
-  requirements_for_protocol: string | null
-  relevant_experience: string | null
+  classifications: string[]
+  classification_other: string | null
   admin_notes: string[] | null
   submitted_at: string | null
   reviewed_at: string | null
@@ -286,17 +286,15 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
   // Export to CSV
   const exportToCSV = () => {
     const csv = [
-      ['Name', 'Email', 'Organization', 'Role', 'Status', 'Submitted At', 'Reason', 'Requirements', 'Experience'],
+      ['Name', 'Email', 'Organization', 'Role', 'Classifications', 'Status', 'Submitted At'],
       ...filteredApplications.map(app => [
         app.name || '',
         app.email || '',
         app.organization || '',
         app.role,
+        app.classifications?.map(c => c === 'other' && app.classification_other ? app.classification_other : c).join('; ') || '',
         app.status,
         app.submitted_at ? new Date(app.submitted_at).toLocaleDateString() : '',
-        app.reason_for_applying,
-        app.requirements_for_protocol || '',
-        app.relevant_experience || '',
       ])
     ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
 
@@ -359,6 +357,24 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
         <Icon className="w-3 h-3 mr-1" />
         {status}
       </Badge>
+    )
+  }
+
+  const getClassificationBadges = (classifications: string[], classificationOther: string | null) => {
+    return (
+      <div className="flex flex-wrap gap-1">
+        {classifications.map((classification) => (
+          <Badge
+            key={classification}
+            variant="outline"
+            className={`text-xs ${getClassificationBadgeClass(classification)}`}
+          >
+            {classification === 'other' && classificationOther
+              ? classificationOther
+              : getClassificationDisplayName(classification)}
+          </Badge>
+        ))}
+      </div>
     )
   }
 
@@ -483,6 +499,7 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
                 </button>
               </TableHead>
               <TableHead>Role</TableHead>
+              <TableHead>Classifications</TableHead>
               <TableHead>
                 <button
                   className="flex items-center font-medium hover:text-gray-900"
@@ -522,6 +539,12 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
                 <TableCell>{application.organization || 'N/A'}</TableCell>
                 <TableCell>
                   <div className="text-sm">{application.role}</div>
+                </TableCell>
+                <TableCell>
+                  {application.classifications && application.classifications.length > 0
+                    ? getClassificationBadges(application.classifications, application.classification_other)
+                    : <span className="text-sm text-gray-400">N/A</span>
+                  }
                 </TableCell>
                 <TableCell>{getStatusBadge(application.status)}</TableCell>
                 <TableCell>

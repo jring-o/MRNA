@@ -258,10 +258,7 @@ export type Database = {
           id: string
           name: string | null
           organization: string | null
-          reason_for_applying: string
           reject_votes: number | null
-          relevant_experience: string | null
-          requirements_for_protocol: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           role: string
@@ -272,6 +269,23 @@ export type Database = {
           user_id: string | null
           voting_completed: boolean | null
           voting_completed_at: string | null
+          // Classification fields
+          classifications: string[]
+          classification_other: string | null
+          // Universal questions (all applicants)
+          importance_of_schema: string
+          excited_projects: string
+          work_links: Json
+          workshop_contribution: string
+          research_elements: string
+          // Role-specific questions (conditional)
+          researcher_use_case: string | null
+          researcher_future_impact: string | null
+          designer_ux_considerations: string | null
+          engineer_working_on: string | null
+          engineer_schema_considerations: string | null
+          conceptionalist_unlock: string | null
+          conceptionalist_enable: string | null
         }
         Insert: {
           abstain_votes?: number | null
@@ -281,10 +295,7 @@ export type Database = {
           id?: string
           name?: string | null
           organization?: string | null
-          reason_for_applying: string
           reject_votes?: number | null
-          relevant_experience?: string | null
-          requirements_for_protocol?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           role: string
@@ -295,6 +306,23 @@ export type Database = {
           user_id?: string | null
           voting_completed?: boolean | null
           voting_completed_at?: string | null
+          // Classification fields
+          classifications: string[]
+          classification_other?: string | null
+          // Universal questions (all applicants)
+          importance_of_schema: string
+          excited_projects: string
+          work_links: Json
+          workshop_contribution: string
+          research_elements: string
+          // Role-specific questions (conditional)
+          researcher_use_case?: string | null
+          researcher_future_impact?: string | null
+          designer_ux_considerations?: string | null
+          engineer_working_on?: string | null
+          engineer_schema_considerations?: string | null
+          conceptionalist_unlock?: string | null
+          conceptionalist_enable?: string | null
         }
         Update: {
           abstain_votes?: number | null
@@ -304,10 +332,7 @@ export type Database = {
           id?: string
           name?: string | null
           organization?: string | null
-          reason_for_applying?: string
           reject_votes?: number | null
-          relevant_experience?: string | null
-          requirements_for_protocol?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           role?: string
@@ -318,6 +343,23 @@ export type Database = {
           user_id?: string | null
           voting_completed?: boolean | null
           voting_completed_at?: string | null
+          // Classification fields
+          classifications?: string[]
+          classification_other?: string | null
+          // Universal questions (all applicants)
+          importance_of_schema?: string
+          excited_projects?: string
+          work_links?: Json
+          workshop_contribution?: string
+          research_elements?: string
+          // Role-specific questions (conditional)
+          researcher_use_case?: string | null
+          researcher_future_impact?: string | null
+          designer_ux_considerations?: string | null
+          engineer_working_on?: string | null
+          engineer_schema_considerations?: string | null
+          conceptionalist_unlock?: string | null
+          conceptionalist_enable?: string | null
         }
         Relationships: [
           {

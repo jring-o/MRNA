@@ -15,7 +15,7 @@ export default function Home() {
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Join us for a groundbreaking workshop to design and prototype interoperable
               frameworks for modular research attribution. Bringing together scientists,
-              designers, and engineers to build the future of scientific collaboration.
+              designers, and engineers to build the future of scientific communication and collaboration.
             </p>
             <div className="flex gap-4 justify-center pt-4">
               <Button size="lg" asChild>

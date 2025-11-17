@@ -13,6 +13,51 @@ export type { UserRole }
 export type Application = Tables<'applications'>
 export type ApplicationStatus = Database['public']['Enums']['application_status']
 
+// Classification types
+export type Classification = 'researcher' | 'engineer' | 'designer' | 'conceptionalist' | 'other'
+
+// Work link structure
+export interface WorkLink {
+  url: string
+  role: string
+}
+
+// Helper to parse work_links from JSONB
+export function parseWorkLinks(workLinks: unknown): WorkLink[] {
+  if (!workLinks || !Array.isArray(workLinks)) return []
+  return workLinks.filter((link): link is WorkLink =>
+    typeof link === 'object' &&
+    link !== null &&
+    'url' in link &&
+    'role' in link &&
+    typeof link.url === 'string' &&
+    typeof link.role === 'string'
+  )
+}
+
+// Helper to get classification display name
+export function getClassificationDisplayName(classification: string): string {
+  const map: Record<string, string> = {
+    'researcher': 'Researcher',
+    'engineer': 'Engineer',
+    'designer': 'Designer',
+    'conceptionalist': 'Conceptionalist',
+  }
+  return map[classification] || classification
+}
+
+// Helper to get classification badge color
+export function getClassificationBadgeClass(classification: string): string {
+  const map: Record<string, string> = {
+    'researcher': 'bg-blue-100 text-blue-800 border-blue-300',
+    'engineer': 'bg-purple-100 text-purple-800 border-purple-300',
+    'designer': 'bg-pink-100 text-pink-800 border-pink-300',
+    'conceptionalist': 'bg-amber-100 text-amber-800 border-amber-300',
+    'other': 'bg-gray-100 text-gray-800 border-gray-300',
+  }
+  return map[classification] || 'bg-gray-100 text-gray-800 border-gray-300'
+}
+
 // Voting types
 export type VoteType = Database['public']['Enums']['vote_type']
 export type ApplicationVote = Tables<'application_votes'> & {
