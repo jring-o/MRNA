@@ -9,6 +9,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 const ADMIN_EMAILS = [
   'jon@scios.tech',
   'ellie@scios.tech',
+  'akamatsm@uw.edu',
   // Add more admin emails as needed
 ]
 
@@ -54,25 +55,38 @@ export async function POST(request: Request) {
       console.error('Error sending applicant confirmation:', applicantError)
     }
 
-    // Send notification emails to all admins
-    const adminEmails = ADMIN_EMAILS.map(adminEmail =>
-      resend.emails.send({
-        from: 'MIRA Workshop <contact@scios.tech>',
-        to: [adminEmail],
-        subject: `New Application: ${applicantName} (${organization || 'Unknown'})`,
-        react: AdminNewApplicationEmail({
-          applicantName,
-          applicantEmail,
-          organization: organization || 'Not specified',
-          submittedAt: formattedDate,
-          applicationId,
-          reviewLink: `https://mrna-nine.vercel.app/admin/applications/${applicationId}`,
-        }),
-      })
-    )
+    // Wait 1500ms before sending admin emails to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 1500))
 
-    // Send all admin emails in parallel
-    const adminResults = await Promise.allSettled(adminEmails)
+    // Send notification emails to all admins (with delay to avoid rate limiting)
+    const adminResults = []
+    for (let i = 0; i < ADMIN_EMAILS.length; i++) {
+      const adminEmail = ADMIN_EMAILS[i]
+
+      // Add 1500ms delay between each admin email (2 req/sec limit)
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 1500))
+      }
+
+      try {
+        const result = await resend.emails.send({
+          from: 'MIRA Workshop <contact@scios.tech>',
+          to: [adminEmail],
+          subject: `New Application: ${applicantName} (${organization || 'Unknown'})`,
+          react: AdminNewApplicationEmail({
+            applicantName,
+            applicantEmail,
+            organization: organization || 'Not specified',
+            submittedAt: formattedDate,
+            applicationId,
+            reviewLink: `https://mrna-nine.vercel.app/admin/applications/${applicationId}`,
+          }),
+        })
+        adminResults.push({ status: 'fulfilled', value: result })
+      } catch (error) {
+        adminResults.push({ status: 'rejected', reason: error })
+      }
+    }
 
     // Log any admin email failures
     adminResults.forEach((result, index) => {
