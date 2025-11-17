@@ -17,7 +17,7 @@ ADD COLUMN classification_other TEXT CHECK (char_length(classification_other) <=
 ALTER TABLE public.applications
 ADD COLUMN importance_of_schema TEXT NOT NULL DEFAULT '',
 ADD COLUMN excited_projects TEXT NOT NULL DEFAULT '',
-ADD COLUMN work_links JSONB NOT NULL DEFAULT '[]'::jsonb,
+ADD COLUMN work_links JSONB NOT NULL DEFAULT '[{"url": "", "role": ""}]'::jsonb,
 ADD COLUMN workshop_contribution TEXT NOT NULL DEFAULT '',
 ADD COLUMN research_elements TEXT NOT NULL DEFAULT '';
 

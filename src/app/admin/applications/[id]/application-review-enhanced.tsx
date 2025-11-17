@@ -13,7 +13,7 @@ import { toast } from 'sonner'
 import { VotingPanel } from '@/components/admin/voting-panel'
 import { CommentsPanel } from '@/components/admin/comments-panel'
 import { InviteTokenGenerator } from '@/components/admin/invite-token-generator'
-import type { ApplicationWithVoting, WorkLink } from '@/types/database'
+import type { ApplicationWithVoting } from '@/types/database'
 import { parseWorkLinks, getClassificationDisplayName, getClassificationBadgeClass } from '@/types/database'
 import {
   ArrowLeft,

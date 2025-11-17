@@ -14,7 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import type { Classification } from '@/types/database'
+import type { Classification, Inserts } from '@/types/database'
 import {
   ArrowLeft,
   ArrowRight,
@@ -44,68 +44,44 @@ const wordCount = (max: number, maxMessage: string) => {
   })
 }
 
-// Form validation schema - dynamic based on classifications
-const createApplicationSchema = (classifications: string[]) => {
-  const baseSchema = {
-    // Page 1: Personal Information & Classifications
-    name: z.string().min(2, 'Name must be at least 2 characters'),
-    email: z.string().email('Invalid email address'),
-    organization: z.string().min(2, 'Organization is required'),
-    role: z.string().min(2, 'Role/Title is required'),
-    classifications: z.array(z.string()).min(1, 'Select at least one classification'),
-    classification_other: z.string().optional(),
+// Complete form schema with all possible fields
+const applicationSchema = z.object({
+  // Page 1: Personal Information & Classifications
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  organization: z.string().min(2, 'Organization is required'),
+  role: z.string().min(2, 'Role/Title is required'),
+  classifications: z.array(z.string()).min(1, 'Select at least one classification'),
+  classification_other: z.string().optional(),
 
-    // Page 2: Universal Questions (all applicants)
-    importance_of_schema: wordCount(200, 'Maximum 200 words allowed'),
-    excited_projects: wordCount(200, 'Maximum 200 words allowed'),
-    work_links: z.array(z.object({
-      url: z.string().url('Invalid URL format').or(z.literal('')),
-      role: z.string().min(1, 'Role description is required'),
-    })).min(1, 'At least one link is required').max(5, 'Maximum 5 links allowed'),
-    workshop_contribution: wordCount(200, 'Maximum 200 words allowed'),
-    research_elements: wordCount(200, 'Maximum 200 words allowed'),
+  // Page 2: Universal Questions (all applicants)
+  importance_of_schema: wordCount(200, 'Maximum 200 words allowed'),
+  excited_projects: wordCount(200, 'Maximum 200 words allowed'),
+  work_links: z.array(z.object({
+    url: z.string().url('Invalid URL format').or(z.literal('')),
+    role: z.string().min(1, 'Role description is required'),
+  })).min(1, 'At least one link is required').max(5, 'Maximum 5 links allowed'),
+  workshop_contribution: wordCount(200, 'Maximum 200 words allowed'),
+  research_elements: wordCount(200, 'Maximum 200 words allowed'),
 
-    // Page 3: Logistics
-    availability_confirmed: z.boolean().refine(val => val === true, {
-      message: 'You must confirm availability'
-    }),
-    travel_requirements: z.string().optional(),
-    dietary_restrictions: z.string().optional(),
-  }
+  // Role-specific questions (all optional, validated conditionally)
+  researcher_use_case: wordCount(200, 'Maximum 200 words allowed').optional(),
+  researcher_future_impact: wordCount(200, 'Maximum 200 words allowed').optional(),
+  designer_ux_considerations: wordCount(200, 'Maximum 200 words allowed').optional(),
+  engineer_working_on: wordCount(200, 'Maximum 200 words allowed').optional(),
+  engineer_schema_considerations: wordCount(200, 'Maximum 200 words allowed').optional(),
+  conceptionalist_unlock: wordCount(200, 'Maximum 200 words allowed').optional(),
+  conceptionalist_enable: wordCount(200, 'Maximum 200 words allowed').optional(),
 
-  // Conditionally add role-specific fields
-  const roleSpecificFields: any = {}
+  // Page 3: Logistics
+  availability_confirmed: z.boolean().refine(val => val === true, {
+    message: 'You must confirm availability'
+  }),
+  travel_requirements: z.string().optional(),
+  dietary_restrictions: z.string().optional(),
+})
 
-  if (classifications.includes('researcher')) {
-    roleSpecificFields.researcher_use_case = wordCount(200, 'Maximum 200 words allowed')
-    roleSpecificFields.researcher_future_impact = wordCount(200, 'Maximum 200 words allowed')
-  }
-
-  if (classifications.includes('designer')) {
-    roleSpecificFields.designer_ux_considerations = wordCount(200, 'Maximum 200 words allowed')
-  }
-
-  if (classifications.includes('engineer')) {
-    roleSpecificFields.engineer_working_on = wordCount(200, 'Maximum 200 words allowed')
-    roleSpecificFields.engineer_schema_considerations = wordCount(200, 'Maximum 200 words allowed')
-  }
-
-  if (classifications.includes('conceptionalist')) {
-    roleSpecificFields.conceptionalist_unlock = wordCount(200, 'Maximum 200 words allowed')
-    roleSpecificFields.conceptionalist_enable = wordCount(200, 'Maximum 200 words allowed')
-  }
-
-  // Check if 'other' selected and require classification_other
-  if (classifications.includes('other')) {
-    baseSchema.classification_other = z.string()
-      .min(1, 'Please specify your classification')
-      .max(15, 'Maximum 15 characters allowed')
-  }
-
-  return z.object({ ...baseSchema, ...roleSpecificFields })
-}
-
-type ApplicationFormData = z.infer<ReturnType<typeof createApplicationSchema>>
+type ApplicationFormData = z.infer<typeof applicationSchema>
 
 const steps = [
   { id: 1, name: 'Personal Info & Classification', icon: User },
@@ -138,7 +114,7 @@ export default function ApplyPage() {
     control,
     setValue,
   } = useForm<ApplicationFormData>({
-    resolver: zodResolver(createApplicationSchema(selectedClassifications)),
+    resolver: zodResolver(applicationSchema),
     mode: 'onChange',
     defaultValues: {
       classifications: [],
@@ -175,38 +151,74 @@ export default function ApplyPage() {
 
   const nextStep = async () => {
     // Validate current step fields
-    let fieldsToValidate: (keyof ApplicationFormData)[] = []
+    const fieldsToValidate: (keyof ApplicationFormData)[] = []
 
     if (currentStep === 1) {
-      fieldsToValidate = ['name', 'email', 'organization', 'role', 'classifications']
+      // Validate personal info
+      fieldsToValidate.push('name', 'email', 'organization', 'role', 'classifications')
+
+      // Check classification_other if needed
       if (selectedClassifications.includes('other')) {
         fieldsToValidate.push('classification_other')
+        const otherValue = watch('classification_other')
+        if (!otherValue || otherValue.trim().length === 0) {
+          setError('Please specify your classification when selecting "Other"')
+          return
+        }
+        if (otherValue.length > 15) {
+          setError('Classification "Other" must be 15 characters or less')
+          return
+        }
       }
     } else if (currentStep === 2) {
       // Validate universal questions
-      fieldsToValidate = [
+      fieldsToValidate.push(
         'importance_of_schema',
         'excited_projects',
         'work_links',
         'workshop_contribution',
-        'research_elements',
-      ]
+        'research_elements'
+      )
 
       // Validate role-specific questions based on classifications
       if (selectedClassifications.includes('researcher')) {
         fieldsToValidate.push('researcher_use_case', 'researcher_future_impact')
+        const useCase = watch('researcher_use_case')
+        const futureImpact = watch('researcher_future_impact')
+        if (!useCase || !futureImpact) {
+          setError('Please answer all Researcher questions')
+          return
+        }
       }
       if (selectedClassifications.includes('designer')) {
         fieldsToValidate.push('designer_ux_considerations')
+        const uxConsiderations = watch('designer_ux_considerations')
+        if (!uxConsiderations) {
+          setError('Please answer the Designer question')
+          return
+        }
       }
       if (selectedClassifications.includes('engineer')) {
         fieldsToValidate.push('engineer_working_on', 'engineer_schema_considerations')
+        const workingOn = watch('engineer_working_on')
+        const schemaConsiderations = watch('engineer_schema_considerations')
+        if (!workingOn || !schemaConsiderations) {
+          setError('Please answer all Engineer questions')
+          return
+        }
       }
       if (selectedClassifications.includes('conceptionalist')) {
         fieldsToValidate.push('conceptionalist_unlock', 'conceptionalist_enable')
+        const unlock = watch('conceptionalist_unlock')
+        const enable = watch('conceptionalist_enable')
+        if (!unlock || !enable) {
+          setError('Please answer all Conceptionalist questions')
+          return
+        }
       }
     }
 
+    setError(null)
     const isValid = await trigger(fieldsToValidate)
     if (isValid) {
       setCurrentStep(prev => Math.min(prev + 1, steps.length))
@@ -241,7 +253,7 @@ export default function ApplyPage() {
       const validWorkLinks = data.work_links.filter(link => link.url && link.role)
 
       // Submit application
-      const applicationData: any = {
+      const applicationData: Inserts<'applications'> = {
         // Personal info
         email: data.email,
         name: data.name,
@@ -260,13 +272,13 @@ export default function ApplyPage() {
         research_elements: data.research_elements,
 
         // Role-specific questions (conditionally included)
-        researcher_use_case: data.classifications.includes('researcher') ? data.researcher_use_case : null,
-        researcher_future_impact: data.classifications.includes('researcher') ? data.researcher_future_impact : null,
-        designer_ux_considerations: data.classifications.includes('designer') ? data.designer_ux_considerations : null,
-        engineer_working_on: data.classifications.includes('engineer') ? data.engineer_working_on : null,
-        engineer_schema_considerations: data.classifications.includes('engineer') ? data.engineer_schema_considerations : null,
-        conceptionalist_unlock: data.classifications.includes('conceptionalist') ? data.conceptionalist_unlock : null,
-        conceptionalist_enable: data.classifications.includes('conceptionalist') ? data.conceptionalist_enable : null,
+        researcher_use_case: data.researcher_use_case || null,
+        researcher_future_impact: data.researcher_future_impact || null,
+        designer_ux_considerations: data.designer_ux_considerations || null,
+        engineer_working_on: data.engineer_working_on || null,
+        engineer_schema_considerations: data.engineer_schema_considerations || null,
+        conceptionalist_unlock: data.conceptionalist_unlock || null,
+        conceptionalist_enable: data.conceptionalist_enable || null,
 
         // Logistics stored in admin_notes for now
         admin_notes: [
