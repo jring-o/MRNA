@@ -2,6 +2,12 @@
 -- Restructure applications table for classification-based questionnaire
 -- ==========================================
 
+-- Clear any existing applications FIRST (before adding constraints)
+TRUNCATE TABLE public.application_votes CASCADE;
+TRUNCATE TABLE public.application_comments CASCADE;
+TRUNCATE TABLE public.invite_tokens CASCADE;
+TRUNCATE TABLE public.applications CASCADE;
+
 -- Drop old application question columns
 ALTER TABLE public.applications
 DROP COLUMN IF EXISTS reason_for_applying,
@@ -89,12 +95,6 @@ ALTER COLUMN excited_projects DROP DEFAULT,
 ALTER COLUMN work_links DROP DEFAULT,
 ALTER COLUMN workshop_contribution DROP DEFAULT,
 ALTER COLUMN research_elements DROP DEFAULT;
-
--- Clear any existing applications (as discussed with user)
-TRUNCATE TABLE public.application_votes CASCADE;
-TRUNCATE TABLE public.application_comments CASCADE;
-TRUNCATE TABLE public.invite_tokens CASCADE;
-TRUNCATE TABLE public.applications CASCADE;
 
 -- ==========================================
 -- Helper function to validate work_links structure

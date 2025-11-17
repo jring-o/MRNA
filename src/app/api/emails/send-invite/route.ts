@@ -63,7 +63,7 @@ export async function POST(request: Request) {
 
     // Send email using React Email template
     const { data, error } = await resend.emails.send({
-      from: 'MIRA <onboarding@resend.dev>',
+      from: 'MIRA <contact@scios.tech>',
       to: [applicantEmail],
       subject: '🎉 You\'ve Been Accepted to MIRA!',
       react: ApplicationAcceptedEmail({

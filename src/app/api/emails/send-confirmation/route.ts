@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 
     // Send confirmation email to applicant
     const { data: applicantData, error: applicantError } = await resend.emails.send({
-      from: 'MIRA <onboarding@resend.dev>',
+      from: 'MIRA <contact@scios.tech>',
       to: [applicantEmail],
       subject: 'Application Received - MIRA',
       react: ApplicationReceivedEmail({
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     // Send notification emails to all admins
     const adminEmails = ADMIN_EMAILS.map(adminEmail =>
       resend.emails.send({
-        from: 'Workshop Admin <onboarding@resend.dev>',
+        from: 'MIRA Workshop <contact@scios.tech>',
         to: [adminEmail],
         subject: `New Application: ${applicantName} (${organization || 'Unknown'})`,
         react: AdminNewApplicationEmail({
