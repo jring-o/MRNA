@@ -60,9 +60,9 @@ export default function LoginPage() {
                 <Beaker className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Design Interoperable Standards</h3>
+                <h3 className="font-semibold mb-1">Build Shared Frameworks</h3>
                 <p className="text-blue-100 text-sm">
-                  Create shared protocols for modular research attribution
+                  Create interoperable protocols for modular research attribution
                 </p>
               </div>
             </div>
@@ -72,9 +72,9 @@ export default function LoginPage() {
                 <Users className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Unite Parallel Efforts</h3>
+                <h3 className="font-semibold mb-1">Co-Create With Users</h3>
                 <p className="text-blue-100 text-sm">
-                  Bring together scientists, designers, and engineers
+                  Bring together researchers, designers, and engineers who need attribution to build it together
                 </p>
               </div>
             </div>
