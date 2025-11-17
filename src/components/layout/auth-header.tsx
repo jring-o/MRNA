@@ -37,18 +37,6 @@ export async function AuthHeader() {
               Dashboard
             </Link>
           )}
-          <Link
-            href="/blog"
-            className="text-sm font-medium transition-colors hover:text-workshop-primary text-gray-600"
-          >
-            Blog
-          </Link>
-          <Link
-            href="/results"
-            className="text-sm font-medium transition-colors hover:text-workshop-primary text-gray-600"
-          >
-            Results
-          </Link>
         </nav>
 
         <div className="flex gap-2">
