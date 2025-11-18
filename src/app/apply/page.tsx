@@ -348,8 +348,8 @@ export default function ApplyPage() {
           <h1 className="text-4xl font-bold text-white mb-2">
             Apply to the Workshop
           </h1>
-          <p className="text-lg text-blue-200">
-            Join leading researchers in revolutionizing scientific attribution
+          <p className="text-base text-blue-200">
+            Join leading researchers, engineers, designers, and ecosystem specialists in revolutionizing scientific attribution
           </p>
         </div>
 
@@ -371,7 +371,7 @@ export default function ApplyPage() {
                 </Alert>
               )}
 
-              {/* Section 1: Personal Information & Classifications */}
+              {/* Section 1: Personal Information */}
               <div className="space-y-6">
                 <div className="border-l-4 border-blue-600 pl-4">
                   <h2 className="text-2xl font-bold text-gray-900">1. Personal Information & Classification</h2>
@@ -515,7 +515,7 @@ export default function ApplyPage() {
                     <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                       <div className="flex items-center justify-between mb-2">
                         <Label htmlFor="importance_of_schema">
-                          Why is an interoperable Research attribution Schema important to you? *
+                          Why is an interoperable Research attribution schema important to you? *
                         </Label>
                         <span className="text-xs text-gray-500">
                           {wordCounts.importance_of_schema || 0}/200 words
@@ -537,56 +537,6 @@ export default function ApplyPage() {
                     </div>
 
                     {/* Question 2 */}
-                    <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
-                      <div className="flex items-center justify-between mb-2">
-                        <Label htmlFor="excited_projects">
-                          What other science, science infrastructure, open science, modular research, etc. projects are you excited about? *
-                        </Label>
-                        <span className="text-xs text-gray-500">
-                          {wordCounts.excited_projects || 0}/200 words
-                        </span>
-                      </div>
-                      <textarea
-                        id="excited_projects"
-                        {...register('excited_projects', {
-                          onChange: (e) => updateWordCount('excited_projects', e.target.value)
-                        })}
-                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
-                          errors.excited_projects ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder="Tell us about projects that inspire you..."
-                      />
-                      {errors.excited_projects && (
-                        <p className="text-sm text-red-500 mt-1">{errors.excited_projects.message}</p>
-                      )}
-                    </div>
-
-                    {/* Question 3 */}
-                    <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
-                      <div className="flex items-center justify-between mb-2">
-                        <Label htmlFor="workshop_contribution">
-                          What would you add to this workshop if you came (specific experience, perspective, etc)? *
-                        </Label>
-                        <span className="text-xs text-gray-500">
-                          {wordCounts.workshop_contribution || 0}/200 words
-                        </span>
-                      </div>
-                      <textarea
-                        id="workshop_contribution"
-                        {...register('workshop_contribution', {
-                          onChange: (e) => updateWordCount('workshop_contribution', e.target.value)
-                        })}
-                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
-                          errors.workshop_contribution ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder="What unique perspective or skills would you bring..."
-                      />
-                      {errors.workshop_contribution && (
-                        <p className="text-sm text-red-500 mt-1">{errors.workshop_contribution.message}</p>
-                      )}
-                    </div>
-
-                    {/* Question 4 */}
                     <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                       <div className="flex items-center justify-between mb-2">
                         <Label htmlFor="research_elements">
@@ -611,6 +561,56 @@ export default function ApplyPage() {
                       )}
                     </div>
                   </div>
+
+                    {/* Question 3 */}
+                    <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
+                      <div className="flex items-center justify-between mb-2">
+                        <Label htmlFor="workshop_contribution">
+                          What specific experience, perspective, and/or approach would you bring to the workshop? *
+                        </Label>
+                        <span className="text-xs text-gray-500">
+                          {wordCounts.workshop_contribution || 0}/200 words
+                        </span>
+                      </div>
+                      <textarea
+                        id="workshop_contribution"
+                        {...register('workshop_contribution', {
+                          onChange: (e) => updateWordCount('workshop_contribution', e.target.value)
+                        })}
+                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
+                          errors.workshop_contribution ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="What unique perspective or skills would you bring..."
+                      />
+                      {errors.workshop_contribution && (
+                        <p className="text-sm text-red-500 mt-1">{errors.workshop_contribution.message}</p>
+                      )}
+                    </div>
+
+                    {/* Question 4 */}
+                    <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
+                      <div className="flex items-center justify-between mb-2">
+                        <Label htmlFor="excited_projects">
+                          What other science, science infrastructure, open science, modular research, etc. projects/initiatives are you excited about? *
+                        </Label>
+                        <span className="text-xs text-gray-500">
+                          {wordCounts.excited_projects || 0}/200 words
+                        </span>
+                      </div>
+                      <textarea
+                        id="excited_projects"
+                        {...register('excited_projects', {
+                          onChange: (e) => updateWordCount('excited_projects', e.target.value)
+                        })}
+                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
+                          errors.excited_projects ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Tell us about projects that inspire you..."
+                      />
+                      {errors.excited_projects && (
+                        <p className="text-sm text-red-500 mt-1">{errors.excited_projects.message}</p>
+                      )}
+                    </div>
 
                     {/* Question 5: Share Your Past/Current Work */}
                     <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
