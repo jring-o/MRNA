@@ -437,18 +437,6 @@ export default function ApplyPage() {
                     </div>
                   </div>
 
-                  {/* Enhanced Separator */}
-                  <div className="relative py-8">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-200"></div>
-                    </div>
-                    <div className="relative flex justify-center">
-                      <span className="bg-white px-4">
-                        <div className="h-px w-12 bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400"></div>
-                      </span>
-                    </div>
-                  </div>
-
                   {/* Classifications */}
                   <div ref={classificationsRef}>
                     <Label className="text-base">How would you classify yourself? *</Label>
@@ -573,13 +561,64 @@ export default function ApplyPage() {
                       )}
                     </div>
 
-                    {/* Question 3: Share Your Past/Current Work */}
-                    <div>
+                    {/* Question 3 */}
+                    <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
+                      <div className="flex items-center justify-between mb-2">
+                        <Label htmlFor="workshop_contribution">
+                          What would you add to this workshop if you came (specific experience, perspective, etc)? *
+                        </Label>
+                        <span className="text-xs text-gray-500">
+                          {wordCounts.workshop_contribution || 0}/200 words
+                        </span>
+                      </div>
+                      <textarea
+                        id="workshop_contribution"
+                        {...register('workshop_contribution', {
+                          onChange: (e) => updateWordCount('workshop_contribution', e.target.value)
+                        })}
+                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
+                          errors.workshop_contribution ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="What unique perspective or skills would you bring..."
+                      />
+                      {errors.workshop_contribution && (
+                        <p className="text-sm text-red-500 mt-1">{errors.workshop_contribution.message}</p>
+                      )}
+                    </div>
+
+                    {/* Question 4 */}
+                    <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
+                      <div className="flex items-center justify-between mb-2">
+                        <Label htmlFor="research_elements">
+                          What elements or outputs of the research process would you define? For example: A Claim, a dataset, etc. *
+                        </Label>
+                        <span className="text-xs text-gray-500">
+                          {wordCounts.research_elements || 0}/200 words
+                        </span>
+                      </div>
+                      <textarea
+                        id="research_elements"
+                        {...register('research_elements', {
+                          onChange: (e) => updateWordCount('research_elements', e.target.value)
+                        })}
+                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
+                          errors.research_elements ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Define the key elements you'd want to track..."
+                      />
+                      {errors.research_elements && (
+                        <p className="text-sm text-red-500 mt-1">{errors.research_elements.message}</p>
+                      )}
+                    </div>
+                  </div>
+
+                    {/* Question 5: Share Your Past/Current Work */}
+                    <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                       <Label>Share your past/current work *</Label>
                       <p className="text-sm text-gray-500 mb-3">Add 1-5 examples of your work with a description and your role (link optional)</p>
                       <div className="space-y-4">
                         {fields.map((field, index) => (
-                          <div key={field.id} className="border rounded-lg p-4 bg-gray-50">
+                          <div key={field.id} className="border rounded-lg p-4 bg-white">
                             <div className="flex gap-2 items-start mb-3">
                               <div className="flex-1">
                                 <Label className="text-xs text-gray-600">Work Example #{index + 1}</Label>
@@ -665,57 +704,6 @@ export default function ApplyPage() {
                         </p>
                       )}
                     </div>
-
-                    {/* Question 4 */}
-                    <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
-                      <div className="flex items-center justify-between mb-2">
-                        <Label htmlFor="workshop_contribution">
-                          What would you add to this workshop if you came (specific experience, perspective, etc)? *
-                        </Label>
-                        <span className="text-xs text-gray-500">
-                          {wordCounts.workshop_contribution || 0}/200 words
-                        </span>
-                      </div>
-                      <textarea
-                        id="workshop_contribution"
-                        {...register('workshop_contribution', {
-                          onChange: (e) => updateWordCount('workshop_contribution', e.target.value)
-                        })}
-                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
-                          errors.workshop_contribution ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder="What unique perspective or skills would you bring..."
-                      />
-                      {errors.workshop_contribution && (
-                        <p className="text-sm text-red-500 mt-1">{errors.workshop_contribution.message}</p>
-                      )}
-                    </div>
-
-                    {/* Question 5 */}
-                    <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
-                      <div className="flex items-center justify-between mb-2">
-                        <Label htmlFor="research_elements">
-                          What elements or outputs of the research process would you define? For example: A Claim, a dataset, etc. *
-                        </Label>
-                        <span className="text-xs text-gray-500">
-                          {wordCounts.research_elements || 0}/200 words
-                        </span>
-                      </div>
-                      <textarea
-                        id="research_elements"
-                        {...register('research_elements', {
-                          onChange: (e) => updateWordCount('research_elements', e.target.value)
-                        })}
-                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
-                          errors.research_elements ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder="Define the key elements you'd want to track..."
-                      />
-                      {errors.research_elements && (
-                        <p className="text-sm text-red-500 mt-1">{errors.research_elements.message}</p>
-                      )}
-                    </div>
-                  </div>
 
                   {/* Role-Specific Questions */}
                   {selectedClassifications.includes('researcher') && (
