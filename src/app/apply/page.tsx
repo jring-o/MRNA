@@ -956,7 +956,7 @@ export default function ApplyPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                     <div className="flex items-start">
                       <input
                         id="availability_confirmed"
@@ -974,26 +974,27 @@ export default function ApplyPage() {
                       </div>
                     </div>
                     {errors.availability_confirmed && (
-                      <p className="text-sm text-red-500">{errors.availability_confirmed.message}</p>
+                      <p className="text-sm text-red-500 mt-2">{errors.availability_confirmed.message}</p>
                     )}
                   </div>
 
-                  <div>
+                  <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                     <Label htmlFor="travel_requirements">Travel Requirements (Optional)</Label>
                     <textarea
                       id="travel_requirements"
                       {...register('travel_requirements')}
-                      className="w-full min-h-[80px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full min-h-[80px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white mt-2"
                       placeholder="Any special travel requirements or accommodations needed..."
                     />
                   </div>
 
-                  <div>
+                  <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                     <Label htmlFor="dietary_restrictions">Dietary Restrictions (Optional)</Label>
                     <Input
                       id="dietary_restrictions"
                       {...register('dietary_restrictions')}
                       placeholder="Vegetarian, vegan, allergies, etc."
+                      className="mt-2 bg-white"
                     />
                   </div>
 
