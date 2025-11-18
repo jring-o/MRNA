@@ -29,7 +29,7 @@ export default function TestHome() {
             <div className="flex gap-4 justify-center pt-8">
               <Button
                 size="lg"
-                className="bg-cyan-600 hover:bg-cyan-500 hover:scale-105 transition-all text-white px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl"
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 hover:scale-105 transition-all text-white px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl"
                 asChild
               >
                 <Link href="/apply">Apply to Participate</Link>

@@ -330,26 +330,40 @@ export function ApplicationReview({
                 <div>
                   <h3 className="font-semibold mb-2 text-gray-700 flex items-center">
                     <LinkIcon className="mr-2 h-4 w-4" />
-                    Links to what you&apos;re working on
+                    Past/Current Work Examples
                   </h3>
                   {workLinks.length > 0 ? (
-                    <div className="space-y-3">
-                      {workLinks.map((link, index) => (
-                        <div key={index} className="border-l-2 border-blue-500 pl-3">
-                          <a
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline font-medium text-sm block"
-                          >
-                            {link.url}
-                          </a>
-                          <p className="text-xs text-gray-500 mt-1">Role: {link.role}</p>
+                    <div className="space-y-4">
+                      {workLinks.map((item: { description?: string; role?: string; url?: string }, index: number) => (
+                        <div key={index} className="border-l-2 border-blue-500 pl-4 py-2 bg-gray-50 rounded-r">
+                          <div className="space-y-2">
+                            <div>
+                              <p className="text-xs font-medium text-gray-500 uppercase mb-1">Description</p>
+                              <p className="text-sm text-gray-900 whitespace-pre-wrap">{item.description || 'No description'}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs font-medium text-gray-500 uppercase mb-1">Role</p>
+                              <p className="text-sm text-gray-700">{item.role || 'No role specified'}</p>
+                            </div>
+                            {item.url && item.url.trim() !== '' && (
+                              <div>
+                                <p className="text-xs font-medium text-gray-500 uppercase mb-1">Link</p>
+                                <a
+                                  href={item.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline text-sm break-all"
+                                >
+                                  {item.url}
+                                </a>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500">No links provided</p>
+                    <p className="text-sm text-gray-500">No work examples provided</p>
                   )}
                 </div>
 

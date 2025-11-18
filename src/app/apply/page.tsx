@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -174,6 +174,7 @@ export default function ApplyPage() {
   const [error, setError] = useState<string | null>(null)
   const [selectedClassifications, setSelectedClassifications] = useState<string[]>([])
   const [wordCounts, setWordCounts] = useState<Record<string, number>>({})
+  const classificationsRef = useRef<HTMLDivElement>(null)
 
   const {
     register,
@@ -198,6 +199,16 @@ export default function ApplyPage() {
   })
 
   const watchClassifications = watch('classifications')
+
+  // Scroll to classifications section if there's a validation error
+  useEffect(() => {
+    if (errors.classifications && classificationsRef.current) {
+      classificationsRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      })
+    }
+  }, [errors.classifications])
 
   const updateWordCount = (field: string, value: string) => {
     const words = value?.trim().split(/\s+/).filter(word => word.length > 0).length || 0
@@ -422,7 +433,7 @@ export default function ApplyPage() {
                   <Separator />
 
                   {/* Classifications */}
-                  <div>
+                  <div ref={classificationsRef}>
                     <Label className="text-base">How would you classify yourself? *</Label>
                     <p className="text-sm text-gray-500 mb-4">Select one or more that apply</p>
 
