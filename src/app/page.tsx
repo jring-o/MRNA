@@ -1,179 +1,293 @@
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import Image from 'next/image'
 
-export default function Home() {
+export default function TestHome() {
   return (
-    <div className="flex flex-col">
-      {/* Hero Section */}
-      <section className="relative py-24 px-4 bg-gradient-to-br from-workshop-secondary via-white to-workshop-primary/10">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center space-y-6">
-            <h1 className="text-5xl font-bold text-gray-900 tracking-tight">
-              Catalyzing Modular Interoperable
-              <span className="text-workshop-primary"> Research Attribution</span>
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Join us for a groundbreaking workshop to design and prototype interoperable
-              frameworks for modular research attribution. Bringing together scientists,
-              designers, and engineers to build the future of scientific communication and collaboration.
-            </p>
-            <div className="flex gap-4 justify-center pt-4">
-              <Button size="lg" asChild>
+    <div className="flex flex-col bg-white">
+      {/* Hero Section - Clean and Bold */}
+      <section className="relative py-32 px-4 bg-gradient-to-b from-slate-900 to-slate-800">
+        <div className="container mx-auto max-w-5xl">
+          <div className="text-center space-y-8">
+            <div className="space-y-4">
+              <div className="text-sm font-medium text-cyan-400 tracking-wider uppercase">
+                June 7-11, 2026 • Ireland
+              </div>
+
+              <h1 className="text-5xl md:text-6xl font-bold text-white tracking-tight leading-tight">
+                Catalyzing Modular Interoperable
+                <br />
+                Research Attribution
+              </h1>
+
+              <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+                A five-day, cost-covered, intensive workshop to design and prototype interoperable
+                frameworks for modular research attribution. Bringing together researchers,
+                designers, and engineers to build the future of scientific communication and collaboration.
+              </p>
+            </div>
+
+            <div className="flex gap-4 justify-center pt-8">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 hover:scale-105 transition-all text-white px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl"
+                asChild
+              >
                 <Link href="/apply">Apply to Participate</Link>
               </Button>
-              <Button variant="outline" size="lg" asChild>
-                <Link href="/status">Check Application Status</Link>
+              <Button
+                size="lg"
+                className="bg-white text-slate-900 hover:bg-cyan-50 hover:scale-105 transition-all px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl"
+                asChild
+              >
+                <Link href="/status">Check Status</Link>
               </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Key Information */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-4 gap-8">
+      {/* Key Information - Minimal Stats */}
+      <section className="py-20 px-4 border-b border-gray-100">
+        <div className="container mx-auto max-w-5xl">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
             <div className="text-center space-y-2">
-              <div className="text-4xl font-bold text-workshop-primary">June 7-11</div>
+              <div className="text-4xl font-bold text-gray-900">June 7-11</div>
               <div className="text-gray-600">2026</div>
             </div>
             <div className="text-center space-y-2">
-              <div className="text-4xl font-bold text-workshop-primary">Ireland</div>
-              <div className="text-gray-600">The Deerstone Eco Hideaway</div>
+              <div className="text-4xl font-bold text-gray-900">Ireland</div>
+              <div className="text-gray-600">
+                <a
+                  href="https://thedeerstone.ie/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-cyan-600 hover:text-cyan-700 hover:underline transition-colors"
+                >
+                  The Deerstone Eco Hideaway
+                </a>
+              </div>
             </div>
             <div className="text-center space-y-2">
-              <div className="text-4xl font-bold text-workshop-primary">22</div>
+              <div className="text-4xl font-bold text-gray-900">22</div>
               <div className="text-gray-600">Participants</div>
             </div>
             <div className="text-center space-y-2">
-              <div className="text-4xl font-bold text-workshop-primary">5 Days</div>
+              <div className="text-4xl font-bold text-gray-900">5 Days</div>
               <div className="text-gray-600">Intensive Collaboration</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Timeline Section */}
-      <section className="py-16 px-4 bg-gray-50">
+      {/* Timeline & Goals Combined Section */}
+      <section className="py-24 px-4 bg-white">
         <div className="container mx-auto max-w-6xl">
-          <h2 className="text-3xl font-bold text-center mb-12">Workshop Timeline</h2>
-          <div className="space-y-6">
-            <div className="flex gap-4 items-start">
-              <div className="flex-shrink-0 w-32 text-right font-semibold text-workshop-primary">
-                Fall 2025
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg mb-1">Applications Open</h3>
-                <p className="text-gray-600">Submit your application to join the workshop</p>
+          <div className="grid md:grid-cols-4 gap-12">
+            {/* Timeline - 1/4 width sidebar */}
+            <div className="md:col-span-1">
+              <div className="sticky top-24">
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-3">Timeline</h2>
+                  <div className="w-12 h-1 bg-cyan-600"></div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                      Fall 2025
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">Applications Open</div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-bold text-cyan-700 uppercase tracking-wide mb-1">
+                      Jan 1, 2026
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">Deadline</div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-bold text-cyan-700 uppercase tracking-wide mb-1">
+                      Jan 15, 2026
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">Decisions</div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                      Jan-Jun 2026
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">Preparation</div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-bold text-cyan-700 uppercase tracking-wide mb-1">
+                      Jun 7-11, 2026
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">Workshop</div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                      Post-Workshop
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">Implementation</div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex gap-4 items-start">
-              <div className="flex-shrink-0 w-32 text-right font-semibold text-workshop-primary">
-                January 1, 2026
+
+            {/* Goals - 3/4 width main content */}
+            <div className="md:col-span-3">
+              <div className="mb-12">
+                <h2 className="text-3xl font-bold text-gray-900 mb-3">Workshop Goals</h2>
+                <div className="w-16 h-1 bg-cyan-600"></div>
               </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg mb-1">Application Deadline</h3>
-                <p className="text-gray-600">Final day to submit your application</p>
-              </div>
-            </div>
-            <div className="flex gap-4 items-start">
-              <div className="flex-shrink-0 w-32 text-right font-semibold text-workshop-primary">
-                January 15, 2026
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg mb-1">Decisions Announced</h3>
-                <p className="text-gray-600">All applicants notified of their application status</p>
-              </div>
-            </div>
-            <div className="flex gap-4 items-start">
-              <div className="flex-shrink-0 w-32 text-right font-semibold text-workshop-primary">
-                Jan-June 2026
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg mb-1">Pre-Workshop Preparation</h3>
-                <p className="text-gray-600">5-7 collaborative calls to consolidate use cases and prototypes</p>
-              </div>
-            </div>
-            <div className="flex gap-4 items-start">
-              <div className="flex-shrink-0 w-32 text-right font-semibold text-workshop-primary">
-                June 7-11, 2026
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg mb-1">5-Day Intensive Workshop</h3>
-                <p className="text-gray-600">Design, prototype, and test shared frameworks in Ireland</p>
-              </div>
-            </div>
-            <div className="flex gap-4 items-start">
-              <div className="flex-shrink-0 w-32 text-right font-semibold text-workshop-primary">
-                Post-Workshop
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg mb-1">Implementation & Follow-up</h3>
-                <p className="text-gray-600">Build APIs and continue development with engineering grants</p>
+
+              <div className="grid md:grid-cols-2 gap-x-12 gap-y-12">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    Design Interoperable Standards
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Create shared protocols and schemas for modular research attribution
+                    that work across diverse platforms and tools.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    Build Working Prototypes
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Develop proof-of-concept implementations that demonstrate real-world
+                    applications of the attribution network.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    Unite Parallel Efforts
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Align disparate technological and social efforts working toward
+                    similar goals in research attribution.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    Enable Real-Time Science
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Create infrastructure for researchers to share and attribute discrete
+                    research results before traditional publication.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Goals Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-3xl font-bold text-center mb-12">Workshop Goals</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-workshop-primary">
-                Design Interoperable Standards
-              </h3>
-              <p className="text-gray-600">
-                Create shared protocols and schemas for modular research attribution
-                that work across diverse platforms and tools.
-              </p>
+      {/* Call to Action - Minimal and Strong */}
+      <section className="py-24 px-4 bg-white border-t border-gray-100">
+        <div className="container mx-auto max-w-3xl text-center space-y-8">
+          <div className="space-y-4">
+            <h2 className="text-4xl font-bold text-gray-900">
+              Ready to Shape the Future of Research?
+            </h2>
+            <p className="text-xl text-gray-600 leading-relaxed">
+              Join us as we work to revolutionize how we
+              share and attribute scientific contributions.
+            </p>
+          </div>
+
+          <div className="pt-4">
+            <Button
+              size="lg"
+              className="bg-cyan-600 hover:bg-cyan-700 text-white px-10 py-6 text-base font-medium"
+              asChild
+            >
+              <Link href="/apply">Apply Now</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Supported By Section */}
+      <section className="py-16 px-4 bg-gray-50 border-t border-gray-200">
+        <div className="container mx-auto max-w-4xl">
+          <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider text-center mb-8">
+            Supported By
+          </h3>
+
+          <div className="flex flex-col md:flex-row items-center justify-center gap-12">
+            {/* SciOS */}
+            <div className="flex flex-col items-center gap-3">
+              <div className="text-sm text-gray-600 font-medium">Facilitation by</div>
+              <a
+                href="https://www.scios.tech/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-opacity hover:opacity-70 bg-slate-900 px-6 py-3 rounded-lg"
+              >
+                <Image
+                  src="/scios-logo.png"
+                  alt="SciOS"
+                  width={200}
+                  height={48}
+                  className="h-12 w-auto"
+                />
+              </a>
             </div>
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-workshop-primary">
-                Build Working Prototypes
-              </h3>
-              <p className="text-gray-600">
-                Develop proof-of-concept implementations that demonstrate real-world
-                applications of the attribution network.
-              </p>
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-workshop-primary">
-                Unite Parallel Efforts
-              </h3>
-              <p className="text-gray-600">
-                Align disparate technological and social efforts working toward
-                similar goals in research attribution.
-              </p>
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-workshop-primary">
-                Enable Real-Time Science
-              </h3>
-              <p className="text-gray-600">
-                Create infrastructure for researchers to share and attribute discrete
-                research results before traditional publication.
-              </p>
+
+            {/* Divider */}
+            <div className="hidden md:block h-16 w-px bg-gray-300"></div>
+
+            {/* Navigation Fund */}
+            <div className="flex flex-col items-center gap-3">
+              <div className="text-sm text-gray-600 font-medium">Funding by</div>
+              <a
+                href="https://www.navigation.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-900 hover:text-cyan-600 transition-colors"
+              >
+                <div className="text-2xl font-bold">Navigation Fund</div>
+              </a>
+              <a
+                href="https://doi.org/10.71707/a62a-a585"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-gray-500 hover:text-cyan-600 transition-colors"
+              >
+                View Grant →
+              </a>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-16 px-4 bg-workshop-primary text-white">
-        <div className="container mx-auto max-w-4xl text-center space-y-6">
-          <h2 className="text-3xl font-bold">Ready to Shape the Future of Research?</h2>
-          <p className="text-xl opacity-90">
-            Join scientists, designers, and engineers working to revolutionize how we
-            share and attribute scientific contributions.
-          </p>
-          <Button size="lg" variant="secondary" asChild>
-            <Link href="/apply">Apply Now</Link>
-          </Button>
+      {/* Footer */}
+      <footer className="py-8 px-4 bg-gray-900 border-t border-gray-800">
+        <div className="container mx-auto max-w-4xl">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+            <div>
+              © 2026 MIRA Workshop
+            </div>
+            <div className="flex gap-6">
+              <Link href="/privacy" className="hover:text-white transition-colors">
+                Privacy Policy
+              </Link>
+              <a href="mailto:contact@scios.tech" className="hover:text-white transition-colors">
+                Contact
+              </a>
+            </div>
+          </div>
         </div>
-      </section>
+      </footer>
     </div>
   )
 }
