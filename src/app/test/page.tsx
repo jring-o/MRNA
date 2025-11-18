@@ -21,7 +21,7 @@ export default function TestHome() {
               </h1>
 
               <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
-                A five-day intensive workshop to design and prototype interoperable
+                A five-day, cost-covered, intensive workshop to design and prototype interoperable
                 frameworks for modular research attribution. Bringing together researchers,
                 designers, and engineers to build the future of scientific communication and collaboration.
               </p>
@@ -269,6 +269,25 @@ export default function TestHome() {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-8 px-4 bg-gray-900 border-t border-gray-800">
+        <div className="container mx-auto max-w-4xl">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+            <div>
+              © 2026 MIRA Workshop
+            </div>
+            <div className="flex gap-6">
+              <Link href="/privacy" className="hover:text-white transition-colors">
+                Privacy Policy
+              </Link>
+              <a href="mailto:contact@scios.tech" className="hover:text-white transition-colors">
+                Contact
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

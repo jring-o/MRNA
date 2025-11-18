@@ -73,6 +73,11 @@ const applicationSchema = z.object({
   }),
   travel_requirements: z.string().optional(),
   dietary_restrictions: z.string().optional(),
+
+  // GDPR Consent
+  privacy_consent: z.boolean().refine(val => val === true, {
+    message: 'You must consent to the privacy policy to submit your application'
+  }),
 }).superRefine((data, ctx) => {
   // Validate classification_other if 'other' is selected
   if (data.classifications.includes('other')) {
@@ -189,6 +194,7 @@ export default function ApplyPage() {
       classifications: [],
       work_items: [{ description: '', role: '', url: '' }],
       availability_confirmed: false,
+      privacy_consent: false,
     }
   })
 
@@ -942,6 +948,7 @@ export default function ApplyPage() {
                             <li>Duration: 5 days intensive workshop</li>
                             <li>Format: In-person collaboration</li>
                             <li>Location: The Deerstone Eco Hideaway, Ireland</li>
+                            <li><strong>Travel, accommodation, and living expenses covered</strong> by Navigation Fund grant</li>
                           </ul>
                         </div>
                       </div>
@@ -987,6 +994,45 @@ export default function ApplyPage() {
                       {...register('dietary_restrictions')}
                       placeholder="Vegetarian, vegan, allergies, etc."
                     />
+                  </div>
+
+              {/* Enhanced Separator */}
+              <div className="relative py-8">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-white px-4">
+                    <div className="h-px w-12 bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400"></div>
+                  </span>
+                </div>
+              </div>
+
+                  {/* Privacy Consent */}
+                  <div className="space-y-4 pt-4">
+                    <div className="flex items-start">
+                      <input
+                        id="privacy_consent"
+                        type="checkbox"
+                        {...register('privacy_consent')}
+                        className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <div className="ml-3">
+                        <Label htmlFor="privacy_consent" className="cursor-pointer">
+                          I consent to the processing of my personal data *
+                        </Label>
+                        <p className="text-sm text-gray-500 mt-1">
+                          I have read and agree to the{' '}
+                          <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline">
+                            Privacy Policy
+                          </Link>
+                          {' '}and consent to my application data being processed for workshop selection purposes
+                        </p>
+                      </div>
+                    </div>
+                    {errors.privacy_consent && (
+                      <p className="text-sm text-red-500">{errors.privacy_consent.message}</p>
+                    )}
                   </div>
 
                   {/* Enhanced Separator */}

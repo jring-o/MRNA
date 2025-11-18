@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, CheckCircle2, Clock, XCircle, AlertCircle, Mail } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Clock, XCircle, AlertCircle, Mail, Download, Trash2 } from 'lucide-react'
 
 function StatusPageContent() {
   const searchParams = useSearchParams()
@@ -19,6 +19,8 @@ function StatusPageContent() {
   const [error, setError] = useState<string | null>(null)
   const [application, setApplication] = useState<Record<string, unknown> | null>(null)
   const [checked, setChecked] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
 
   // Pre-fill email from URL if provided
   useEffect(() => {
@@ -124,6 +126,78 @@ function StatusPageContent() {
         }
       default:
         return null
+    }
+  }
+
+  const handleExportData = () => {
+    if (!application) return
+
+    setIsExporting(true)
+    try {
+      // Create a clean copy of the application data
+      const exportData = {
+        ...application,
+        exported_at: new Date().toISOString(),
+        exported_by: email
+      }
+
+      // Convert to JSON and download
+      const dataStr = JSON.stringify(exportData, null, 2)
+      const dataBlob = new Blob([dataStr], { type: 'application/json' })
+      const url = URL.createObjectURL(dataBlob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `mira-application-${application.id}.json`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('Export error:', err)
+      setError('Failed to export data. Please try again.')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const handleDeleteApplication = async () => {
+    if (!application) return
+
+    if (!confirm('Are you sure you want to delete your application? This action cannot be undone.')) {
+      return
+    }
+
+    setIsDeleting(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/applications/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          applicationId: application.id,
+          email: email,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to delete application')
+      }
+
+      // Success - show message and reset
+      alert('Your application has been successfully deleted.')
+      setApplication(null)
+      setChecked(false)
+      setEmail('')
+    } catch (err) {
+      console.error('Delete error:', err)
+      setError(err instanceof Error ? err.message : 'Failed to delete application. Please try again.')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -278,6 +352,40 @@ function StatusPageContent() {
                       </div>
                     )}
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* GDPR Actions */}
+            <Card className="shadow-xl border-blue-200">
+              <CardHeader>
+                <CardTitle className="text-base">Your Data Rights</CardTitle>
+                <CardDescription>Download or delete your application data</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <Button
+                    onClick={handleExportData}
+                    variant="outline"
+                    className="w-full"
+                    disabled={isExporting}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    {isExporting ? 'Exporting...' : 'Export My Data (JSON)'}
+                  </Button>
+                  <Button
+                    onClick={handleDeleteApplication}
+                    variant="destructive"
+                    className="w-full"
+                    disabled={isDeleting}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    {isDeleting ? 'Deleting...' : 'Delete My Application'}
+                  </Button>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Learn more about your rights in our{' '}
+                    <Link href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link>
+                  </p>
                 </div>
               </CardContent>
             </Card>

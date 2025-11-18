@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthHeader } from "@/components/layout/auth-header";
+import { CookieConsent } from "@/components/cookie-consent";
+import { ConditionalAnalytics } from "@/components/conditional-analytics";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,6 +34,8 @@ export default function RootLayout({
           <AuthHeader />
           <main className="flex-1">{children}</main>
         </div>
+        <CookieConsent />
+        <ConditionalAnalytics />
       </body>
     </html>
   );
