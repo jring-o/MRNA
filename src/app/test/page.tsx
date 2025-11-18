@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function TestHome() {
   return (
@@ -56,7 +57,16 @@ export default function TestHome() {
             </div>
             <div className="text-center space-y-2">
               <div className="text-4xl font-bold text-gray-900">Ireland</div>
-              <div className="text-gray-600">The Deerstone Eco Hideaway</div>
+              <div className="text-gray-600">
+                <a
+                  href="https://thedeerstone.ie/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-cyan-600 hover:text-cyan-700 hover:underline transition-colors"
+                >
+                  The Deerstone Eco Hideaway
+                </a>
+              </div>
             </div>
             <div className="text-center space-y-2">
               <div className="text-4xl font-bold text-gray-900">22</div>
@@ -202,6 +212,60 @@ export default function TestHome() {
             >
               <Link href="/apply">Apply Now</Link>
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Supported By Section */}
+      <section className="py-16 px-4 bg-gray-50 border-t border-gray-200">
+        <div className="container mx-auto max-w-4xl">
+          <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider text-center mb-8">
+            Supported By
+          </h3>
+
+          <div className="flex flex-col md:flex-row items-center justify-center gap-12">
+            {/* SciOS */}
+            <div className="flex flex-col items-center gap-3">
+              <div className="text-sm text-gray-600 font-medium">Facilitation by</div>
+              <a
+                href="https://www.scios.tech/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-opacity hover:opacity-70 bg-slate-900 px-6 py-3 rounded-lg"
+              >
+                <Image
+                  src="/scios-logo.png"
+                  alt="SciOS"
+                  width={200}
+                  height={48}
+                  className="h-12 w-auto"
+                />
+              </a>
+            </div>
+
+            {/* Divider */}
+            <div className="hidden md:block h-16 w-px bg-gray-300"></div>
+
+            {/* Navigation Fund */}
+            <div className="flex flex-col items-center gap-3">
+              <div className="text-sm text-gray-600 font-medium">Funding by</div>
+              <a
+                href="https://www.navigation.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-900 hover:text-cyan-600 transition-colors"
+              >
+                <div className="text-2xl font-bold">Navigation Fund</div>
+              </a>
+              <a
+                href="https://doi.org/10.71707/a62a-a585"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-gray-500 hover:text-cyan-600 transition-colors"
+              >
+                View Grant →
+              </a>
+            </div>
           </div>
         </div>
       </section>
