@@ -16,12 +16,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import type { Classification, Inserts } from '@/types/database'
 import {
-  ArrowLeft,
-  ArrowRight,
-  User,
-  FileText,
-  Calendar,
-  Check,
   Loader2,
   Info,
   AlertCircle,
@@ -83,12 +77,6 @@ const applicationSchema = z.object({
 
 type ApplicationFormData = z.infer<typeof applicationSchema>
 
-const steps = [
-  { id: 1, name: 'Personal Info & Classification', icon: User },
-  { id: 2, name: 'Application Questions', icon: FileText },
-  { id: 3, name: 'Logistics', icon: Calendar },
-]
-
 const classificationOptions: { value: Classification; label: string }[] = [
   { value: 'researcher', label: 'Researcher' },
   { value: 'engineer', label: 'Engineer' },
@@ -99,7 +87,6 @@ const classificationOptions: { value: Classification; label: string }[] = [
 
 export default function ApplyPage() {
   const router = useRouter()
-  const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedClassifications, setSelectedClassifications] = useState<string[]>([])
@@ -109,7 +96,6 @@ export default function ApplyPage() {
     register,
     handleSubmit,
     formState: { errors },
-    trigger,
     watch,
     control,
     setValue,
@@ -147,86 +133,6 @@ export default function ApplyPage() {
 
     setValue('classifications', updated)
     setSelectedClassifications(updated)
-  }
-
-  const nextStep = async () => {
-    // Validate current step fields
-    const fieldsToValidate: (keyof ApplicationFormData)[] = []
-
-    if (currentStep === 1) {
-      // Validate personal info
-      fieldsToValidate.push('name', 'email', 'organization', 'role', 'classifications')
-
-      // Check classification_other if needed
-      if (selectedClassifications.includes('other')) {
-        fieldsToValidate.push('classification_other')
-        const otherValue = watch('classification_other')
-        if (!otherValue || otherValue.trim().length === 0) {
-          setError('Please specify your classification when selecting "Other"')
-          return
-        }
-        if (otherValue.length > 15) {
-          setError('Classification "Other" must be 15 characters or less')
-          return
-        }
-      }
-    } else if (currentStep === 2) {
-      // Validate universal questions
-      fieldsToValidate.push(
-        'importance_of_schema',
-        'excited_projects',
-        'work_links',
-        'workshop_contribution',
-        'research_elements'
-      )
-
-      // Validate role-specific questions based on classifications
-      if (selectedClassifications.includes('researcher')) {
-        fieldsToValidate.push('researcher_use_case', 'researcher_future_impact')
-        const useCase = watch('researcher_use_case')
-        const futureImpact = watch('researcher_future_impact')
-        if (!useCase || !futureImpact) {
-          setError('Please answer all Researcher questions')
-          return
-        }
-      }
-      if (selectedClassifications.includes('designer')) {
-        fieldsToValidate.push('designer_ux_considerations')
-        const uxConsiderations = watch('designer_ux_considerations')
-        if (!uxConsiderations) {
-          setError('Please answer the Designer question')
-          return
-        }
-      }
-      if (selectedClassifications.includes('engineer')) {
-        fieldsToValidate.push('engineer_working_on', 'engineer_schema_considerations')
-        const workingOn = watch('engineer_working_on')
-        const schemaConsiderations = watch('engineer_schema_considerations')
-        if (!workingOn || !schemaConsiderations) {
-          setError('Please answer all Engineer questions')
-          return
-        }
-      }
-      if (selectedClassifications.includes('conceptionalist')) {
-        fieldsToValidate.push('conceptionalist_unlock', 'conceptionalist_enable')
-        const unlock = watch('conceptionalist_unlock')
-        const enable = watch('conceptionalist_enable')
-        if (!unlock || !enable) {
-          setError('Please answer all Conceptionalist questions')
-          return
-        }
-      }
-    }
-
-    setError(null)
-    const isValid = await trigger(fieldsToValidate)
-    if (isValid) {
-      setCurrentStep(prev => Math.min(prev + 1, steps.length))
-    }
-  }
-
-  const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1))
   }
 
   const onSubmit = async (data: ApplicationFormData) => {
@@ -343,72 +249,17 @@ export default function ApplyPage() {
           </p>
         </div>
 
-        {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            {steps.map((step, index) => {
-              const Icon = step.icon
-              return (
-                <div key={step.id} className="flex-1 relative">
-                  <div className="flex items-center">
-                    <div
-                      className={`
-                        w-12 h-12 rounded-full flex items-center justify-center transition-all
-                        ${currentStep > step.id
-                          ? 'bg-green-600 text-white'
-                          : currentStep === step.id
-                          ? 'bg-blue-600 text-white ring-4 ring-blue-100'
-                          : 'bg-gray-200 text-gray-500'}
-                      `}
-                    >
-                      {currentStep > step.id ? (
-                        <Check className="w-5 h-5" />
-                      ) : (
-                        <Icon className="w-5 h-5" />
-                      )}
-                    </div>
-                    <div className="ml-3">
-                      <p className={`text-sm font-medium ${
-                        currentStep >= step.id ? 'text-gray-900' : 'text-gray-500'
-                      }`}>
-                        Step {step.id}
-                      </p>
-                      <p className={`text-xs ${
-                        currentStep >= step.id ? 'text-gray-600' : 'text-gray-400'
-                      }`}>
-                        {step.name}
-                      </p>
-                    </div>
-                  </div>
-                  {index < steps.length - 1 && (
-                    <div className={`
-                      absolute top-6 left-12 w-full h-0.5 transition-all
-                      ${currentStep > step.id ? 'bg-green-600' : 'bg-gray-200'}
-                    `} />
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
         {/* Form Card */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <Card className="shadow-xl">
             <CardHeader>
-              <CardTitle>
-                {currentStep === 1 && 'Personal Information & Classification'}
-                {currentStep === 2 && 'Application Questions'}
-                {currentStep === 3 && 'Logistics & Confirmation'}
-              </CardTitle>
+              <CardTitle>Workshop Application</CardTitle>
               <CardDescription>
-                {currentStep === 1 && 'Tell us about yourself and how you classify your work'}
-                {currentStep === 2 && 'Share your perspectives and motivations'}
-                {currentStep === 3 && 'Confirm availability and provide logistics information'}
+                Complete all sections below to apply to the MIRA workshop
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-8">
               {error && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
@@ -416,8 +267,12 @@ export default function ApplyPage() {
                 </Alert>
               )}
 
-              {/* Step 1: Personal Information & Classifications */}
-              {currentStep === 1 && (
+              {/* Section 1: Personal Information & Classifications */}
+              <div className="space-y-6">
+                <div className="border-l-4 border-blue-600 pl-4">
+                  <h2 className="text-2xl font-bold text-gray-900">1. Personal Information & Classification</h2>
+                  <p className="text-sm text-gray-600 mt-1">Tell us about yourself and how you classify your work</p>
+                </div>
                 <div className="space-y-6">
                   {/* Personal Info */}
                   <div className="space-y-4">
@@ -526,10 +381,16 @@ export default function ApplyPage() {
                     )}
                   </div>
                 </div>
-              )}
+              </div>
 
-              {/* Step 2: Application Questions */}
-              {currentStep === 2 && (
+              <Separator />
+
+              {/* Section 2: Application Questions */}
+              <div className="space-y-6">
+                <div className="border-l-4 border-purple-600 pl-4">
+                  <h2 className="text-2xl font-bold text-gray-900">2. Application Questions</h2>
+                  <p className="text-sm text-gray-600 mt-1">Share your perspectives and motivations</p>
+                </div>
                 <div className="space-y-8">
                   {/* Universal Questions Section */}
                   <div className="space-y-6">
@@ -898,10 +759,16 @@ export default function ApplyPage() {
                     </div>
                   )}
                 </div>
-              )}
+              </div>
 
-              {/* Step 3: Logistics */}
-              {currentStep === 3 && (
+              <Separator />
+
+              {/* Section 3: Logistics */}
+              <div className="space-y-6">
+                <div className="border-l-4 border-green-600 pl-4">
+                  <h2 className="text-2xl font-bold text-gray-900">3. Logistics & Confirmation</h2>
+                  <p className="text-sm text-gray-600 mt-1">Confirm availability and provide logistics information</p>
+                </div>
                 <div className="space-y-6">
                   <div className="rounded-lg bg-blue-50 p-4">
                     <div className="flex">
@@ -973,41 +840,20 @@ export default function ApplyPage() {
                     </ul>
                   </div>
                 </div>
-              )}
+              </div>
             </CardContent>
 
-            <CardFooter className="flex justify-between">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={prevStep}
-                disabled={currentStep === 1}
-                className={currentStep === 1 ? 'invisible' : ''}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Previous
+            <CardFooter className="flex justify-end">
+              <Button type="submit" disabled={isSubmitting} size="lg">
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting Application...
+                  </>
+                ) : (
+                  'Submit Application'
+                )}
               </Button>
-
-              {currentStep < steps.length ? (
-                <Button type="button" onClick={nextStep}>
-                  Next
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              ) : (
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      Submit Application
-                      <Check className="ml-2 h-4 w-4" />
-                    </>
-                  )}
-                </Button>
-              )}
             </CardFooter>
           </Card>
         </form>
