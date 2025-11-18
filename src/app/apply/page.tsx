@@ -944,10 +944,10 @@ export default function ApplyPage() {
                         <h3 className="text-sm font-medium text-blue-800">Workshop Details</h3>
                         <div className="mt-2 text-sm text-blue-700">
                           <ul className="list-disc space-y-1 pl-5">
-                            <li><strong>Pre-Workshop:</strong> 5-7 working calls (Feb-Jun 2026)</li>
-                            <li>Date: June 7-11, 2026</li>
+                            <li>Pre-Workshop: 5-7 working calls (Feb-Jun 2026)</li>
+                            <li>Workshop Dates: June 7-11, 2026</li>
                             <li>Duration: 5 days intensive workshop</li>
-                            <li>Format: In-person collaboration</li>
+                            <li>Format: In-person facilitated collaboration</li>
                             <li>Location: The Deerstone Eco Hideaway, Ireland</li>
                             <li><strong>Travel, accommodation, and living expenses covered</strong> by Navigation Fund grant</li>
                           </ul>
