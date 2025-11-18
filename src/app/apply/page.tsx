@@ -944,6 +944,7 @@ export default function ApplyPage() {
                         <h3 className="text-sm font-medium text-blue-800">Workshop Details</h3>
                         <div className="mt-2 text-sm text-blue-700">
                           <ul className="list-disc space-y-1 pl-5">
+                            <li><strong>Pre-Workshop:</strong> 5-7 working calls (Feb-Jun 2026)</li>
                             <li>Date: June 7-11, 2026</li>
                             <li>Duration: 5 days intensive workshop</li>
                             <li>Format: In-person collaboration</li>
@@ -965,10 +966,10 @@ export default function ApplyPage() {
                       />
                       <div className="ml-3">
                         <Label htmlFor="availability_confirmed" className="cursor-pointer">
-                          I confirm my availability for the full 5-day workshop *
+                          I confirm my availability for pre-workshop calls and the full 5-day workshop *
                         </Label>
                         <p className="text-sm text-gray-500 mt-1">
-                          You must be able to attend all workshop days (June 7-11, 2026)
+                          You must be able to participate in 5-7 working calls (Feb-Jun 2026) and attend all workshop days (June 7-11, 2026)
                         </p>
                       </div>
                     </div>

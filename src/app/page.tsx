@@ -21,9 +21,9 @@ export default function TestHome() {
               </h1>
 
               <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
-                A five-day, cost-covered, intensive workshop to design and prototype interoperable
+                A five-day, intensive, cost-covered, workshop to design and prototype interoperable
                 frameworks for modular research attribution. Bringing together researchers,
-                designers, and engineers to build the future of scientific communication and collaboration.
+                designers, engineers, and specialists to build the future of scientific communication and collaboration.
               </p>
             </div>
 
