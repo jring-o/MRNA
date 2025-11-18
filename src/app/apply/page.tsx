@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Separator } from '@/components/ui/separator'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -334,21 +333,29 @@ export default function ApplyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      <div className="max-w-4xl mx-auto py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 relative overflow-hidden">
+      {/* Inspiring background pattern - grid with radial fade */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/50 to-slate-900"></div>
+
+      {/* Subtle decorative light elements */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-purple-500/15 to-blue-500/15 rounded-full blur-3xl" />
+
+      <div className="max-w-4xl mx-auto py-12 px-4 relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="text-4xl font-bold text-white mb-2">
             Apply to the Workshop
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-blue-200">
             Join leading researchers in revolutionizing scientific attribution
           </p>
         </div>
 
         {/* Form Card */}
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Card className="shadow-xl">
+          <Card className="shadow-2xl border-white/20 backdrop-blur-sm bg-white/95">
             <CardHeader>
               <CardTitle>Workshop Application</CardTitle>
               <CardDescription>
@@ -430,7 +437,17 @@ export default function ApplyPage() {
                     </div>
                   </div>
 
-                  <Separator />
+                  {/* Enhanced Separator */}
+                  <div className="relative py-8">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-200"></div>
+                    </div>
+                    <div className="relative flex justify-center">
+                      <span className="bg-white px-4">
+                        <div className="h-px w-12 bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400"></div>
+                      </span>
+                    </div>
+                  </div>
 
                   {/* Classifications */}
                   <div ref={classificationsRef}>
@@ -480,7 +497,17 @@ export default function ApplyPage() {
                 </div>
               </div>
 
-              <Separator />
+              {/* Enhanced Separator */}
+              <div className="relative py-8">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-white px-4">
+                    <div className="h-px w-12 bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400"></div>
+                  </span>
+                </div>
+              </div>
 
               {/* Section 2: Application Questions */}
               <div className="space-y-6">
@@ -497,7 +524,7 @@ export default function ApplyPage() {
                     </div>
 
                     {/* Question 1 */}
-                    <div>
+                    <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                       <div className="flex items-center justify-between mb-2">
                         <Label htmlFor="importance_of_schema">
                           Why is an interoperable Research attribution Schema important to you? *
@@ -511,7 +538,7 @@ export default function ApplyPage() {
                         {...register('importance_of_schema', {
                           onChange: (e) => updateWordCount('importance_of_schema', e.target.value)
                         })}
-                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
                           errors.importance_of_schema ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Share why this matters to you..."
@@ -522,7 +549,7 @@ export default function ApplyPage() {
                     </div>
 
                     {/* Question 2 */}
-                    <div>
+                    <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                       <div className="flex items-center justify-between mb-2">
                         <Label htmlFor="excited_projects">
                           What other science, science infrastructure, open science, modular research, etc. projects are you excited about? *
@@ -536,7 +563,7 @@ export default function ApplyPage() {
                         {...register('excited_projects', {
                           onChange: (e) => updateWordCount('excited_projects', e.target.value)
                         })}
-                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
                           errors.excited_projects ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Tell us about projects that inspire you..."
@@ -640,7 +667,7 @@ export default function ApplyPage() {
                     </div>
 
                     {/* Question 4 */}
-                    <div>
+                    <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                       <div className="flex items-center justify-between mb-2">
                         <Label htmlFor="workshop_contribution">
                           What would you add to this workshop if you came (specific experience, perspective, etc)? *
@@ -654,7 +681,7 @@ export default function ApplyPage() {
                         {...register('workshop_contribution', {
                           onChange: (e) => updateWordCount('workshop_contribution', e.target.value)
                         })}
-                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
                           errors.workshop_contribution ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="What unique perspective or skills would you bring..."
@@ -665,7 +692,7 @@ export default function ApplyPage() {
                     </div>
 
                     {/* Question 5 */}
-                    <div>
+                    <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                       <div className="flex items-center justify-between mb-2">
                         <Label htmlFor="research_elements">
                           What elements or outputs of the research process would you define? For example: A Claim, a dataset, etc. *
@@ -679,7 +706,7 @@ export default function ApplyPage() {
                         {...register('research_elements', {
                           onChange: (e) => updateWordCount('research_elements', e.target.value)
                         })}
-                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
                           errors.research_elements ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Define the key elements you'd want to track..."
@@ -698,7 +725,7 @@ export default function ApplyPage() {
                         <p className="text-sm text-blue-700">Because you selected Researcher</p>
                       </div>
 
-                      <div>
+                      <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                         <div className="flex items-center justify-between mb-2">
                           <Label htmlFor="researcher_use_case">
                             What is your immediate use-case for modular research sharing and/or attribution? *
@@ -712,7 +739,7 @@ export default function ApplyPage() {
                           {...register('researcher_use_case', {
                             onChange: (e) => updateWordCount('researcher_use_case', e.target.value)
                           })}
-                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
                             errors.researcher_use_case ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="Describe your current use case..."
@@ -722,7 +749,7 @@ export default function ApplyPage() {
                         )}
                       </div>
 
-                      <div>
+                      <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                         <div className="flex items-center justify-between mb-2">
                           <Label htmlFor="researcher_future_impact">
                             What impact might more granular research sharing and attribution have for you or your collaborations in the future? *
@@ -736,7 +763,7 @@ export default function ApplyPage() {
                           {...register('researcher_future_impact', {
                             onChange: (e) => updateWordCount('researcher_future_impact', e.target.value)
                           })}
-                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
                             errors.researcher_future_impact ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="Describe the potential future impact..."
@@ -755,7 +782,7 @@ export default function ApplyPage() {
                         <p className="text-sm text-pink-700">Because you selected Designer</p>
                       </div>
 
-                      <div>
+                      <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                         <div className="flex items-center justify-between mb-2">
                           <Label htmlFor="designer_ux_considerations">
                             What are the most important considerations when doing UX/design for researchers and pulling/publishing data across multiple platforms with differing schemas? *
@@ -769,7 +796,7 @@ export default function ApplyPage() {
                           {...register('designer_ux_considerations', {
                             onChange: (e) => updateWordCount('designer_ux_considerations', e.target.value)
                           })}
-                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
                             errors.designer_ux_considerations ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="Share your design perspectives..."
@@ -788,7 +815,7 @@ export default function ApplyPage() {
                         <p className="text-sm text-purple-700">Because you selected Engineer</p>
                       </div>
 
-                      <div>
+                      <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                         <div className="flex items-center justify-between mb-2">
                           <Label htmlFor="engineer_working_on">
                             What are you working on that would use an interoperable research attribution schema - How? *
@@ -802,7 +829,7 @@ export default function ApplyPage() {
                           {...register('engineer_working_on', {
                             onChange: (e) => updateWordCount('engineer_working_on', e.target.value)
                           })}
-                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
                             errors.engineer_working_on ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="Describe your engineering work..."
@@ -812,7 +839,7 @@ export default function ApplyPage() {
                         )}
                       </div>
 
-                      <div>
+                      <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                         <div className="flex items-center justify-between mb-2">
                           <Label htmlFor="engineer_schema_considerations">
                             What are the most important considerations when designing and implementing a shared schema or crosswalks across multiple platforms/tools? *
@@ -826,7 +853,7 @@ export default function ApplyPage() {
                           {...register('engineer_schema_considerations', {
                             onChange: (e) => updateWordCount('engineer_schema_considerations', e.target.value)
                           })}
-                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
                             errors.engineer_schema_considerations ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="Share your technical perspectives..."
@@ -845,7 +872,7 @@ export default function ApplyPage() {
                         <p className="text-sm text-amber-700">Because you selected Landscape/Ecosystem Specialist</p>
                       </div>
 
-                      <div>
+                      <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                         <div className="flex items-center justify-between mb-2">
                           <Label htmlFor="landscape_specialist_current_work">
                             What would an interoperable attribution schema unlock for one of your existing projects? *
@@ -859,7 +886,7 @@ export default function ApplyPage() {
                           {...register('landscape_specialist_current_work', {
                             onChange: (e) => updateWordCount('landscape_specialist_current_work', e.target.value)
                           })}
-                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
                             errors.landscape_specialist_current_work ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="Describe what would be unlocked..."
@@ -869,7 +896,7 @@ export default function ApplyPage() {
                         )}
                       </div>
 
-                      <div>
+                      <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                         <div className="flex items-center justify-between mb-2">
                           <Label htmlFor="landscape_specialist_see_emerging">
                             What new projects might an interoperable attribution schema enable, broadly speaking? *
@@ -883,7 +910,7 @@ export default function ApplyPage() {
                           {...register('landscape_specialist_see_emerging', {
                             onChange: (e) => updateWordCount('landscape_specialist_see_emerging', e.target.value)
                           })}
-                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
                             errors.landscape_specialist_see_emerging ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="Describe potential new projects..."
@@ -897,7 +924,17 @@ export default function ApplyPage() {
                 </div>
               </div>
 
-              <Separator />
+              {/* Enhanced Separator */}
+              <div className="relative py-8">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-white px-4">
+                    <div className="h-px w-12 bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400"></div>
+                  </span>
+                </div>
+              </div>
 
               {/* Section 3: Logistics */}
               <div className="space-y-6">
@@ -964,7 +1001,17 @@ export default function ApplyPage() {
                     />
                   </div>
 
-                  <Separator />
+                  {/* Enhanced Separator */}
+                  <div className="relative py-8">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-200"></div>
+                    </div>
+                    <div className="relative flex justify-center">
+                      <span className="bg-white px-4">
+                        <div className="h-px w-12 bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400"></div>
+                      </span>
+                    </div>
+                  </div>
 
                   <div className="rounded-lg bg-gray-50 p-4">
                     <h3 className="text-sm font-medium text-gray-900 mb-2">Before you submit:</h3>
@@ -995,12 +1042,12 @@ export default function ApplyPage() {
         </form>
 
         {/* Footer Links */}
-        <div className="mt-8 text-center text-sm text-gray-600">
-          <Link href="/status" className="text-blue-600 hover:text-blue-500">
+        <div className="mt-8 text-center text-sm text-blue-200">
+          <Link href="/status" className="text-cyan-400 hover:text-cyan-300 transition-colors">
             Already applied? Check your status
           </Link>
           {' • '}
-          <Link href="/" className="text-blue-600 hover:text-blue-500">
+          <Link href="/" className="text-cyan-400 hover:text-cyan-300 transition-colors">
             Back to Homepage
           </Link>
         </div>
