@@ -51,10 +51,11 @@ const applicationSchema = z.object({
   // Page 2: Universal Questions (all applicants)
   importance_of_schema: wordCount(200, 'Maximum 200 words allowed'),
   excited_projects: wordCount(200, 'Maximum 200 words allowed'),
-  work_links: z.array(z.object({
-    url: z.string().url('Invalid URL format').or(z.literal('')),
-    role: z.string().min(1, 'Role description is required'),
-  })).min(1, 'At least one link is required').max(5, 'Maximum 5 links allowed'),
+  work_items: z.array(z.object({
+    description: z.string().min(1, 'Description is required'),
+    role: z.string().min(1, 'Role is required'),
+    url: z.string().url('Invalid URL format').optional().or(z.literal('')),
+  })).min(1, 'At least one work example is required').max(5, 'Maximum 5 work examples allowed'),
   workshop_contribution: wordCount(200, 'Maximum 200 words allowed'),
   research_elements: wordCount(200, 'Maximum 200 words allowed'),
 
@@ -64,8 +65,8 @@ const applicationSchema = z.object({
   designer_ux_considerations: wordCount(200, 'Maximum 200 words allowed').optional(),
   engineer_working_on: wordCount(200, 'Maximum 200 words allowed').optional(),
   engineer_schema_considerations: wordCount(200, 'Maximum 200 words allowed').optional(),
-  conceptionalist_unlock: wordCount(200, 'Maximum 200 words allowed').optional(),
-  conceptionalist_enable: wordCount(200, 'Maximum 200 words allowed').optional(),
+  landscape_specialist_current_work: wordCount(200, 'Maximum 200 words allowed').optional(),
+  landscape_specialist_see_emerging: wordCount(200, 'Maximum 200 words allowed').optional(),
 
   // Page 3: Logistics
   availability_confirmed: z.boolean().refine(val => val === true, {
@@ -73,6 +74,88 @@ const applicationSchema = z.object({
   }),
   travel_requirements: z.string().optional(),
   dietary_restrictions: z.string().optional(),
+}).superRefine((data, ctx) => {
+  // Validate classification_other if 'other' is selected
+  if (data.classifications.includes('other')) {
+    if (!data.classification_other || data.classification_other.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Please specify your classification when selecting "Other"',
+        path: ['classification_other'],
+      })
+    } else if (data.classification_other.length > 15) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Classification must be 15 characters or less',
+        path: ['classification_other'],
+      })
+    }
+  }
+
+  // Validate researcher questions if 'researcher' is selected
+  if (data.classifications.includes('researcher')) {
+    if (!data.researcher_use_case || data.researcher_use_case.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'This question is required for researchers',
+        path: ['researcher_use_case'],
+      })
+    }
+    if (!data.researcher_future_impact || data.researcher_future_impact.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'This question is required for researchers',
+        path: ['researcher_future_impact'],
+      })
+    }
+  }
+
+  // Validate designer questions if 'designer' is selected
+  if (data.classifications.includes('designer')) {
+    if (!data.designer_ux_considerations || data.designer_ux_considerations.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'This question is required for designers',
+        path: ['designer_ux_considerations'],
+      })
+    }
+  }
+
+  // Validate engineer questions if 'engineer' is selected
+  if (data.classifications.includes('engineer')) {
+    if (!data.engineer_working_on || data.engineer_working_on.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'This question is required for engineers',
+        path: ['engineer_working_on'],
+      })
+    }
+    if (!data.engineer_schema_considerations || data.engineer_schema_considerations.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'This question is required for engineers',
+        path: ['engineer_schema_considerations'],
+      })
+    }
+  }
+
+  // Validate landscape/ecosystem specialist questions if 'landscape_specialist' is selected
+  if (data.classifications.includes('landscape_specialist')) {
+    if (!data.landscape_specialist_current_work || data.landscape_specialist_current_work.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'This question is required for landscape/ecosystem specialists',
+        path: ['landscape_specialist_current_work'],
+      })
+    }
+    if (!data.landscape_specialist_see_emerging || data.landscape_specialist_see_emerging.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'This question is required for landscape/ecosystem specialists',
+        path: ['landscape_specialist_see_emerging'],
+      })
+    }
+  }
 })
 
 type ApplicationFormData = z.infer<typeof applicationSchema>
@@ -81,7 +164,7 @@ const classificationOptions: { value: Classification; label: string }[] = [
   { value: 'researcher', label: 'Researcher' },
   { value: 'engineer', label: 'Engineer' },
   { value: 'designer', label: 'Designer' },
-  { value: 'conceptionalist', label: 'Conceptionalist' },
+  { value: 'landscape_specialist', label: 'Landscape/Ecosystem Specialist' },
   { value: 'other', label: 'Other' },
 ]
 
@@ -104,14 +187,14 @@ export default function ApplyPage() {
     mode: 'onChange',
     defaultValues: {
       classifications: [],
-      work_links: [{ url: '', role: '' }],
+      work_items: [{ description: '', role: '', url: '' }],
       availability_confirmed: false,
     }
   })
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'work_links',
+    name: 'work_items',
   })
 
   const watchClassifications = watch('classifications')
@@ -155,11 +238,14 @@ export default function ApplyPage() {
         return
       }
 
-      // Filter out empty work links
-      const validWorkLinks = data.work_links.filter(link => link.url && link.role)
+      // Filter out completely empty work items (both description and role are empty)
+      const validWorkItems = data.work_items.filter(
+        item => item.description.trim() !== '' || item.role.trim() !== ''
+      )
 
       // Submit application
-      const applicationData: Inserts<'applications'> = {
+      // TODO: Regenerate Supabase types after running migration 015
+      const applicationData = {
         // Personal info
         email: data.email,
         name: data.name,
@@ -173,7 +259,7 @@ export default function ApplyPage() {
         // Universal questions
         importance_of_schema: data.importance_of_schema,
         excited_projects: data.excited_projects,
-        work_links: validWorkLinks,
+        work_links: validWorkItems,
         workshop_contribution: data.workshop_contribution,
         research_elements: data.research_elements,
 
@@ -183,8 +269,8 @@ export default function ApplyPage() {
         designer_ux_considerations: data.designer_ux_considerations || null,
         engineer_working_on: data.engineer_working_on || null,
         engineer_schema_considerations: data.engineer_schema_considerations || null,
-        conceptionalist_unlock: data.conceptionalist_unlock || null,
-        conceptionalist_enable: data.conceptionalist_enable || null,
+        landscape_specialist_current_work: data.landscape_specialist_current_work || null,
+        landscape_specialist_see_emerging: data.landscape_specialist_see_emerging || null,
 
         // Logistics stored in admin_notes for now
         admin_notes: [
@@ -192,7 +278,7 @@ export default function ApplyPage() {
           `Travel Requirements: ${data.travel_requirements || 'None'}`,
           `Dietary Restrictions: ${data.dietary_restrictions || 'None'}`,
         ],
-      }
+      } as Inserts<'applications'>
 
       const { data: newApplication, error: applicationError } = await supabase
         .from('applications')
@@ -449,36 +535,75 @@ export default function ApplyPage() {
                       )}
                     </div>
 
-                    {/* Question 3: Work Links */}
+                    {/* Question 3: Share Your Past/Current Work */}
                     <div>
-                      <Label>Links to what you&apos;re working on *</Label>
-                      <p className="text-sm text-gray-500 mb-3">Add 1-5 links with a description of your role</p>
-                      <div className="space-y-3">
+                      <Label>Share your past/current work *</Label>
+                      <p className="text-sm text-gray-500 mb-3">Add 1-5 examples of your work with a description and your role (link optional)</p>
+                      <div className="space-y-4">
                         {fields.map((field, index) => (
-                          <div key={field.id} className="flex gap-2 items-start">
-                            <div className="flex-1 space-y-2">
-                              <Input
-                                {...register(`work_links.${index}.url` as const)}
-                                placeholder="https://example.com/your-project"
-                                className={errors.work_links?.[index]?.url ? 'border-red-500' : ''}
-                              />
-                              <Input
-                                {...register(`work_links.${index}.role` as const)}
-                                placeholder="Your role (e.g., Lead Developer, PI, Designer)"
-                                className={errors.work_links?.[index]?.role ? 'border-red-500' : ''}
-                              />
+                          <div key={field.id} className="border rounded-lg p-4 bg-gray-50">
+                            <div className="flex gap-2 items-start mb-3">
+                              <div className="flex-1">
+                                <Label className="text-xs text-gray-600">Work Example #{index + 1}</Label>
+                              </div>
+                              {fields.length > 1 && (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="icon"
+                                  onClick={() => remove(index)}
+                                  className="h-8 w-8"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              )}
                             </div>
-                            {fields.length > 1 && (
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                onClick={() => remove(index)}
-                                className="mt-0"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            )}
+                            <div className="space-y-3">
+                              <div>
+                                <Label htmlFor={`work_items.${index}.description`} className="text-sm">
+                                  Description *
+                                </Label>
+                                <textarea
+                                  id={`work_items.${index}.description`}
+                                  {...register(`work_items.${index}.description` as const)}
+                                  placeholder="Describe the project, research, or work you contributed to..."
+                                  className={`w-full min-h-[80px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                    errors.work_items?.[index]?.description ? 'border-red-500' : 'border-gray-300'
+                                  }`}
+                                />
+                                {errors.work_items?.[index]?.description && (
+                                  <p className="text-sm text-red-500 mt-1">{errors.work_items[index]?.description?.message}</p>
+                                )}
+                              </div>
+                              <div>
+                                <Label htmlFor={`work_items.${index}.role`} className="text-sm">
+                                  Your Role *
+                                </Label>
+                                <Input
+                                  id={`work_items.${index}.role`}
+                                  {...register(`work_items.${index}.role` as const)}
+                                  placeholder="e.g., Lead Developer, PI, Designer, Research Assistant"
+                                  className={errors.work_items?.[index]?.role ? 'border-red-500' : ''}
+                                />
+                                {errors.work_items?.[index]?.role && (
+                                  <p className="text-sm text-red-500 mt-1">{errors.work_items[index]?.role?.message}</p>
+                                )}
+                              </div>
+                              <div>
+                                <Label htmlFor={`work_items.${index}.url`} className="text-sm">
+                                  Link (Optional)
+                                </Label>
+                                <Input
+                                  id={`work_items.${index}.url`}
+                                  {...register(`work_items.${index}.url` as const)}
+                                  placeholder="https://example.com/your-project (if publicly available)"
+                                  className={errors.work_items?.[index]?.url ? 'border-red-500' : ''}
+                                />
+                                {errors.work_items?.[index]?.url && (
+                                  <p className="text-sm text-red-500 mt-1">{errors.work_items[index]?.url?.message}</p>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         ))}
                         {fields.length < 5 && (
@@ -486,19 +611,19 @@ export default function ApplyPage() {
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={() => append({ url: '', role: '' })}
+                            onClick={() => append({ description: '', role: '', url: '' })}
                             className="w-full"
                           >
                             <Plus className="h-4 w-4 mr-2" />
-                            Add another link
+                            Add another work example
                           </Button>
                         )}
                       </div>
-                      {errors.work_links && (
+                      {errors.work_items && (
                         <p className="text-sm text-red-500 mt-1">
-                          {typeof errors.work_links.message === 'string'
-                            ? errors.work_links.message
-                            : 'Please provide valid links and role descriptions'}
+                          {typeof errors.work_items.message === 'string'
+                            ? errors.work_items.message
+                            : 'Please provide valid work examples'}
                         </p>
                       )}
                     </div>
@@ -702,58 +827,58 @@ export default function ApplyPage() {
                     </div>
                   )}
 
-                  {selectedClassifications.includes('conceptionalist') && (
+                  {selectedClassifications.includes('landscape_specialist') && (
                     <div className="space-y-6">
                       <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                        <h3 className="font-semibold text-amber-900 mb-1">Questions for Conceptionalists</h3>
-                        <p className="text-sm text-amber-700">Because you selected Conceptionalist</p>
+                        <h3 className="font-semibold text-amber-900 mb-1">Questions for Landscape/Ecosystem Specialists</h3>
+                        <p className="text-sm text-amber-700">Because you selected Landscape/Ecosystem Specialist</p>
                       </div>
 
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <Label htmlFor="conceptionalist_unlock">
+                          <Label htmlFor="landscape_specialist_current_work">
                             What would an interoperable attribution schema unlock for one of your existing projects? *
                           </Label>
                           <span className="text-xs text-gray-500">
-                            {wordCounts.conceptionalist_unlock || 0}/200 words
+                            {wordCounts.landscape_specialist_current_work || 0}/200 words
                           </span>
                         </div>
                         <textarea
-                          id="conceptionalist_unlock"
-                          {...register('conceptionalist_unlock', {
-                            onChange: (e) => updateWordCount('conceptionalist_unlock', e.target.value)
+                          id="landscape_specialist_current_work"
+                          {...register('landscape_specialist_current_work', {
+                            onChange: (e) => updateWordCount('landscape_specialist_current_work', e.target.value)
                           })}
                           className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                            errors.conceptionalist_unlock ? 'border-red-500' : 'border-gray-300'
+                            errors.landscape_specialist_current_work ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="Describe what would be unlocked..."
                         />
-                        {errors.conceptionalist_unlock && (
-                          <p className="text-sm text-red-500 mt-1">{errors.conceptionalist_unlock.message}</p>
+                        {errors.landscape_specialist_current_work && (
+                          <p className="text-sm text-red-500 mt-1">{errors.landscape_specialist_current_work.message}</p>
                         )}
                       </div>
 
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <Label htmlFor="conceptionalist_enable">
+                          <Label htmlFor="landscape_specialist_see_emerging">
                             What new projects might an interoperable attribution schema enable, broadly speaking? *
                           </Label>
                           <span className="text-xs text-gray-500">
-                            {wordCounts.conceptionalist_enable || 0}/200 words
+                            {wordCounts.landscape_specialist_see_emerging || 0}/200 words
                           </span>
                         </div>
                         <textarea
-                          id="conceptionalist_enable"
-                          {...register('conceptionalist_enable', {
-                            onChange: (e) => updateWordCount('conceptionalist_enable', e.target.value)
+                          id="landscape_specialist_see_emerging"
+                          {...register('landscape_specialist_see_emerging', {
+                            onChange: (e) => updateWordCount('landscape_specialist_see_emerging', e.target.value)
                           })}
                           className={`w-full min-h-[120px] px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                            errors.conceptionalist_enable ? 'border-red-500' : 'border-gray-300'
+                            errors.landscape_specialist_see_emerging ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="Describe potential new projects..."
                         />
-                        {errors.conceptionalist_enable && (
-                          <p className="text-sm text-red-500 mt-1">{errors.conceptionalist_enable.message}</p>
+                        {errors.landscape_specialist_see_emerging && (
+                          <p className="text-sm text-red-500 mt-1">{errors.landscape_specialist_see_emerging.message}</p>
                         )}
                       </div>
                     </div>

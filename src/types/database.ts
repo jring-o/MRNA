@@ -14,7 +14,7 @@ export type Application = Tables<'applications'>
 export type ApplicationStatus = Database['public']['Enums']['application_status']
 
 // Classification types
-export type Classification = 'researcher' | 'engineer' | 'designer' | 'conceptionalist' | 'other'
+export type Classification = 'researcher' | 'engineer' | 'designer' | 'landscape_specialist' | 'other'
 
 // Work link structure
 export interface WorkLink {
@@ -41,7 +41,7 @@ export function getClassificationDisplayName(classification: string): string {
     'researcher': 'Researcher',
     'engineer': 'Engineer',
     'designer': 'Designer',
-    'conceptionalist': 'Conceptionalist',
+    'landscape_specialist': 'Landscape/Ecosystem Specialist',
   }
   return map[classification] || classification
 }
@@ -52,7 +52,7 @@ export function getClassificationBadgeClass(classification: string): string {
     'researcher': 'bg-blue-100 text-blue-800 border-blue-300',
     'engineer': 'bg-purple-100 text-purple-800 border-purple-300',
     'designer': 'bg-pink-100 text-pink-800 border-pink-300',
-    'conceptionalist': 'bg-amber-100 text-amber-800 border-amber-300',
+    'landscape_specialist': 'bg-amber-100 text-amber-800 border-amber-300',
     'other': 'bg-gray-100 text-gray-800 border-gray-300',
   }
   return map[classification] || 'bg-gray-100 text-gray-800 border-gray-300'
