@@ -21,9 +21,9 @@ export default function TestHome() {
               </h1>
 
               <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
-                A five-day, intensive, cost-covered, workshop to design and prototype interoperable
+                A five-day, cost-covered, intensive workshop to design and prototype interoperable
                 frameworks for modular research attribution. Bringing together researchers,
-                designers, engineers, and specialists to build the future of scientific communication and collaboration.
+                designers, and engineers to build the future of scientific communication and collaboration.
               </p>
             </div>
 
@@ -115,10 +115,11 @@ export default function TestHome() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                      Jan-Jun 2026
+                    <div className="text-xs font-bold text-cyan-700 uppercase tracking-wide mb-1">
+                      Feb-Jun 2026
                     </div>
-                    <div className="text-sm font-semibold text-gray-900">Preparation</div>
+                    <div className="text-sm font-semibold text-gray-900">Pre-Workshop Collaboration</div>
+                    <div className="text-xs text-gray-600 mt-1">5-7 working calls</div>
                   </div>
 
                   <div>
