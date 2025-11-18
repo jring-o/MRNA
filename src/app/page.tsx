@@ -104,14 +104,14 @@ export default function TestHome() {
                     <div className="text-xs font-bold text-cyan-700 uppercase tracking-wide mb-1">
                       Jan 1, 2026
                     </div>
-                    <div className="text-sm font-semibold text-gray-900">Deadline</div>
+                    <div className="text-sm font-semibold text-gray-900">Application Deadline</div>
                   </div>
 
                   <div>
                     <div className="text-xs font-bold text-cyan-700 uppercase tracking-wide mb-1">
                       Jan 15, 2026
                     </div>
-                    <div className="text-sm font-semibold text-gray-900">Decisions</div>
+                    <div className="text-sm font-semibold text-gray-900">Application Responses</div>
                   </div>
 
                   <div>
@@ -133,7 +133,7 @@ export default function TestHome() {
                     <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
                       Post-Workshop
                     </div>
-                    <div className="text-sm font-semibold text-gray-900">Implementation</div>
+                    <div className="text-sm font-semibold text-gray-900">Continuing Work</div>
                   </div>
                 </div>
               </div>
