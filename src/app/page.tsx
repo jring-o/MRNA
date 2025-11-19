@@ -11,7 +11,7 @@ export default function TestHome() {
           <div className="text-center space-y-8">
             <div className="space-y-4">
               <div className="text-sm font-medium text-cyan-400 tracking-wider uppercase">
-                June 7-11, 2026 • Ireland
+                June 7-11, 2026 • Ireland • Fully Sponsored
               </div>
 
               <h1 className="text-5xl md:text-6xl font-bold text-white tracking-tight leading-tight">
@@ -21,9 +21,9 @@ export default function TestHome() {
               </h1>
 
               <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
-                A sponsored five-day, intensive workshop to design and prototype interoperable
+                A five-day, intensive workshop to design and prototype interoperable
                 frameworks for modular research attribution. Bringing together researchers,
-                designers, and engineers, and ecosystem specialists to build the future of scientific communication and collaboration.
+                designers, engineers, and ecosystem specialists to build the future of scientific communication and collaboration.
               </p>
             </div>
 
