@@ -242,11 +242,19 @@ export default function ApplyPage() {
       const supabase = createClient()
 
       // Check if an application already exists for this email
-      const { data: existingApp } = await supabase
+      const { data: existingApp, error: checkError } = await supabase
         .from('applications')
         .select('id')
         .eq('email', data.email)
-        .single()
+        .maybeSingle()
+
+      // Only show error if there's a real database error (not just "no rows found")
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('Error checking existing application:', checkError)
+        setError('Unable to verify application status. Please try again.')
+        setIsSubmitting(false)
+        return
+      }
 
       if (existingApp) {
         setError('An application has already been submitted with this email address. Please check your application status.')
@@ -370,13 +378,6 @@ export default function ApplyPage() {
             </CardHeader>
 
             <CardContent className="space-y-8">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
               {/* Section 1: Personal Information */}
               <div className="space-y-6">
                 <div className="border-l-4 border-blue-600 pl-4">
@@ -521,7 +522,7 @@ export default function ApplyPage() {
                     <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                       <div className="flex items-center justify-between mb-2">
                         <Label htmlFor="importance_of_schema">
-                          Why is an interoperable Research attribution schema important to you? *
+                          Why is an interoperable research attribution schema important to you? *
                         </Label>
                         <span className="text-xs text-gray-500">
                           {wordCounts.importance_of_schema || 0}/200 words
@@ -546,7 +547,7 @@ export default function ApplyPage() {
                     <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                       <div className="flex items-center justify-between mb-2">
                         <Label htmlFor="research_elements">
-                          What elements or outputs of the research process would you define? For example: A Claim, a dataset, etc. *
+                          What elements or outputs of the research process would you define? For example: A claim, a dataset, etc. *
                         </Label>
                         <span className="text-xs text-gray-500">
                           {wordCounts.research_elements || 0}/200 words
@@ -1052,17 +1053,25 @@ export default function ApplyPage() {
               </div>
             </CardContent>
 
-            <CardFooter className="flex justify-end">
-              <Button type="submit" disabled={isSubmitting} size="lg">
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting Application...
-                  </>
-                ) : (
-                  'Submit Application'
-                )}
-              </Button>
+            <CardFooter className="flex flex-col items-stretch gap-4">
+              {error && (
+                <Alert variant="destructive" className="bg-red-50 border-red-500">
+                  <AlertCircle className="h-4 w-4 text-red-600" />
+                  <AlertDescription className="text-red-800">{error}</AlertDescription>
+                </Alert>
+              )}
+              <div className="flex justify-end">
+                <Button type="submit" disabled={isSubmitting} size="lg">
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting Application...
+                    </>
+                  ) : (
+                    'Submit Application'
+                  )}
+                </Button>
+              </div>
             </CardFooter>
           </Card>
         </form>
