@@ -22,7 +22,7 @@ function ApplicationSuccessContent() {
             </div>
             <CardTitle className="text-3xl">Application Submitted!</CardTitle>
             <CardDescription className="text-lg">
-              Thank you for applying to MIRA, Modular Interoperable Research Attribution
+              Thank you for applying to MIRA
             </CardDescription>
           </CardHeader>
 
@@ -131,13 +131,13 @@ function ApplicationSuccessContent() {
 
         {/* Footer Links */}
         <div className="mt-8 text-center text-sm text-gray-600">
-          <Link href="/blog" className="text-blue-600 hover:text-blue-500">
-            Learn more about the workshop
+          <Link href="/" className="text-blue-600 hover:text-blue-500">
+            Back to Homepage
           </Link>
           {' • '}
-          <Link href="/contact" className="text-blue-600 hover:text-blue-500">
+          <a href="mailto:contact@scios.tech" className="text-blue-600 hover:text-blue-500">
             Contact us
-          </Link>
+          </a>
         </div>
       </div>
     </div>

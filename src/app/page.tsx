@@ -21,9 +21,9 @@ export default function TestHome() {
               </h1>
 
               <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
-                A five-day, cost-covered, intensive workshop to design and prototype interoperable
+                A sponsored five-day, intensive workshop to design and prototype interoperable
                 frameworks for modular research attribution. Bringing together researchers,
-                designers, and engineers to build the future of scientific communication and collaboration.
+                designers, and engineers, and ecosystem specialists to build the future of scientific communication and collaboration.
               </p>
             </div>
 
@@ -94,8 +94,8 @@ export default function TestHome() {
 
                 <div className="space-y-6">
                   <div>
-                    <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                      Fall 2025
+                    <div className="text-xs font-medium text-cyan-700 uppercase tracking-wide mb-1">
+                      November 2025
                     </div>
                     <div className="text-sm font-semibold text-gray-900">Applications Open</div>
                   </div>
@@ -163,7 +163,7 @@ export default function TestHome() {
                   </h3>
                   <p className="text-gray-600 leading-relaxed">
                     Develop proof-of-concept implementations that demonstrate real-world
-                    applications of the attribution network.
+                    applications of the attribution schema across the participating network.
                   </p>
                 </div>
 
@@ -220,10 +220,6 @@ export default function TestHome() {
       {/* Supported By Section */}
       <section className="py-16 px-4 bg-gray-50 border-t border-gray-200">
         <div className="container mx-auto max-w-4xl">
-          <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider text-center mb-8">
-            Supported By
-          </h3>
-
           <div className="flex flex-col md:flex-row items-center justify-center gap-12">
             {/* SciOS */}
             <div className="flex flex-col items-center gap-3">

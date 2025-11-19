@@ -381,7 +381,7 @@ export default function ApplyPage() {
               <div className="space-y-6">
                 <div className="border-l-4 border-blue-600 pl-4">
                   <h2 className="text-2xl font-bold text-gray-900">1. Personal Information & Classification</h2>
-                  <p className="text-sm text-gray-600 mt-1">Tell us about yourself and how you classify your work</p>
+                  <p className="text-sm text-gray-600 mt-1">Tell us about yourself</p>
                 </div>
                 <div className="space-y-6">
                   {/* Personal Info */}
@@ -779,7 +779,7 @@ export default function ApplyPage() {
                       <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                         <div className="flex items-center justify-between mb-2">
                           <Label htmlFor="designer_ux_considerations">
-                            What are the most important considerations when doing UX/design for researchers and pulling/publishing data across multiple platforms with differing schemas? *
+                            What are the most important considerations when designing for researchers looking to access and share data across multiple platforms with differing schemas? *
                           </Label>
                           <span className="text-xs text-gray-500">
                             {wordCounts.designer_ux_considerations || 0}/200 words
@@ -1048,16 +1048,6 @@ export default function ApplyPage() {
                       </span>
                     </div>
                   </div>
-
-                  <div className="rounded-lg bg-gray-50 p-4">
-                    <h3 className="text-sm font-medium text-gray-900 mb-2">Before you submit:</h3>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• <strong>Application deadline:</strong> January 1, 2026</li>
-                      <li>• You&apos;ll receive a confirmation email after submission</li>
-                      <li>• <strong>Decisions announced:</strong> January 15, 2026</li>
-                      <li>• You can check your status anytime using your email</li>
-                    </ul>
-                  </div>
                 </div>
               </div>
             </CardContent>
@@ -1086,6 +1076,10 @@ export default function ApplyPage() {
           <Link href="/" className="text-cyan-400 hover:text-cyan-300 transition-colors">
             Back to Homepage
           </Link>
+          {' • '}
+          <a href="mailto:contact@scios.tech" className="text-cyan-400 hover:text-cyan-300 transition-colors">
+            Contact us
+          </a>
         </div>
       </div>
     </div>
