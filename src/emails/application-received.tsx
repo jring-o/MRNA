@@ -41,7 +41,7 @@ export const ApplicationReceivedEmail = ({
             </Text>
 
             <Text style={paragraph}>
-              Thank you for applying to <strong>MIRA, Modular Interoperable Research Attribution</strong>.
+              Thank you for applying to.
               We have successfully received your application and it is now under review.
             </Text>
 
@@ -70,14 +70,13 @@ export const ApplicationReceivedEmail = ({
                 <li><strong>Review Period:</strong> January 1-15, 2026</li>
                 <li><strong>Decisions Announced:</strong> January 15, 2026</li>
                 <li><strong>Workshop Dates:</strong> June 7-11, 2026</li>
-                <li><strong>Location:</strong> The Deerstone Eco Hideaway, Ireland</li>
               </ul>
             </Section>
 
             <Text style={paragraph}>
               You can check the status of your application at any time by visiting:{' '}
-              <Link href="https://mrna-nine.vercel.app/status" style={link}>
-                https://mrna-nine.vercel.app/status
+              <Link href="https://mira.science/status" style={link}>
+                https://mira.science/status
               </Link>
             </Text>
 
@@ -90,8 +89,8 @@ export const ApplicationReceivedEmail = ({
 
             <Text style={paragraph}>
               If you have any urgent questions, please contact us at{' '}
-              <Link href="mailto:workshop@modularresearch.org" style={link}>
-                workshop@modularresearch.org
+              <Link href="mailto:contact@scios.tech" style={link}>
+                contact@scios.tech
               </Link>
               .
             </Text>
@@ -107,7 +106,7 @@ export const ApplicationReceivedEmail = ({
             <Text style={footerText}>
               MIRA - Modular Interoperable Research Attribution
               <br />
-              June 2026 • The Deerstone Eco Hideaway, Ireland
+              June 2026
             </Text>
           </Section>
         </Container>
