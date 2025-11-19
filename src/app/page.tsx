@@ -11,7 +11,7 @@ export default function TestHome() {
           <div className="text-center space-y-8">
             <div className="space-y-4">
               <div className="text-sm font-medium text-cyan-400 tracking-wider uppercase">
-                June 7-11, 2026 • Ireland • Fully Sponsored
+                June 7-11, 2026 • Ireland
               </div>
 
               <h1 className="text-5xl md:text-6xl font-bold text-white tracking-tight leading-tight">
@@ -27,21 +27,24 @@ export default function TestHome() {
               </p>
             </div>
 
-            <div className="flex gap-4 justify-center pt-8">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 hover:scale-105 transition-all text-white px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl"
-                asChild
-              >
-                <Link href="/apply">Apply to Participate</Link>
-              </Button>
-              <Button
-                size="lg"
-                className="bg-white text-slate-900 hover:bg-cyan-50 hover:scale-105 transition-all px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl"
-                asChild
-              >
-                <Link href="/status">Check Status</Link>
-              </Button>
+            <div className="flex flex-col items-center gap-3 pt-8">
+              <div className="flex gap-4 justify-center">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 hover:scale-105 transition-all text-white px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl"
+                  asChild
+                >
+                  <Link href="/apply">Apply to Participate</Link>
+                </Button>
+                <Button
+                  size="lg"
+                  className="bg-white text-slate-900 hover:bg-cyan-50 hover:scale-105 transition-all px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl"
+                  asChild
+                >
+                  <Link href="/status">Check Status</Link>
+                </Button>
+              </div>
+              <p className="text-sm italic text-slate-400">Travel & accommodation included</p>
             </div>
           </div>
         </div>
