@@ -97,7 +97,7 @@ export default function TestHome() {
 
                 <div className="space-y-6">
                   <div>
-                    <div className="text-xs font-medium text-cyan-700 uppercase tracking-wide mb-1">
+                    <div className="text-xs font-bold text-cyan-700 uppercase tracking-wide mb-1">
                       November 2025
                     </div>
                     <div className="text-sm font-semibold text-gray-900">Applications Open</div>
@@ -133,7 +133,7 @@ export default function TestHome() {
                   </div>
 
                   <div>
-                    <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    <div className="text-xs font-bold text-cyan-700 uppercase tracking-wide mb-1">
                       Post-Workshop
                     </div>
                     <div className="text-sm font-semibold text-gray-900">Continuing Work</div>
@@ -275,7 +275,7 @@ export default function TestHome() {
         <div className="container mx-auto max-w-4xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
             <div>
-              © 2026 MIRA Workshop
+              © 2026 SciOS
             </div>
             <div className="flex gap-6">
               <Link href="/privacy" className="hover:text-white transition-colors">

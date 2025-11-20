@@ -48,24 +48,24 @@ const applicationSchema = z.object({
   classification_other: z.string().optional(),
 
   // Page 2: Universal Questions (all applicants)
-  importance_of_schema: wordCount(200, 'Maximum 200 words allowed'),
-  excited_projects: wordCount(200, 'Maximum 200 words allowed'),
+  importance_of_schema: wordCount(100, 'Maximum 100 words allowed'),
+  excited_projects: wordCount(50, 'Maximum 50 words allowed'),
   work_items: z.array(z.object({
     description: z.string().min(1, 'Description is required'),
     role: z.string().min(1, 'Role is required'),
     url: z.string().url('Invalid URL format').optional().or(z.literal('')),
   })).min(1, 'At least one work example is required').max(5, 'Maximum 5 work examples allowed'),
-  workshop_contribution: wordCount(200, 'Maximum 200 words allowed'),
-  research_elements: wordCount(200, 'Maximum 200 words allowed'),
+  workshop_contribution: wordCount(75, 'Maximum 75 words allowed'),
+  research_elements: wordCount(75, 'Maximum 75 words allowed'),
 
   // Role-specific questions (all optional, validated conditionally)
-  researcher_use_case: wordCount(200, 'Maximum 200 words allowed').optional(),
-  researcher_future_impact: wordCount(200, 'Maximum 200 words allowed').optional(),
-  designer_ux_considerations: wordCount(200, 'Maximum 200 words allowed').optional(),
-  engineer_working_on: wordCount(200, 'Maximum 200 words allowed').optional(),
-  engineer_schema_considerations: wordCount(200, 'Maximum 200 words allowed').optional(),
-  landscape_specialist_current_work: wordCount(200, 'Maximum 200 words allowed').optional(),
-  landscape_specialist_see_emerging: wordCount(200, 'Maximum 200 words allowed').optional(),
+  researcher_use_case: wordCount(70, 'Maximum 70 words allowed').optional(),
+  researcher_future_impact: wordCount(70, 'Maximum 70 words allowed').optional(),
+  designer_ux_considerations: wordCount(70, 'Maximum 70 words allowed').optional(),
+  engineer_working_on: wordCount(70, 'Maximum 70 words allowed').optional(),
+  engineer_schema_considerations: wordCount(70, 'Maximum 70 words allowed').optional(),
+  landscape_specialist_current_work: wordCount(70, 'Maximum 70 words allowed').optional(),
+  landscape_specialist_see_emerging: wordCount(70, 'Maximum 70 words allowed').optional(),
 
   // Page 3: Logistics
   availability_confirmed: z.boolean().refine(val => val === true, {
@@ -525,7 +525,7 @@ export default function ApplyPage() {
                           Why is an interoperable research attribution schema important to you? *
                         </Label>
                         <span className="text-xs text-gray-500">
-                          {wordCounts.importance_of_schema || 0}/200 words
+                          {wordCounts.importance_of_schema || 0}/100 words
                         </span>
                       </div>
                       <textarea
@@ -550,7 +550,7 @@ export default function ApplyPage() {
                           What elements or outputs of the research process would you define? For example: A claim, a dataset, etc. *
                         </Label>
                         <span className="text-xs text-gray-500">
-                          {wordCounts.research_elements || 0}/200 words
+                          {wordCounts.research_elements || 0}/75 words
                         </span>
                       </div>
                       <textarea
@@ -576,7 +576,7 @@ export default function ApplyPage() {
                           What specific experience, perspective, and/or approach would you bring to the workshop? *
                         </Label>
                         <span className="text-xs text-gray-500">
-                          {wordCounts.workshop_contribution || 0}/200 words
+                          {wordCounts.workshop_contribution || 0}/75 words
                         </span>
                       </div>
                       <textarea
@@ -601,7 +601,7 @@ export default function ApplyPage() {
                           What other science, science infrastructure, open science, modular research, etc. projects/initiatives are you excited about? *
                         </Label>
                         <span className="text-xs text-gray-500">
-                          {wordCounts.excited_projects || 0}/200 words
+                          {wordCounts.excited_projects || 0}/50 words
                         </span>
                       </div>
                       <textarea
@@ -726,7 +726,7 @@ export default function ApplyPage() {
                             What is your immediate use-case for modular research sharing and/or attribution? *
                           </Label>
                           <span className="text-xs text-gray-500">
-                            {wordCounts.researcher_use_case || 0}/200 words
+                            {wordCounts.researcher_use_case || 0}/70 words
                           </span>
                         </div>
                         <textarea
@@ -750,7 +750,7 @@ export default function ApplyPage() {
                             What impact might more granular research sharing and attribution have for you or your collaborations in the future? *
                           </Label>
                           <span className="text-xs text-gray-500">
-                            {wordCounts.researcher_future_impact || 0}/200 words
+                            {wordCounts.researcher_future_impact || 0}/70 words
                           </span>
                         </div>
                         <textarea
@@ -780,10 +780,10 @@ export default function ApplyPage() {
                       <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                         <div className="flex items-center justify-between mb-2">
                           <Label htmlFor="designer_ux_considerations">
-                            What are the most important considerations when designing for researchers looking to access and share data across multiple platforms with differing schemas? *
+                            What are the most important considerations you've found when designing for researchers looking to access and share data across multiple platforms with differing schemas? *
                           </Label>
                           <span className="text-xs text-gray-500">
-                            {wordCounts.designer_ux_considerations || 0}/200 words
+                            {wordCounts.designer_ux_considerations || 0}/70 words
                           </span>
                         </div>
                         <textarea
@@ -816,7 +816,7 @@ export default function ApplyPage() {
                             What are you working on that would use an interoperable research attribution schema - How? *
                           </Label>
                           <span className="text-xs text-gray-500">
-                            {wordCounts.engineer_working_on || 0}/200 words
+                            {wordCounts.engineer_working_on || 0}/70 words
                           </span>
                         </div>
                         <textarea
@@ -840,7 +840,7 @@ export default function ApplyPage() {
                             What are the most important considerations when designing and implementing a shared schema or crosswalks across multiple platforms/tools? *
                           </Label>
                           <span className="text-xs text-gray-500">
-                            {wordCounts.engineer_schema_considerations || 0}/200 words
+                            {wordCounts.engineer_schema_considerations || 0}/70 words
                           </span>
                         </div>
                         <textarea
@@ -873,7 +873,7 @@ export default function ApplyPage() {
                             What would an interoperable attribution schema unlock for one of your existing projects? *
                           </Label>
                           <span className="text-xs text-gray-500">
-                            {wordCounts.landscape_specialist_current_work || 0}/200 words
+                            {wordCounts.landscape_specialist_current_work || 0}/70 words
                           </span>
                         </div>
                         <textarea
@@ -897,7 +897,7 @@ export default function ApplyPage() {
                             What new projects might an interoperable attribution schema enable, broadly speaking? *
                           </Label>
                           <span className="text-xs text-gray-500">
-                            {wordCounts.landscape_specialist_see_emerging || 0}/200 words
+                            {wordCounts.landscape_specialist_see_emerging || 0}/70 words
                           </span>
                         </div>
                         <textarea
