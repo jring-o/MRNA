@@ -780,7 +780,7 @@ export default function ApplyPage() {
                       <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                         <div className="flex items-center justify-between mb-2">
                           <Label htmlFor="designer_ux_considerations">
-                            What are the most important considerations you've found when designing for researchers looking to access and share data across multiple platforms with differing schemas? *
+                            What are the most important considerations you&apos;ve found when designing for researchers looking to access and share data across multiple platforms with differing schemas? *
                           </Label>
                           <span className="text-xs text-gray-500">
                             {wordCounts.designer_ux_considerations || 0}/70 words
