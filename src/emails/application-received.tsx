@@ -66,9 +66,9 @@ export const ApplicationReceivedEmail = ({
                 Our selection committee will review all applications after the deadline. Here&apos;s the timeline:
               </Text>
               <ul style={list}>
-                <li><strong>Application Deadline:</strong> January 1, 2026</li>
-                <li><strong>Review Period:</strong> January 1-15, 2026</li>
-                <li><strong>Decisions Announced:</strong> January 15, 2026</li>
+                <li><strong>Application Deadline:</strong> January 15, 2026</li>
+                <li><strong>Review Period:</strong> January 15 - February 1, 2026</li>
+                <li><strong>Decisions Announced:</strong> February 1, 2026</li>
                 <li><strong>Workshop Dates:</strong> June 7-11, 2026</li>
               </ul>
             </Section>
@@ -82,7 +82,7 @@ export const ApplicationReceivedEmail = ({
 
             <Text style={paragraph}>
               We appreciate your interest in advancing scientific attribution methods and look forward
-              to reviewing your application. All applicants will be notified of their status on January 15, 2026.
+              to reviewing your application. All applicants will be notified of their status on February 1, 2026.
             </Text>
 
             <Hr style={hr} />

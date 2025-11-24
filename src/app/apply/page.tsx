@@ -598,7 +598,7 @@ export default function ApplyPage() {
                     <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                       <div className="flex items-center justify-between mb-2">
                         <Label htmlFor="excited_projects">
-                          What other science, science infrastructure, open science, modular research, etc. projects/initiatives are you excited about? *
+                          What other open science infrastructure, modular research, etc. projects/initiatives are you excited about? *
                         </Label>
                         <span className="text-xs text-gray-500">
                           {wordCounts.excited_projects || 0}/50 words
@@ -680,7 +680,7 @@ export default function ApplyPage() {
                                 <Input
                                   id={`work_items.${index}.url`}
                                   {...register(`work_items.${index}.url` as const)}
-                                  placeholder="https://example.com/your-project (if publicly available)"
+                                  placeholder="https://example.com/your-project (if available)"
                                   className={errors.work_items?.[index]?.url ? 'border-red-500' : ''}
                                 />
                                 {errors.work_items?.[index]?.url && (
@@ -780,7 +780,7 @@ export default function ApplyPage() {
                       <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                         <div className="flex items-center justify-between mb-2">
                           <Label htmlFor="designer_ux_considerations">
-                            What are the most important considerations you&apos;ve found when designing for researchers looking to access and share data across multiple platforms with differing schemas? *
+                            What are the most important considerations you&apos;ve found when designing for researchers looking to access and share data across multiple platforms? *
                           </Label>
                           <span className="text-xs text-gray-500">
                             {wordCounts.designer_ux_considerations || 0}/70 words
@@ -870,7 +870,7 @@ export default function ApplyPage() {
                       <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                         <div className="flex items-center justify-between mb-2">
                           <Label htmlFor="landscape_specialist_current_work">
-                            What would an interoperable attribution schema unlock for one of your existing projects? *
+                            What would a schema for interoperable attribution unlock for you and your projects? *
                           </Label>
                           <span className="text-xs text-gray-500">
                             {wordCounts.landscape_specialist_current_work || 0}/70 words
@@ -894,7 +894,7 @@ export default function ApplyPage() {
                       <div className="bg-gray-50/40 rounded-lg p-4 border border-gray-100/50">
                         <div className="flex items-center justify-between mb-2">
                           <Label htmlFor="landscape_specialist_see_emerging">
-                            What new projects might an interoperable attribution schema enable, broadly speaking? *
+                            What new projects might a schema for interoperable attribution unlock for the ecosystem? *
                           </Label>
                           <span className="text-xs text-gray-500">
                             {wordCounts.landscape_specialist_see_emerging || 0}/70 words
@@ -1029,7 +1029,7 @@ export default function ApplyPage() {
                           <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline">
                             Privacy Policy
                           </Link>
-                          {' '}and consent to my application data being processed for workshop selection purposes
+                          {' '}and consent to my application data being reviewed for workshop selection purposes
                         </p>
                       </div>
                     </div>
