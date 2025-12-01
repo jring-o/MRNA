@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MIRA 2026 - Modular Interoperable Research Attribution",
   description: "Catalyzing Modular Interoperable Research Attribution - A workshop to design and prototype interoperable frameworks for modular research attribution. June 7-11, 2026 in Ireland.",
+  verification: {
+    google: "Nh-LxuSsuu8H1wfHyCv-gxOKpCStoCI_I_ioxKG0X5g",
+  },
   openGraph: {
     title: "MIRA 2026 - Modular Interoperable Research Attribution",
     description: "Catalyzing Modular Interoperable Research Attribution - A workshop to design and prototype interoperable frameworks for modular research attribution. June 7-11, 2026 in Ireland.",
