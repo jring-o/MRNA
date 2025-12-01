@@ -18,6 +18,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MIRA 2026 - Modular Interoperable Research Attribution",
   description: "Catalyzing Modular Interoperable Research Attribution - A workshop to design and prototype interoperable frameworks for modular research attribution. June 7-11, 2026 in Ireland.",
+  openGraph: {
+    title: "MIRA 2026 - Modular Interoperable Research Attribution",
+    description: "Catalyzing Modular Interoperable Research Attribution - A workshop to design and prototype interoperable frameworks for modular research attribution. June 7-11, 2026 in Ireland.",
+    url: "https://mira.science",
+    siteName: "MIRA 2026",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MIRA 2026 - Modular Interoperable Research Attribution",
+    description: "Catalyzing Modular Interoperable Research Attribution - A workshop to design and prototype interoperable frameworks for modular research attribution. June 7-11, 2026 in Ireland.",
+  },
 };
 
 export default function RootLayout({
