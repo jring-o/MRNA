@@ -958,7 +958,7 @@ export default function ApplyPage() {
                             <li>Duration: 5 days intensive workshop</li>
                             <li>Format: In-person facilitated collaboration</li>
                             <li>Location: The Deerstone Eco Hideaway, Ireland</li>
-                            <li><strong>Travel, accommodation, and living expenses covered</strong> by Navigation Fund grant</li>
+                            <li>Travel, accommodation, and living expenses covered by Navigation Fund grant</li>
                           </ul>
                         </div>
                       </div>
