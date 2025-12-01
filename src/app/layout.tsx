@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "MIRA 2026 - Modular Interoperable Research Attribution",
-  description: "MIRA - Catalyzing Modular Networked Research Attribution - A workshop to design and prototype interoperable frameworks for modular research attribution. June 7-11, 2026 in Ireland.",
+  description: "Catalyzing Modular Interoperable Research Attribution - A workshop to design and prototype interoperable frameworks for modular research attribution. June 7-11, 2026 in Ireland.",
 };
 
 export default function RootLayout({
