@@ -14,10 +14,9 @@ export default function TestHome() {
                 June 7-11, 2026 • Ireland
               </div>
 
-              <h1 className="text-5xl md:text-6xl font-bold text-white tracking-tight leading-tight">
-                Catalyzing Modular Interoperable
-                <br />
-                Research Attribution
+              <h1 className="font-bold text-white tracking-tight leading-tight text-center w-full">
+                <span className="text-[4.2vw] md:text-[3.5vw] lg:text-5xl block mb-2">Catalyzing</span>
+                <span className="text-[4.2vw] md:text-[3.5vw] lg:text-5xl block whitespace-nowrap">Modular Interoperable Research Attribution</span>
               </h1>
 
               <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
