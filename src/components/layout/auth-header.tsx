@@ -29,6 +29,12 @@ export async function AuthHeader() {
           >
             Home
           </Link>
+          <Link
+            href="/about"
+            className="text-sm font-medium transition-colors hover:text-workshop-primary text-gray-600"
+          >
+            About
+          </Link>
           {user && (
             <Link
               href="/dashboard"

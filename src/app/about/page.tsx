@@ -65,7 +65,7 @@ export default function AboutPage() {
               </div>
               <p className="text-sm text-gray-600 mb-2"><strong>Figure 1:</strong></p>
               <p className="text-gray-700">
-                (Left) An information model for modular research contributions — a discourse graph. Evidence (results) are discrete observations from a single experiment, dataset, or figure panel/table of a journal article. (Right) Distinguishing models of DNA structure with an experimental result by Rosalyn Franklin. In an imagined modular research publishing environment, Franklin could post the result, and Crick/Watson would need to cite the result to support their claim that DNA forms a double helix.
+                (Left) An information model for modular research contributions — a discourse graph. Evidence (results) are discrete observations from a single experiment, dataset, or figure panel/table of a journal article. (Right) Distinguishing models of DNA structure with an experimental result by Rosalind Franklin. In an imagined modular research publishing environment, Franklin could post the result, and Crick/Watson would need to cite the result to support their claim that DNA forms a double helix.
               </p>
               <p className="text-xs text-gray-500 mt-2">License: CC-BY4.0</p>
             </div>
