@@ -278,6 +278,12 @@ export default function TestHome() {
               © 2026 SciOS
             </div>
             <div className="flex gap-6">
+              <Link href="/about" className="hover:text-white transition-colors">
+                About
+              </Link>
+              <Link href="/blog" className="hover:text-white transition-colors">
+                Blog
+              </Link>
               <Link href="/privacy" className="hover:text-white transition-colors">
                 Privacy Policy
               </Link>
