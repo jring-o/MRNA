@@ -12,7 +12,7 @@ export default function AboutPage() {
             About MIRA
           </h1>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-            Catalyzing Modular Interoperable Research Attribution
+            Catalyzing (M)odular (I)nteroperable (R)esearch (A)ttribution
           </p>
         </div>
       </section>
