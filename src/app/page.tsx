@@ -40,7 +40,7 @@ export default function TestHome() {
                   className="bg-white text-slate-900 hover:bg-cyan-50 hover:scale-105 transition-all px-8 py-6 text-base font-medium shadow-lg hover:shadow-xl"
                   asChild
                 >
-                  <Link href="/status">Check Status</Link>
+                  <Link href="/about">Learn More</Link>
                 </Button>
               </div>
               <p className="text-sm italic text-slate-400">Travel & accommodation included</p>
@@ -97,7 +97,7 @@ export default function TestHome() {
                 <div className="space-y-6">
                   <div>
                     <div className="text-xs font-bold text-cyan-700 uppercase tracking-wide mb-1">
-                      November 2025
+                      Dec 3, 2025
                     </div>
                     <div className="text-sm font-semibold text-gray-900">Applications Open</div>
                   </div>
