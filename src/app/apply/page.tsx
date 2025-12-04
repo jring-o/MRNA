@@ -1030,14 +1030,14 @@ export default function ApplyPage() {
                       />
                       <div className="ml-3">
                         <Label htmlFor="privacy_consent" className="cursor-pointer">
-                          I consent to the processing of my personal data *
+                          I agree to the Privacy Policy *
                         </Label>
                         <p className="text-sm text-gray-500 mt-1">
-                          I have read and agree to the{' '}
+                          I have read the{' '}
                           <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline">
                             Privacy Policy
                           </Link>
-                          {' '}and consent to my application data being reviewed for workshop selection purposes
+                          {' '}and understand my application will be reviewed for workshop selection.
                         </p>
                       </div>
                     </div>
