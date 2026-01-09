@@ -103,7 +103,7 @@ function StatusPageContent() {
       case 'pending':
         return {
           title: 'Your application is under review',
-          description: 'Our team will review all applications after the January 15, 2026 deadline. All applicants will be notified of their status on February 1, 2026 via email.',
+          description: 'Our team will review all applications after the January 23, 2026 deadline. All applicants will be notified of their status on February 1, 2026 via email.',
           color: 'yellow'
         }
       case 'accepted':

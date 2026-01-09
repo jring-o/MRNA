@@ -66,8 +66,8 @@ export const ApplicationReceivedEmail = ({
                 Our selection committee will review all applications after the deadline. Here&apos;s the timeline:
               </Text>
               <ul style={list}>
-                <li><strong>Application Deadline:</strong> January 15, 2026</li>
-                <li><strong>Review Period:</strong> January 15 - February 1, 2026</li>
+                <li><strong>Application Deadline:</strong> January 23, 2026</li>
+                <li><strong>Review Period:</strong> January 23 - February 1, 2026</li>
                 <li><strong>Decisions Announced:</strong> February 1, 2026</li>
                 <li><strong>Workshop Dates:</strong> June 7-11, 2026</li>
               </ul>

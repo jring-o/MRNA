@@ -371,7 +371,7 @@ export default function ApplyPage() {
         <Alert className="mb-6 bg-amber-50 border-amber-300">
           <AlertCircle className="h-4 w-4 text-amber-600" />
           <AlertDescription className="text-amber-800 font-medium">
-            Please submit your application by January 15th, end of day, anywhere on Earth
+            Please submit your application by January 23rd, end of day, anywhere on Earth
           </AlertDescription>
         </Alert>
 

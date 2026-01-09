@@ -55,7 +55,7 @@ function ApplicationSuccessContent() {
                   <div className="ml-3">
                     <p className="text-sm font-medium text-gray-900">Application Review</p>
                     <p className="text-sm text-gray-600">
-                      Our team will carefully review all applications after the January 15, 2026 deadline
+                      Our team will carefully review all applications after the January 23, 2026 deadline
                     </p>
                   </div>
                 </div>
@@ -93,7 +93,7 @@ function ApplicationSuccessContent() {
                 <div className="ml-3">
                   <h3 className="text-sm font-semibold text-gray-900">Important Dates</h3>
                   <ul className="text-sm text-gray-600 mt-2 space-y-1">
-                    <li>• <strong>Application deadline:</strong> January 15, 2026</li>
+                    <li>• <strong>Application deadline:</strong> January 23, 2026</li>
                     <li>• <strong>Decisions announced:</strong> February 1, 2026</li>
                     <li>• <strong>Workshop dates:</strong> June 7-11, 2026 (5 days)</li>
                   </ul>

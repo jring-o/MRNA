@@ -104,7 +104,7 @@ export default function TestHome() {
 
                   <div>
                     <div className="text-xs font-bold text-cyan-700 uppercase tracking-wide mb-1">
-                      Jan 15, 2026
+                      Jan 23, 2026
                     </div>
                     <div className="text-sm font-semibold text-gray-900">Application Deadline</div>
                   </div>
