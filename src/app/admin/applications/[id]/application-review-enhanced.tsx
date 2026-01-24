@@ -1,15 +1,12 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { toast } from 'sonner'
 import { VotingPanel } from '@/components/admin/voting-panel'
 import { CommentsPanel } from '@/components/admin/comments-panel'
 import { InviteTokenGenerator } from '@/components/admin/invite-token-generator'
@@ -56,10 +53,7 @@ export function ApplicationReview({
   currentUserId: string
 }) {
   const router = useRouter()
-  const [status, setStatus] = useState(application.status)
-  const [isUpdating, setIsUpdating] = useState(false)
-
-  const supabase = createClient()
+  const status = application.status
 
   const getStatusBadge = (status: Application['status']) => {
     const variants = {
@@ -76,32 +70,6 @@ export function ApplicationReview({
         {status}
       </Badge>
     )
-  }
-
-  const updateStatus = async (newStatus: Application['status']) => {
-    setIsUpdating(true)
-    try {
-      const { error } = await supabase
-        .from('applications')
-        .update({
-          status: newStatus,
-          reviewed_at: new Date().toISOString(),
-          reviewed_by: currentUserId,
-        } as never)
-        .eq('id', application.id)
-
-      if (error) throw error
-
-      setStatus(newStatus)
-      toast.success(`Application ${newStatus}`)
-
-      // TODO: Send notification email to applicant
-    } catch (error) {
-      console.error('Error updating status:', error)
-      toast.error('Failed to update status')
-    } finally {
-      setIsUpdating(false)
-    }
   }
 
   const exportApplication = () => {

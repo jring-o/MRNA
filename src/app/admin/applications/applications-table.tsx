@@ -75,13 +75,12 @@ type SortField = 'submitted_at' | 'name' | 'organization' | 'status'
 type SortOrder = 'asc' | 'desc'
 
 export function ApplicationsTable({ initialApplications }: { initialApplications: Application[] }) {
-  const [applications, setApplications] = useState<Application[]>(initialApplications)
+  const [applications] = useState<Application[]>(initialApplications)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [sortField, setSortField] = useState<SortField>('submitted_at')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
-  const [isUpdating, setIsUpdating] = useState(false)
   const [emailSentMap, setEmailSentMap] = useState<Map<string, boolean>>(new Map())
   const [emailDialogOpen, setEmailDialogOpen] = useState(false)
   const [emailApplicants, setEmailApplicants] = useState<Application[]>([])
@@ -155,76 +154,6 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
 
     return filtered
   }, [applications, searchTerm, statusFilter, sortField, sortOrder])
-
-  // Handle status update for single application
-  const updateStatus = async (id: string, newStatus: Application['status']) => {
-    setIsUpdating(true)
-    try {
-      const { error } = await supabase
-        .from('applications')
-        .update({
-          status: newStatus,
-          reviewed_at: new Date().toISOString(),
-        })
-        .eq('id', id)
-
-      if (error) throw error
-
-      // Update local state
-      setApplications(apps =>
-        apps.map(app =>
-          app.id === id
-            ? { ...app, status: newStatus, reviewed_at: new Date().toISOString() }
-            : app
-        )
-      )
-
-      toast.success(`Application ${newStatus}`)
-    } catch (error) {
-      console.error('Error updating status:', error)
-      toast.error('Failed to update status')
-    } finally {
-      setIsUpdating(false)
-    }
-  }
-
-  // Handle bulk status update
-  const bulkUpdateStatus = async (newStatus: Application['status']) => {
-    if (selectedIds.size === 0) {
-      toast.error('No applications selected')
-      return
-    }
-
-    setIsUpdating(true)
-    try {
-      const { error } = await supabase
-        .from('applications')
-        .update({
-          status: newStatus,
-          reviewed_at: new Date().toISOString(),
-        })
-        .in('id', Array.from(selectedIds))
-
-      if (error) throw error
-
-      // Update local state
-      setApplications(apps =>
-        apps.map(app =>
-          selectedIds.has(app.id)
-            ? { ...app, status: newStatus, reviewed_at: new Date().toISOString() }
-            : app
-        )
-      )
-
-      setSelectedIds(new Set())
-      toast.success(`${selectedIds.size} applications updated`)
-    } catch (error) {
-      console.error('Error updating status:', error)
-      toast.error('Failed to update applications')
-    } finally {
-      setIsUpdating(false)
-    }
-  }
 
   // Send acceptance email to single applicant
   const sendAcceptanceEmail = async (applicant: Application) => {
@@ -427,7 +356,6 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
                 size="sm"
                 variant="outline"
                 onClick={openBulkEmailDialog}
-                disabled={isUpdating}
                 className="border-blue-600 text-blue-600 hover:bg-blue-50"
               >
                 <Send className="mr-2 h-4 w-4" />
