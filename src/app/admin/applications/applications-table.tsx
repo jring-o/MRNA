@@ -426,30 +426,6 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => bulkUpdateStatus('accepted')}
-                disabled={isUpdating}
-              >
-                Accept All
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => bulkUpdateStatus('waitlisted')}
-                disabled={isUpdating}
-              >
-                Waitlist All
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => bulkUpdateStatus('rejected')}
-                disabled={isUpdating}
-              >
-                Reject All
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
                 onClick={openBulkEmailDialog}
                 disabled={isUpdating}
                 className="border-blue-600 text-blue-600 hover:bg-blue-50"
@@ -569,9 +545,9 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
                           View Details
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator />
                       {application.status === 'accepted' && (
                         <>
+                          <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={() => openEmailDialog(application)}
                           >
@@ -587,30 +563,8 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
                               </>
                             )}
                           </DropdownMenuItem>
-                          <DropdownMenuSeparator />
                         </>
                       )}
-                      <DropdownMenuItem
-                        onClick={() => updateStatus(application.id, 'accepted')}
-                        disabled={isUpdating}
-                      >
-                        <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
-                        Accept
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => updateStatus(application.id, 'waitlisted')}
-                        disabled={isUpdating}
-                      >
-                        <AlertCircle className="mr-2 h-4 w-4 text-blue-600" />
-                        Waitlist
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => updateStatus(application.id, 'rejected')}
-                        disabled={isUpdating}
-                      >
-                        <XCircle className="mr-2 h-4 w-4 text-red-600" />
-                        Reject
-                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

@@ -204,62 +204,6 @@ export function ApplicationReview({
           </div>
         </div>
 
-        {/* Quick Actions (only show if voting is not enabled or voting is complete) */}
-        {(!hasVotingData || application.voting_completed) && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Application Decision</CardTitle>
-              <CardDescription>
-                {hasVotingData && application.voting_completed
-                  ? 'Voting is complete. You can now make the final decision.'
-                  : 'Update the application status'
-                }
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => updateStatus('accepted')}
-                  disabled={isUpdating || status === 'accepted'}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Accept
-                </Button>
-                <Button
-                  onClick={() => updateStatus('waitlisted')}
-                  disabled={isUpdating || status === 'waitlisted'}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <AlertCircle className="mr-2 h-4 w-4" />
-                  Waitlist
-                </Button>
-                <Button
-                  onClick={() => updateStatus('rejected')}
-                  disabled={isUpdating || status === 'rejected'}
-                  variant="destructive"
-                >
-                  <XCircle className="mr-2 h-4 w-4" />
-                  Reject
-                </Button>
-                <Button
-                  onClick={() => updateStatus('pending')}
-                  disabled={isUpdating || status === 'pending'}
-                  variant="outline"
-                >
-                  <Clock className="mr-2 h-4 w-4" />
-                  Set Pending
-                </Button>
-              </div>
-              {application.reviewed_at && (
-                <div className="mt-4 text-sm text-gray-500">
-                  Last reviewed on {new Date(application.reviewed_at).toLocaleString()}
-                  {application.reviewer && ` by ${application.reviewer.name}`}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
 
         {/* Application Content Tabs */}
         <Tabs defaultValue="application" className="space-y-4">

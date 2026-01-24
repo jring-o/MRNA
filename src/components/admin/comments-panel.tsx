@@ -7,8 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import {
@@ -18,7 +16,6 @@ import {
   Trash2,
   Save,
   X,
-  Eye,
   EyeOff,
   ChevronDown,
   ChevronUp,
@@ -52,7 +49,6 @@ export function CommentsPanel({
 }: CommentsPanelProps) {
   const [comments, setComments] = useState<CommentWithReplies[]>([])
   const [newComment, setNewComment] = useState('')
-  const [isInternal, setIsInternal] = useState(true)
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
   const [editingComment, setEditingComment] = useState<string | null>(null)
   const [editContent, setEditContent] = useState('')
@@ -165,7 +161,7 @@ export function CommentsPanel({
           author_id: currentUserId,
           content: content.trim(),
           parent_id: parentId,
-          is_internal: isApplicantView ? false : isInternal,
+          is_internal: true,
         })
 
       if (error) throw error
@@ -475,21 +471,7 @@ export function CommentsPanel({
               className="min-h-[80px] bg-white"
             />
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="internal"
-                  checked={isInternal}
-                  onCheckedChange={(checked) => setIsInternal(checked as boolean)}
-                />
-                <label
-                  htmlFor="internal"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Internal comment (admin only)
-                </label>
-              </div>
-
+            <div className="flex items-center justify-end">
               <Button
                 onClick={() => submitComment(null)}
                 disabled={isSubmitting || !newComment.trim()}
@@ -498,15 +480,6 @@ export function CommentsPanel({
                 Post Comment
               </Button>
             </div>
-
-            {!isInternal && (
-              <Alert>
-                <Eye className="h-4 w-4" />
-                <AlertDescription>
-                  This comment will be visible to the applicant if they check their application status.
-                </AlertDescription>
-              </Alert>
-            )}
           </div>
         )}
 
