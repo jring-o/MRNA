@@ -87,6 +87,7 @@ export function CommentsPanel({
     filteredComments.forEach(comment => {
       commentMap.set(comment.id, {
         ...comment,
+        author_name: comment.author?.name || 'Unknown',
         is_internal: comment.is_internal ?? false,
         created_at: comment.created_at ?? new Date().toISOString(),
         replies: []
