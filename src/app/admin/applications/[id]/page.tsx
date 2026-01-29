@@ -89,5 +89,5 @@ export default async function ApplicationDetailPage({
     } | null
   }
 
-  return <ApplicationReview application={enrichedApplication as EnrichedApplication} currentUserId={user.id} />
+  return <ApplicationReview application={enrichedApplication as EnrichedApplication} currentUserId={user.id} userEmail={user.email || ''} />
 }

@@ -1,6 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,6 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { VotingPanel } from '@/components/admin/voting-panel'
 import { CommentsPanel } from '@/components/admin/comments-panel'
 import { InviteTokenGenerator } from '@/components/admin/invite-token-generator'
+import { toast } from 'sonner'
 import type { ApplicationWithVoting } from '@/types/database'
 import { parseWorkLinks, getClassificationDisplayName, getClassificationBadgeClass } from '@/types/database'
 import {
@@ -27,6 +30,7 @@ import {
   Users,
   Vote,
   Layers,
+  Shield,
 } from 'lucide-react'
 
 // Extended Application type that includes voting fields and relations
@@ -45,15 +49,53 @@ type Application = ApplicationWithVoting & {
   } | null
 }
 
+const SUPER_ADMIN_EMAIL = 'jon@scios.tech'
+
 export function ApplicationReview({
   application,
-  currentUserId
+  currentUserId,
+  userEmail,
 }: {
   application: Application
   currentUserId: string
+  userEmail: string
 }) {
   const router = useRouter()
+  const supabase = createClient()
+  const [approving, setApproving] = useState(false)
   const status = application.status
+  const isSuperAdmin = userEmail === SUPER_ADMIN_EMAIL
+
+  // Direct approve function (super admin only)
+  const directApprove = async () => {
+    if (!isSuperAdmin) return
+
+    setApproving(true)
+    try {
+      const { error } = await supabase
+        .from('applications')
+        .update({
+          status: 'accepted',
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: currentUserId,
+          voting_completed: true,
+          voting_completed_at: new Date().toISOString(),
+        })
+        .eq('id', application.id)
+
+      if (error) {
+        throw error
+      }
+
+      toast.success('Application directly approved')
+      router.refresh()
+    } catch (error) {
+      console.error('Error approving application:', error)
+      toast.error('Failed to approve application')
+    } finally {
+      setApproving(false)
+    }
+  }
 
   const getStatusBadge = (status: Application['status']) => {
     const variants = {
@@ -172,6 +214,30 @@ export function ApplicationReview({
           </div>
         </div>
 
+        {/* Super Admin: Direct Approve Card */}
+        {isSuperAdmin && application.status !== 'accepted' && (
+          <Card className="mb-6 border-amber-300 bg-amber-50">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center text-amber-800">
+                <Shield className="mr-2 h-5 w-5" />
+                Admin Override
+              </CardTitle>
+              <CardDescription className="text-amber-700">
+                Bypass the voting system and directly approve this application
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={directApprove}
+                disabled={approving}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <CheckCircle className="mr-2 h-4 w-4" />
+                {approving ? 'Approving...' : 'Direct Approve (Bypass Voting)'}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Application Content Tabs */}
         <Tabs defaultValue="application" className="space-y-4">

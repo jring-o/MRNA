@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Checkbox } from '@/components/ui/checkbox'
 import { SendEmailDialog } from '@/components/admin/send-email-dialog'
+import { AddPersonDialog } from '@/components/admin/add-person-dialog'
 import { toast } from 'sonner'
 import { getClassificationDisplayName, getClassificationBadgeClass } from '@/types/database'
 import {
@@ -47,6 +48,7 @@ import {
   ChevronsUpDown,
   Send,
   RefreshCw,
+  Shield,
 } from 'lucide-react'
 
 type Application = {
@@ -74,8 +76,19 @@ type Application = {
 type SortField = 'submitted_at' | 'name' | 'organization' | 'status'
 type SortOrder = 'asc' | 'desc'
 
-export function ApplicationsTable({ initialApplications }: { initialApplications: Application[] }) {
-  const [applications] = useState<Application[]>(initialApplications)
+const SUPER_ADMIN_EMAIL = 'jon@scios.tech'
+
+export function ApplicationsTable({
+  initialApplications,
+  userEmail,
+  currentUserId,
+}: {
+  initialApplications: Application[]
+  userEmail: string
+  currentUserId: string
+}) {
+  const [applications, setApplications] = useState<Application[]>(initialApplications)
+  const isSuperAdmin = userEmail === SUPER_ADMIN_EMAIL
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -86,6 +99,45 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
   const [emailApplicants, setEmailApplicants] = useState<Application[]>([])
 
   const supabase = createClient()
+
+  // Refresh applications list
+  const refreshApplications = async () => {
+    const { data } = await supabase
+      .from('applications')
+      .select('*')
+      .order('submitted_at', { ascending: false })
+    if (data) {
+      setApplications(data)
+    }
+  }
+
+  // Direct approve function (super admin only)
+  const directApprove = async (appId: string) => {
+    if (!isSuperAdmin) return
+
+    try {
+      const { error } = await supabase
+        .from('applications')
+        .update({
+          status: 'accepted',
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: currentUserId,
+          voting_completed: true,
+          voting_completed_at: new Date().toISOString(),
+        })
+        .eq('id', appId)
+
+      if (error) {
+        throw error
+      }
+
+      toast.success('Application directly approved')
+      refreshApplications()
+    } catch (error) {
+      console.error('Error approving application:', error)
+      toast.error('Failed to approve application')
+    }
+  }
 
   // Check for existing invite tokens on mount
   useEffect(() => {
@@ -343,6 +395,11 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
             <Download className="mr-2 h-4 w-4" />
             Export CSV
           </Button>
+
+          {/* Super Admin: Add Person Button */}
+          {isSuperAdmin && (
+            <AddPersonDialog onPersonAdded={refreshApplications} />
+          )}
         </div>
 
         {/* Bulk Actions */}
@@ -473,6 +530,19 @@ export function ApplicationsTable({ initialApplications }: { initialApplications
                           View Details
                         </Link>
                       </DropdownMenuItem>
+                      {/* Super Admin: Direct Approve */}
+                      {isSuperAdmin && application.status !== 'accepted' && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => directApprove(application.id)}
+                            className="text-green-600 focus:text-green-600 focus:bg-green-50"
+                          >
+                            <Shield className="mr-2 h-4 w-4" />
+                            Direct Approve
+                          </DropdownMenuItem>
+                        </>
+                      )}
                       {application.status === 'accepted' && (
                         <>
                           <DropdownMenuSeparator />

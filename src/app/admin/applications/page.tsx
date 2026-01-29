@@ -90,7 +90,11 @@ export default async function AdminApplicationsPage() {
         </div>
 
         {/* Applications Table */}
-        <ApplicationsTable initialApplications={applications || []} />
+        <ApplicationsTable
+          initialApplications={applications || []}
+          userEmail={user.email || ''}
+          currentUserId={user.id}
+        />
       </div>
     </div>
   )

@@ -10,7 +10,7 @@ import {
   MessageSquare,
   Settings,
   ArrowRight,
-  Activity,
+  UserCheck,
 } from 'lucide-react'
 
 export default async function AdminDashboardPage() {
@@ -39,6 +39,7 @@ export default async function AdminDashboardPage() {
     .select('status')
 
   const pendingApplications = applications?.filter(a => a.status === 'pending').length || 0
+  const acceptedApplications = applications?.filter(a => a.status === 'accepted').length || 0
   const totalApplications = applications?.length || 0
   const pendingTodos = todos?.filter(t => t.status === 'pending' || t.status === 'in_progress').length || 0
   const totalTodos = todos?.length || 0
@@ -86,20 +87,22 @@ export default async function AdminDashboardPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                System Status
-              </CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">Active</div>
-              <p className="text-xs text-muted-foreground">
-                All systems operational
-              </p>
-            </CardContent>
-          </Card>
+          <Link href="/admin/attendees">
+            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Accepted Attendees
+                </CardTitle>
+                <UserCheck className="h-4 w-4 text-green-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">{acceptedApplications}</div>
+                <p className="text-xs text-muted-foreground">
+                  View attendees &rarr;
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -142,7 +145,27 @@ export default async function AdminDashboardPage() {
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CheckSquare className="h-8 w-8 text-green-600" />
+                <UserCheck className="h-8 w-8 text-green-600" />
+                <ArrowRight className="h-5 w-5 text-gray-400" />
+              </div>
+              <CardTitle className="mt-4">Attendees</CardTitle>
+              <CardDescription>
+                Manage accepted workshop participants
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/admin/attendees">
+                <Button className="w-full" variant="default">
+                  View Attendees
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CheckSquare className="h-8 w-8 text-amber-600" />
                 <ArrowRight className="h-5 w-5 text-gray-400" />
               </div>
               <CardTitle className="mt-4">Todo List</CardTitle>
