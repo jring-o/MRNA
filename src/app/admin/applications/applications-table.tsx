@@ -49,6 +49,7 @@ import {
   Send,
   RefreshCw,
   Shield,
+  Trash2,
 } from 'lucide-react'
 
 type Application = {
@@ -136,6 +137,51 @@ export function ApplicationsTable({
     } catch (error) {
       console.error('Error approving application:', error)
       toast.error('Failed to approve application')
+    }
+  }
+
+  // Remove application function (super admin only)
+  const removeApplication = async (appId: string) => {
+    console.log('[removeApplication] Called with appId:', appId)
+    console.log('[removeApplication] isSuperAdmin:', isSuperAdmin)
+    console.log('[removeApplication] userEmail:', userEmail)
+
+    if (!isSuperAdmin) {
+      console.log('[removeApplication] Not super admin, returning early')
+      return
+    }
+
+    console.log('[removeApplication] Showing confirm dialog...')
+    const confirmed = confirm('Are you sure you want to remove this application? This action cannot be undone.')
+    console.log('[removeApplication] User confirmed:', confirmed)
+
+    if (!confirmed) {
+      console.log('[removeApplication] User cancelled, returning')
+      return
+    }
+
+    try {
+      console.log('[removeApplication] Attempting to delete from database...')
+      const { data, error, status, statusText } = await supabase
+        .from('applications')
+        .delete()
+        .eq('id', appId)
+        .select()
+
+      console.log('[removeApplication] Delete response:', { data, error, status, statusText })
+
+      if (error) {
+        console.error('[removeApplication] Supabase error:', error)
+        throw error
+      }
+
+      console.log('[removeApplication] Delete successful, refreshing applications...')
+      toast.success('Application removed')
+      await refreshApplications()
+      console.log('[removeApplication] Refresh complete')
+    } catch (error) {
+      console.error('[removeApplication] Caught error:', error)
+      toast.error('Failed to remove application')
     }
   }
 
@@ -540,6 +586,19 @@ export function ApplicationsTable({
                           >
                             <Shield className="mr-2 h-4 w-4" />
                             Direct Approve
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                      {/* Super Admin: Remove Application */}
+                      {isSuperAdmin && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => removeApplication(application.id)}
+                            className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Remove
                           </DropdownMenuItem>
                         </>
                       )}
