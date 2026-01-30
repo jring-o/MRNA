@@ -180,7 +180,7 @@ export function ApplicationReview({
         <div className="mb-6">
           <Button
             variant="ghost"
-            onClick={() => router.push('/admin/applications')}
+            onClick={() => router.back()}
             className="mb-4"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />

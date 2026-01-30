@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -88,18 +89,40 @@ export function ApplicationsTable({
   userEmail: string
   currentUserId: string
 }) {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+
   const [applications, setApplications] = useState<Application[]>(initialApplications)
   const isSuperAdmin = userEmail === SUPER_ADMIN_EMAIL
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [sortField, setSortField] = useState<SortField>('submitted_at')
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
+
+  // Initialize filters from URL params
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '')
+  const [statusFilter, setStatusFilter] = useState<string>(searchParams.get('status') || 'all')
+  const [sortField, setSortField] = useState<SortField>((searchParams.get('sort') as SortField) || 'submitted_at')
+  const [sortOrder, setSortOrder] = useState<SortOrder>((searchParams.get('order') as SortOrder) || 'desc')
   const [emailSentMap, setEmailSentMap] = useState<Map<string, boolean>>(new Map())
   const [emailDialogOpen, setEmailDialogOpen] = useState(false)
   const [emailApplicants, setEmailApplicants] = useState<Application[]>([])
 
   const supabase = createClient()
+
+  // Update URL when filters change
+  const updateURL = useCallback((params: { search?: string; status?: string; sort?: string; order?: string }) => {
+    const newParams = new URLSearchParams(searchParams.toString())
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value && value !== 'all' && value !== '' && !(key === 'sort' && value === 'submitted_at') && !(key === 'order' && value === 'desc')) {
+        newParams.set(key, value)
+      } else {
+        newParams.delete(key)
+      }
+    })
+
+    const queryString = newParams.toString()
+    router.replace(`${pathname}${queryString ? `?${queryString}` : ''}`, { scroll: false })
+  }, [searchParams, router, pathname])
 
   // Refresh applications list
   const refreshApplications = async () => {
@@ -361,12 +384,15 @@ export function ApplicationsTable({
 
   // Sort handler
   const handleSort = (field: SortField) => {
+    let newOrder: SortOrder = 'desc'
     if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+      newOrder = sortOrder === 'asc' ? 'desc' : 'asc'
+      setSortOrder(newOrder)
     } else {
       setSortField(field)
       setSortOrder('desc')
     }
+    updateURL({ search: searchTerm, status: statusFilter, sort: field, order: newOrder })
   }
 
   const getSortIcon = (field: SortField) => {
@@ -422,13 +448,19 @@ export function ApplicationsTable({
             <Input
               placeholder="Search by name, email, organization, or role..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value)
+                updateURL({ search: e.target.value, status: statusFilter, sort: sortField, order: sortOrder })
+              }}
               className="pl-10"
             />
           </div>
 
           {/* Status Filter */}
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <Select value={statusFilter} onValueChange={(value) => {
+            setStatusFilter(value)
+            updateURL({ search: searchTerm, status: value, sort: sortField, order: sortOrder })
+          }}>
             <SelectTrigger className="w-[180px]">
               <Filter className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Filter by status" />

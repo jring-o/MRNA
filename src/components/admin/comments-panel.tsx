@@ -16,7 +16,6 @@ import {
   Trash2,
   Save,
   X,
-  EyeOff,
   ChevronDown,
   ChevronUp,
   MoreVertical,
@@ -33,7 +32,6 @@ import { canEditComment } from '@/types/database'
 interface CommentsPanelProps {
   applicationId: string
   currentUserId: string
-  isApplicantView?: boolean // For showing comments to applicants (non-internal only)
   onCommentAdded?: () => void
 }
 
@@ -44,7 +42,6 @@ interface CommentWithReplies extends ApplicationComment {
 export function CommentsPanel({
   applicationId,
   currentUserId,
-  isApplicantView = false,
   onCommentAdded,
 }: CommentsPanelProps) {
   const [comments, setComments] = useState<CommentWithReplies[]>([])
@@ -73,11 +70,7 @@ export function CommentsPanel({
       return
     }
 
-    // Filter comments based on view type
-    let filteredComments = data || []
-    if (isApplicantView) {
-      filteredComments = filteredComments.filter(c => !c.is_internal && !c.deleted_at)
-    }
+    const filteredComments = data || []
 
     // Build comment tree structure
     const commentMap = new Map<string, CommentWithReplies>()
@@ -121,7 +114,7 @@ export function CommentsPanel({
     sortReplies(rootComments)
 
     setComments(rootComments)
-  }, [applicationId, isApplicantView, supabase])
+  }, [applicationId, supabase])
 
   useEffect(() => {
     loadComments()
@@ -265,8 +258,8 @@ export function CommentsPanel({
     }
 
     const isAuthor = comment.author_id === currentUserId
-    const canEdit = isAuthor && canEditComment(comment, currentUserId) && !isApplicantView
-    const canDelete = isAuthor && !isApplicantView
+    const canEdit = isAuthor && canEditComment(comment, currentUserId)
+    const canDelete = isAuthor
     const hasReplies = comment.replies.length > 0
     const isExpanded = expandedThreads.has(comment.id)
     const isEditing = editingComment === comment.id
@@ -286,12 +279,6 @@ export function CommentsPanel({
               <div>
                 <div className="flex items-center space-x-2">
                   <span className="text-sm font-medium">{comment.author_name || 'Unknown'}</span>
-                  {comment.is_internal && !isApplicantView && (
-                    <Badge variant="outline" className="text-xs">
-                      <EyeOff className="mr-1 h-3 w-3" />
-                      Internal
-                    </Badge>
-                  )}
                   <span className="text-xs text-gray-500">
                     {comment.created_at ? new Date(comment.created_at).toLocaleString() : 'Unknown date'}
                   </span>
@@ -302,8 +289,7 @@ export function CommentsPanel({
               </div>
 
               {/* Actions Menu */}
-              {!isApplicantView && (
-                <DropdownMenu>
+              <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
                       <MoreVertical className="h-4 w-4" />
@@ -337,7 +323,6 @@ export function CommentsPanel({
                     )}
                   </DropdownMenuContent>
                 </DropdownMenu>
-              )}
             </div>
 
             {/* Comment Content */}
@@ -398,7 +383,7 @@ export function CommentsPanel({
         </div>
 
         {/* Reply Form */}
-        {replyingTo === comment.id && !isApplicantView && (
+        {replyingTo === comment.id && (
           <div className="ml-12 mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="space-y-2">
               <Textarea
@@ -448,41 +433,36 @@ export function CommentsPanel({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center">
             <MessageSquare className="mr-2 h-5 w-5" />
-            {isApplicantView ? 'Comments' : 'Discussion & Comments'}
+            Discussion & Comments
           </CardTitle>
           <Badge variant="outline">
             {comments.length} {comments.length === 1 ? 'thread' : 'threads'}
           </Badge>
         </div>
         <CardDescription>
-          {isApplicantView
-            ? 'View comments from the review team'
-            : 'Collaborate with other admins on this application'
-          }
+          Collaborate with other admins on this application
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* New Comment Form */}
-        {!isApplicantView && (
-          <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
-            <Textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Add a comment..."
-              className="min-h-[80px] bg-white"
-            />
+        <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+          <Textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Add a comment..."
+            className="min-h-[80px] bg-white"
+          />
 
-            <div className="flex items-center justify-end">
-              <Button
-                onClick={() => submitComment(null)}
-                disabled={isSubmitting || !newComment.trim()}
-              >
-                <MessageSquare className="mr-2 h-4 w-4" />
-                Post Comment
-              </Button>
-            </div>
+          <div className="flex items-center justify-end">
+            <Button
+              onClick={() => submitComment(null)}
+              disabled={isSubmitting || !newComment.trim()}
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Post Comment
+            </Button>
           </div>
-        )}
+        </div>
 
         <Separator />
 
@@ -494,9 +474,7 @@ export function CommentsPanel({
             <div className="text-center py-8 text-gray-500">
               <MessageSquare className="mx-auto h-12 w-12 text-gray-300 mb-3" />
               <p className="text-sm">No comments yet</p>
-              {!isApplicantView && (
-                <p className="text-xs mt-1">Be the first to add a comment</p>
-              )}
+              <p className="text-xs mt-1">Be the first to add a comment</p>
             </div>
           )}
         </div>
