@@ -74,7 +74,7 @@ type Application = {
   } | null
 }
 
-type SortField = 'submitted_at' | 'name' | 'organization' | 'status'
+type SortField = 'submitted_at' | 'name' | 'organization' | 'status' | 'classifications'
 type SortOrder = 'asc' | 'desc'
 
 const SUPER_ADMIN_EMAIL = 'jon@scios.tech'
@@ -231,12 +231,18 @@ export function ApplicationsTable({
 
     // Sort
     filtered.sort((a, b) => {
-      let aValue: string | number | Date | null = a[sortField]
-      let bValue: string | number | Date | null = b[sortField]
+      let aValue: string | number | Date | null = a[sortField] as string | number | Date | null
+      let bValue: string | number | Date | null = b[sortField] as string | number | Date | null
 
       if (sortField === 'submitted_at') {
         aValue = a.submitted_at ? new Date(a.submitted_at).getTime() : 0
         bValue = b.submitted_at ? new Date(b.submitted_at).getTime() : 0
+      }
+
+      if (sortField === 'classifications') {
+        // Sort by first classification alphabetically
+        aValue = a.classifications?.[0]?.toLowerCase() || ''
+        bValue = b.classifications?.[0]?.toLowerCase() || ''
       }
 
       // Handle null values
@@ -506,7 +512,15 @@ export function ApplicationsTable({
                 </button>
               </TableHead>
               <TableHead>Role</TableHead>
-              <TableHead>Classifications</TableHead>
+              <TableHead>
+                <button
+                  className="flex items-center font-medium hover:text-gray-900"
+                  onClick={() => handleSort('classifications')}
+                >
+                  Classifications
+                  {getSortIcon('classifications')}
+                </button>
+              </TableHead>
               <TableHead>
                 <button
                   className="flex items-center font-medium hover:text-gray-900"
