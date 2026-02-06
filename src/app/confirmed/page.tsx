@@ -29,7 +29,7 @@ export default function ConfirmedPage() {
                 <Calendar className="w-5 h-5 text-blue-600 flex-shrink-0" />
                 <div className="text-left">
                   <p className="font-medium text-gray-900">June 7-11, 2026</p>
-                  <p className="text-sm text-gray-600">Ireland</p>
+                  <p className="text-sm text-gray-600">The Deerstone Eco Hideaway, Ireland</p>
                 </div>
               </div>
             </div>

@@ -166,35 +166,28 @@ function SignUpContent() {
         <div className="relative z-10 flex flex-col justify-center text-white">
           <div>
             <h1 className="text-4xl font-bold mb-4">
-              Welcome to the Workshop!
+              Confirm Your Attendance
             </h1>
             <p className="text-blue-100 text-lg mb-8">
-              You&apos;ve been accepted to MIRA, Modular Interoperable Research Attribution
+              MIRA Workshop • June 7-11, 2026 • The Deerstone Eco Hideaway, Ireland
             </p>
           </div>
 
           <div className="space-y-6">
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-              <h3 className="text-xl font-semibold mb-4">Congratulations! 🎉</h3>
-              <p className="text-blue-50 mb-4">
-                Your application has been accepted. Create your account to access:
-              </p>
+              <h3 className="text-xl font-semibold mb-4">What You&apos;re Committing To</h3>
               <ul className="space-y-3">
                 <li className="flex items-start space-x-3">
                   <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-blue-200 mt-0.5" />
-                  <span className="text-blue-50">Participant directory and profiles</span>
+                  <span className="text-blue-50">Attending the in-person workshop in The Deerstone Eco Hideaway, Ireland</span>
                 </li>
                 <li className="flex items-start space-x-3">
                   <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-blue-200 mt-0.5" />
-                  <span className="text-blue-50">Workshop schedule and logistics</span>
+                  <span className="text-blue-50">3 hours of pre-workshop preparation</span>
                 </li>
                 <li className="flex items-start space-x-3">
                   <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-blue-200 mt-0.5" />
-                  <span className="text-blue-50">Pre-workshop collaboration tools</span>
-                </li>
-                <li className="flex items-start space-x-3">
-                  <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-blue-200 mt-0.5" />
-                  <span className="text-blue-50">Shared resources and documents</span>
+                  <span className="text-blue-50">Collaborating with fellow researchers</span>
                 </li>
               </ul>
             </div>
@@ -209,16 +202,16 @@ function SignUpContent() {
                   <p className="font-semibold">June 7-11, 2026</p>
                 </div>
                 <div>
-                  <p className="text-blue-200">Duration</p>
-                  <p className="font-semibold">5 Days</p>
+                  <p className="text-blue-200">Location</p>
+                  <p className="font-semibold">The Deerstone Eco Hideaway, Ireland</p>
                 </div>
                 <div>
                   <p className="text-blue-200">Format</p>
                   <p className="font-semibold">In-Person</p>
                 </div>
                 <div>
-                  <p className="text-blue-200">Your Status</p>
-                  <p className="font-semibold text-green-300">Accepted</p>
+                  <p className="text-blue-200">Duration</p>
+                  <p className="font-semibold">5 Days</p>
                 </div>
               </div>
             </div>
@@ -230,23 +223,20 @@ function SignUpContent() {
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-              <CheckCircle2 className="w-8 h-8 text-green-600" />
-            </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Create Your Account
+              Confirm Your Attendance
             </h2>
             <p className="text-gray-600">
-              Complete your registration for the workshop
+              Create your account to confirm your spot at the workshop
             </p>
           </div>
 
           <Card className="border-0 shadow-xl">
             <form onSubmit={handleSignUp}>
               <CardHeader className="pb-4">
-                <CardTitle>Participant Registration</CardTitle>
+                <CardTitle>Account Details</CardTitle>
                 <CardDescription>
-                  Set up your account to access workshop resources
+                  We&apos;ll use this information to set up your participant profile
                 </CardDescription>
               </CardHeader>
 
@@ -348,19 +338,19 @@ function SignUpContent() {
                   {loading ? (
                     <>
                       <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      Creating account...
+                      Confirming...
                     </>
                   ) : (
                     <>
-                      Complete Registration
+                      Confirm Attendance
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </>
                   )}
                 </Button>
 
                 <p className="text-xs text-center text-gray-500">
-                  By creating an account, you confirm your participation in the
-                  June 2026 workshop and agree to collaborate respectfully.
+                  By confirming, you are committing to attend the workshop
+                  and complete 3 hours of pre-workshop preparation.
                 </p>
               </CardFooter>
             </form>

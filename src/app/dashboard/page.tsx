@@ -20,9 +20,14 @@ export default async function DashboardPage() {
   const role = user.app_metadata?.role || 'applicant'
   const isAdmin = role === 'admin'
 
-  // Dashboard is only for participants (including admins who are also participants)
+  // Dashboard is only for admins until the platform is ready
+  // Participants are redirected to the confirmed page
+  if (role === 'participant') {
+    redirect('/confirmed')
+  }
+
   // Applicants should be redirected to apply
-  if (role !== 'participant' && role !== 'admin') {
+  if (role !== 'admin') {
     redirect('/apply')
   }
 
