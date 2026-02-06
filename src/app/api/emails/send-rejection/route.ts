@@ -3,9 +3,8 @@ import { Resend } from 'resend'
 import { ApplicationRejectedEmail } from '@/emails/application-rejected'
 import { createClient } from '@/lib/supabase/server'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function POST(request: Request) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     // Check if user is admin
     const supabase = await createClient()

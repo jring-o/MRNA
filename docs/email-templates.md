@@ -52,7 +52,7 @@ Dear {applicantName},
 
 Thank you for applying to MIRA!
 
-We genuinely loved your application, your experience, and your ideas, and would love to work with you. Unfortunately, with limit spots available, we couldn't include everyone in the in-person workshop.
+We genuinely loved your application, your experience, and your ideas, and would love to work with you. Unfortunately, with limited spots available, we couldn't include everyone in the in-person workshop.
 
 > ### You're on the Waitlist
 >

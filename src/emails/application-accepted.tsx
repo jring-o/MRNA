@@ -40,7 +40,7 @@ export const ApplicationAcceptedEmail = ({
             </Text>
 
             <Text style={paragraph}>
-              We are excited to formally invite you to join us for the in-person MIRA workshop
+              We are excited to invite you to join us for the in-person MIRA workshop
               in Ireland on <strong>June 7-11, 2026</strong>!
             </Text>
 
@@ -53,7 +53,7 @@ export const ApplicationAcceptedEmail = ({
                 We have a rich waitlist, and if we don&apos;t receive a response, we&apos;ll need to
                 invite another person to take your place.
               </Text>
-              <Text style={paragraph}>
+              <Text style={boxParagraph}>
                 By confirming your attendance, you are committing to <strong>3 hours of pre-workshop work</strong> to
                 help us prepare and make the most of our time together.
               </Text>
@@ -80,8 +80,8 @@ export const ApplicationAcceptedEmail = ({
 
             <Text style={paragraph}>
               If you have any questions, please don&apos;t hesitate to reach out to us at{' '}
-              <Link href="mailto:workshop@modularresearch.org" style={link}>
-                workshop@modularresearch.org
+              <Link href="mailto:contact@scios.tech" style={link}>
+                contact@scios.tech
               </Link>
               .
             </Text>
@@ -154,6 +154,13 @@ const paragraph = {
   fontSize: '15px',
   lineHeight: '24px',
   marginBottom: '16px',
+}
+
+const boxParagraph = {
+  color: '#374151',
+  fontSize: '15px',
+  lineHeight: '24px',
+  marginBottom: '0',
 }
 
 const highlightBox = {

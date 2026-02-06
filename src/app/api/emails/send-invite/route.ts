@@ -3,9 +3,8 @@ import { Resend } from 'resend'
 import { ApplicationAcceptedEmail } from '@/emails/application-accepted'
 import { createClient } from '@/lib/supabase/server'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function POST(request: Request) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     // Check if user is admin
     const supabase = await createClient()
@@ -65,12 +64,10 @@ export async function POST(request: Request) {
     const { data, error } = await resend.emails.send({
       from: 'MIRA <contact@scios.tech>',
       to: [applicantEmail],
-      subject: '🎉 You\'ve Been Accepted to MIRA!',
+      subject: 'You\'re Invited to MIRA - June 7-11, 2026 in Ireland',
       react: ApplicationAcceptedEmail({
         applicantName,
         inviteLink,
-        workshopDates: 'June 7-11, 2026',
-        workshopLocation: 'The Deerstone Eco Hideaway, Ireland',
       }),
     })
 

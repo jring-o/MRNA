@@ -3,8 +3,6 @@ import { Resend } from 'resend'
 import { ApplicationReceivedEmail } from '@/emails/application-received'
 import { AdminNewApplicationEmail } from '@/emails/admin-new-application'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 // Admin emails to notify when new applications are submitted
 const ADMIN_EMAILS = [
   'jon@scios.tech',
@@ -14,6 +12,8 @@ const ADMIN_EMAILS = [
 ]
 
 export async function POST(request: Request) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
+
   try {
     const body = await request.json()
     const {

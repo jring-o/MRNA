@@ -37,13 +37,13 @@ export const ApplicationWaitlistedEmail = ({
             </Text>
 
             <Text style={paragraph}>
-              Thank you for applying to MIRA. We received a significant number of applications
-              from a wide array of backgrounds, and we were impressed by the quality of submissions.
+              Thank you for applying to MIRA!
             </Text>
 
             <Text style={paragraph}>
-              While you&apos;re awesome, highly qualified, and we would love to work with you, we
-              unfortunately do not have enough space to bring everyone to this in-person workshop.
+              We genuinely loved your application, your experience, and your ideas, and would love
+              to work with you. Unfortunately, with limited spots available, we couldn&apos;t include
+              everyone in the in-person workshop.
             </Text>
 
             <Section style={waitlistBox}>
@@ -66,8 +66,8 @@ export const ApplicationWaitlistedEmail = ({
 
             <Text style={paragraph}>
               If you have any questions, please feel free to contact us at{' '}
-              <Link href="mailto:workshop@modularresearch.org" style={link}>
-                workshop@modularresearch.org
+              <Link href="mailto:contact@scios.tech" style={link}>
+                contact@scios.tech
               </Link>
               .
             </Text>
