@@ -30,37 +30,17 @@ export async function POST(request: Request) {
       )
     }
 
-    // Generate invite token
+    // Generate invite token and link (but don't save yet)
     const token = crypto.randomUUID()
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + 7) // 7 days expiration
 
-    // Save invite token to database
-    const { error: tokenError } = await supabase
-      .from('invite_tokens')
-      .insert({
-        email: applicantEmail,
-        token,
-        application_id: applicationId,
-        expires_at: expiresAt.toISOString(),
-        used: false,
-      })
-
-    if (tokenError) {
-      console.error('Error creating invite token:', tokenError)
-      return NextResponse.json(
-        { error: 'Failed to create invite token' },
-        { status: 500 }
-      )
-    }
-
-    // Create invite link
     const baseUrl = process.env.NODE_ENV === 'production'
       ? 'https://mrna-nine.vercel.app'
       : 'http://localhost:3000'
     const inviteLink = `${baseUrl}/signup?token=${token}&email=${encodeURIComponent(applicantEmail)}`
 
-    // Send email using React Email template
+    // Send email first - only save token if email succeeds
     const { data, error } = await resend.emails.send({
       from: 'MIRA <contact@scios.tech>',
       to: [applicantEmail],
@@ -75,6 +55,25 @@ export async function POST(request: Request) {
       console.error('Error sending email:', error)
       return NextResponse.json(
         { error: 'Failed to send email' },
+        { status: 500 }
+      )
+    }
+
+    // Email sent successfully - now save the invite token
+    const { error: tokenError } = await supabase
+      .from('invite_tokens')
+      .insert({
+        email: applicantEmail,
+        token,
+        application_id: applicationId,
+        expires_at: expiresAt.toISOString(),
+        used: false,
+      })
+
+    if (tokenError) {
+      console.error('Error creating invite token:', tokenError)
+      return NextResponse.json(
+        { error: 'Email sent but failed to save invite token' },
         { status: 500 }
       )
     }

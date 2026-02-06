@@ -23,6 +23,7 @@ import {
 import { SendEmailDialog } from '@/components/admin/send-email-dialog'
 import { toast } from 'sonner'
 import { getClassificationDisplayName, getClassificationBadgeClass } from '@/types/database'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Search,
   Download,
@@ -66,8 +67,9 @@ export function AttendeesTable({ attendees: initialAttendees }: { attendees: Att
   const router = useRouter()
   const [attendees, setAttendees] = useState<Attendee[]>(initialAttendees)
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [emailDialogOpen, setEmailDialogOpen] = useState(false)
-  const [emailApplicant, setEmailApplicant] = useState<Attendee | null>(null)
+  const [emailApplicants, setEmailApplicants] = useState<Attendee[]>([])
   const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
   const [attendeeToRemove, setAttendeeToRemove] = useState<Attendee | null>(null)
   const [removing, setRemoving] = useState(false)
@@ -83,34 +85,66 @@ export function AttendeesTable({ attendees: initialAttendees }: { attendees: Att
     )
   }, [attendees, searchTerm])
 
-  // Send acceptance email
+  // Send acceptance email to a single attendee
   const sendAcceptanceEmail = async (attendee: Attendee) => {
-    try {
-      const response = await fetch('/api/emails/send-invite', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          applicationId: attendee.id,
-          applicantEmail: attendee.email,
-          applicantName: attendee.name,
-        }),
-      })
+    const response = await fetch('/api/emails/send-invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        applicationId: attendee.id,
+        applicantEmail: attendee.email,
+        applicantName: attendee.name,
+      }),
+    })
 
-      if (!response.ok) {
-        throw new Error('Failed to send email')
-      }
-
-      toast.success('Acceptance email sent')
-      router.refresh()
-    } catch (error) {
-      console.error('Error sending email:', error)
-      toast.error('Failed to send email')
+    if (!response.ok) {
+      throw new Error('Failed to send email')
     }
+
+    // Update local state
+    setAttendees(prev => prev.map(a =>
+      a.id === attendee.id ? { ...a, emailSent: true } : a
+    ))
   }
 
-  // Open email dialog
+  // Send acceptance emails sequentially to avoid rate limits
+  const sendBulkAcceptanceEmails = async () => {
+    const eligible = emailApplicants.filter(a => a.status === 'accepted')
+    let successful = 0
+    let failed = 0
+
+    for (const attendee of eligible) {
+      try {
+        await sendAcceptanceEmail(attendee)
+        successful++
+      } catch {
+        failed++
+      }
+      if (successful + failed < eligible.length) {
+        await new Promise(resolve => setTimeout(resolve, 1500))
+      }
+    }
+
+    if (failed > 0) {
+      toast.warning(`Sent ${successful} email(s), ${failed} failed`)
+    } else {
+      toast.success(`Successfully sent ${successful} acceptance email(s)`)
+    }
+
+    setSelectedIds(new Set())
+    router.refresh()
+  }
+
+  // Open email dialog for single attendee
   const openEmailDialog = (attendee: Attendee) => {
-    setEmailApplicant(attendee)
+    setEmailApplicants([attendee])
+    setEmailDialogOpen(true)
+  }
+
+  // Open email dialog for selected attendees
+  const openBulkEmailDialog = () => {
+    const selected = attendees.filter(a => selectedIds.has(a.id))
+    setEmailApplicants(selected)
     setEmailDialogOpen(true)
   }
 
@@ -219,6 +253,31 @@ export function AttendeesTable({ attendees: initialAttendees }: { attendees: Att
             Export CSV
           </Button>
         </div>
+
+        {/* Bulk Actions */}
+        {selectedIds.size > 0 && (
+          <div className="flex items-center gap-3 mt-4 pt-4 border-t">
+            <span className="text-sm font-medium text-gray-700">
+              {selectedIds.size} selected
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={openBulkEmailDialog}
+              className="border-blue-600 text-blue-600 hover:bg-blue-50"
+            >
+              <Send className="mr-2 h-4 w-4" />
+              Send Acceptance Emails
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setSelectedIds(new Set())}
+            >
+              Clear Selection
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Attendees Table */}
@@ -226,6 +285,18 @@ export function AttendeesTable({ attendees: initialAttendees }: { attendees: Att
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[40px]">
+                <Checkbox
+                  checked={filteredAttendees.length > 0 && filteredAttendees.every(a => selectedIds.has(a.id))}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setSelectedIds(new Set(filteredAttendees.map(a => a.id)))
+                    } else {
+                      setSelectedIds(new Set())
+                    }
+                  }}
+                />
+              </TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Organization</TableHead>
               <TableHead>Classifications</TableHead>
@@ -246,7 +317,23 @@ export function AttendeesTable({ attendees: initialAttendees }: { attendees: Att
           </TableHeader>
           <TableBody>
             {filteredAttendees.map((attendee) => (
-              <TableRow key={attendee.id}>
+              <TableRow key={attendee.id} className={selectedIds.has(attendee.id) ? 'bg-blue-50' : ''}>
+                <TableCell>
+                  <Checkbox
+                    checked={selectedIds.has(attendee.id)}
+                    onCheckedChange={(checked) => {
+                      setSelectedIds(prev => {
+                        const next = new Set(prev)
+                        if (checked) {
+                          next.add(attendee.id)
+                        } else {
+                          next.delete(attendee.id)
+                        }
+                        return next
+                      })
+                    }}
+                  />
+                </TableCell>
                 <TableCell>
                   <div>
                     <div className="font-medium">{attendee.name || 'N/A'}</div>
@@ -326,13 +413,14 @@ export function AttendeesTable({ attendees: initialAttendees }: { attendees: Att
       </div>
 
       {/* Email Confirmation Dialog */}
-      {emailApplicant && (
+      {emailApplicants.length > 0 && (
         <SendEmailDialog
           open={emailDialogOpen}
           onOpenChange={setEmailDialogOpen}
-          applicants={[emailApplicant]}
-          onSend={() => sendAcceptanceEmail(emailApplicant)}
-          isResend={emailApplicant.emailSent}
+          applicants={emailApplicants}
+          onSend={sendBulkAcceptanceEmails}
+          isResend={emailApplicants.length === 1 && emailApplicants[0].emailSent}
+          emailType="acceptance"
         />
       )}
 

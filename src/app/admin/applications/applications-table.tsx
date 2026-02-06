@@ -337,16 +337,24 @@ export function ApplicationsTable({
     }
   }
 
-  // Send acceptance emails to multiple applicants
+  // Send acceptance emails to multiple applicants (sequentially to avoid rate limits)
   const sendBulkAcceptanceEmails = async () => {
-    const results = await Promise.allSettled(
-      emailApplicants
-        .filter(app => app.status === 'accepted')
-        .map(app => sendAcceptanceEmail(app))
-    )
+    const eligible = emailApplicants.filter(app => app.status === 'accepted')
+    let successful = 0
+    let failed = 0
 
-    const successful = results.filter(r => r.status === 'fulfilled').length
-    const failed = results.filter(r => r.status === 'rejected').length
+    for (const app of eligible) {
+      try {
+        await sendAcceptanceEmail(app)
+        successful++
+      } catch {
+        failed++
+      }
+      // Wait 1.5s between sends to stay under Resend rate limits
+      if (successful + failed < eligible.length) {
+        await new Promise(resolve => setTimeout(resolve, 1500))
+      }
+    }
 
     if (failed > 0) {
       toast.warning(`Sent ${successful} email(s), ${failed} failed`)
@@ -381,16 +389,24 @@ export function ApplicationsTable({
     }
   }
 
-  // Send waitlist emails to multiple applicants
+  // Send waitlist emails to multiple applicants (sequentially to avoid rate limits)
   const sendBulkWaitlistEmails = async () => {
-    const results = await Promise.allSettled(
-      waitlistEmailApplicants
-        .filter(app => app.status === 'waitlisted')
-        .map(app => sendWaitlistEmail(app))
-    )
+    const eligible = waitlistEmailApplicants.filter(app => app.status === 'waitlisted')
+    let successful = 0
+    let failed = 0
 
-    const successful = results.filter(r => r.status === 'fulfilled').length
-    const failed = results.filter(r => r.status === 'rejected').length
+    for (const app of eligible) {
+      try {
+        await sendWaitlistEmail(app)
+        successful++
+      } catch {
+        failed++
+      }
+      // Wait 1.5s between sends to stay under Resend rate limits
+      if (successful + failed < eligible.length) {
+        await new Promise(resolve => setTimeout(resolve, 1500))
+      }
+    }
 
     if (failed > 0) {
       toast.warning(`Sent ${successful} waitlist email(s), ${failed} failed`)
