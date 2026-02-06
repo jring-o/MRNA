@@ -41,10 +41,10 @@ function SignUpContent() {
 
     const supabase = createClient()
 
-    // Check if token is valid
+    // Check if token is valid and fetch application data
     const { data, error } = await supabase
       .from('invite_tokens')
-      .select('*')
+      .select('*, applications(name, organization)')
       .eq('token', token)
       .eq('email', email)
       .eq('used', false)
@@ -56,6 +56,15 @@ function SignUpContent() {
       setTokenValid(false)
     } else {
       setTokenValid(true)
+      // Prepopulate form with application data
+      const application = data.applications as { name: string | null; organization: string | null } | null
+      if (application) {
+        setFormData(prev => ({
+          ...prev,
+          name: application.name || '',
+          organization: application.organization || ''
+        }))
+      }
     }
     setValidatingToken(false)
   }
@@ -187,7 +196,7 @@ function SignUpContent() {
                 </li>
                 <li className="flex items-start space-x-3">
                   <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-blue-200 mt-0.5" />
-                  <span className="text-blue-50">Collaborating with fellow researchers</span>
+                  <span className="text-blue-50">Active collaboration with fellow modular research builders</span>
                 </li>
               </ul>
             </div>
