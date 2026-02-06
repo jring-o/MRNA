@@ -356,11 +356,6 @@ function SignUpContent() {
                     </>
                   )}
                 </Button>
-
-                <p className="text-xs text-center text-gray-500">
-                  By confirming, you are committing to attend the workshop
-                  and complete 3 hours of pre-workshop preparation.
-                </p>
               </CardFooter>
             </form>
           </Card>
