@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     const { data, error } = await resend.emails.send({
       from: 'MIRA <contact@scios.tech>',
       to: [applicantEmail],
-      subject: 'You\'re Invited to MIRA - June 7-11, 2026 in Ireland',
+      subject: 'Join us for MIRA, June 7-11, 2026 in Ireland',
       react: ApplicationAcceptedEmail({
         applicantName,
         inviteLink,
