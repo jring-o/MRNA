@@ -104,8 +104,8 @@ function SignUpContent() {
       return
     }
 
-    // Since we disabled email confirmation, always go to dashboard
-    router.push('/dashboard')
+    // Redirect to confirmation page (dashboard access will be enabled later)
+    router.push('/confirmed')
     router.refresh()
   }
 

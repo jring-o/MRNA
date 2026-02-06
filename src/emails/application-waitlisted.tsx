@@ -1,6 +1,5 @@
 import {
   Body,
-  Button,
   Container,
   Head,
   Heading,
@@ -13,16 +12,14 @@ import {
 } from '@react-email/components'
 import * as React from 'react'
 
-interface ApplicationAcceptedEmailProps {
+interface ApplicationWaitlistedEmailProps {
   applicantName: string
-  inviteLink: string
 }
 
-export const ApplicationAcceptedEmail = ({
+export const ApplicationWaitlistedEmail = ({
   applicantName = 'Researcher',
-  inviteLink = 'https://mrna-nine.vercel.app/signup',
-}: ApplicationAcceptedEmailProps) => {
-  const previewText = `You're invited to MIRA - June 7-11, 2026 in Ireland`
+}: ApplicationWaitlistedEmailProps) => {
+  const previewText = `Update on your MIRA application`
 
   return (
     <Html>
@@ -31,7 +28,7 @@ export const ApplicationAcceptedEmail = ({
       <Body style={main}>
         <Container style={container}>
           <Section style={header}>
-            <Heading style={h1}>You&apos;re Invited to MIRA!</Heading>
+            <Heading style={h1}>MIRA Application Update</Heading>
           </Section>
 
           <Section style={content}>
@@ -40,46 +37,35 @@ export const ApplicationAcceptedEmail = ({
             </Text>
 
             <Text style={paragraph}>
-              We are excited to formally invite you to join us for the in-person MIRA workshop
-              in Ireland on <strong>June 7-11, 2026</strong>!
+              Thank you for applying to MIRA. We received a significant number of applications
+              from a wide array of backgrounds, and we were impressed by the quality of submissions.
             </Text>
 
-            <Section style={highlightBox}>
-              <Heading as="h2" style={h2}>
-                Please Confirm Your Attendance
-              </Heading>
-              <Text style={paragraph}>
-                Please confirm your availability for these dates by <strong>February 13th</strong>.
-                We have a rich waitlist, and if we don&apos;t receive a response, we&apos;ll need to
-                invite another person to take your place.
-              </Text>
-              <Text style={paragraph}>
-                By confirming your attendance, you are committing to <strong>3 hours of pre-workshop work</strong> to
-                help us prepare and make the most of our time together.
-              </Text>
-            </Section>
+            <Text style={paragraph}>
+              While you&apos;re awesome, highly qualified, and we would love to work with you, we
+              unfortunately do not have enough space to bring everyone to this in-person workshop.
+            </Text>
 
-            <Section style={ctaSection}>
-              <Button
-                style={button}
-                href={inviteLink}
-              >
-                Confirm Your Attendance →
-              </Button>
-              <Text style={smallText}>
-                This personalized link will expire after 7 days.
+            <Section style={waitlistBox}>
+              <Heading as="h2" style={h2}>
+                You&apos;re on the Waitlist
+              </Heading>
+              <Text style={boxParagraph}>
+                We have placed you on our waitlist and will let you know if anything changes
+                within the next two weeks.
               </Text>
             </Section>
 
             <Text style={paragraph}>
-              Once we have attendance sorted for everyone, we will reach out again with more
-              information as we get started with MIRA over the next several weeks.
+              Either way, we&apos;ll keep you in the loop regarding workshop development and activities.
+              We hope you&apos;ll join us in our quest to modularize the scientific endeavor over the
+              years to come.
             </Text>
 
             <Hr style={hr} />
 
             <Text style={paragraph}>
-              If you have any questions, please don&apos;t hesitate to reach out to us at{' '}
+              If you have any questions, please feel free to contact us at{' '}
               <Link href="mailto:workshop@modularresearch.org" style={link}>
                 workshop@modularresearch.org
               </Link>
@@ -87,7 +73,7 @@ export const ApplicationAcceptedEmail = ({
             </Text>
 
             <Text style={paragraph}>
-              Looking forward to meeting you in Ireland!
+              Best regards,
               <br />
               <strong>The MIRA Team</strong>
             </Text>
@@ -123,13 +109,13 @@ const container = {
 
 const header = {
   padding: '24px',
-  backgroundColor: '#2563eb',
+  backgroundColor: '#d97706',
   borderRadius: '5px 5px 0 0',
 }
 
 const h1 = {
   color: '#ffffff',
-  fontSize: '28px',
+  fontSize: '24px',
   fontWeight: '600',
   lineHeight: '1.3',
   margin: '0',
@@ -137,7 +123,7 @@ const h1 = {
 }
 
 const h2 = {
-  color: '#1f2937',
+  color: '#92400e',
   fontSize: '18px',
   fontWeight: '600',
   lineHeight: '1.3',
@@ -156,40 +142,20 @@ const paragraph = {
   marginBottom: '16px',
 }
 
-const highlightBox = {
-  backgroundColor: '#f0f9ff',
-  borderLeft: '4px solid #2563eb',
+const boxParagraph = {
+  color: '#374151',
+  fontSize: '15px',
+  lineHeight: '24px',
+  marginBottom: '0',
+}
+
+const waitlistBox = {
+  backgroundColor: '#fffbeb',
+  borderLeft: '4px solid #d97706',
   borderRadius: '4px',
   padding: '16px',
   marginBottom: '24px',
   marginTop: '24px',
-}
-
-const ctaSection = {
-  textAlign: 'center' as const,
-  marginTop: '32px',
-  marginBottom: '32px',
-}
-
-const button = {
-  backgroundColor: '#2563eb',
-  borderRadius: '5px',
-  color: '#fff',
-  fontSize: '16px',
-  fontWeight: '600',
-  textDecoration: 'none',
-  textAlign: 'center' as const,
-  display: 'inline-block',
-  padding: '12px 32px',
-  marginTop: '12px',
-  marginBottom: '12px',
-}
-
-const smallText = {
-  color: '#6b7280',
-  fontSize: '13px',
-  lineHeight: '20px',
-  marginTop: '8px',
 }
 
 const hr = {
@@ -216,4 +182,4 @@ const footerText = {
   margin: '0',
 }
 
-export default ApplicationAcceptedEmail
+export default ApplicationWaitlistedEmail

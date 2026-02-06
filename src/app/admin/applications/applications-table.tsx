@@ -103,8 +103,11 @@ export function ApplicationsTable({
   const [sortField, setSortField] = useState<SortField>((searchParams.get('sort') as SortField) || 'submitted_at')
   const [sortOrder, setSortOrder] = useState<SortOrder>((searchParams.get('order') as SortOrder) || 'desc')
   const [emailSentMap, setEmailSentMap] = useState<Map<string, boolean>>(new Map())
+  const [waitlistEmailSentMap, setWaitlistEmailSentMap] = useState<Map<string, boolean>>(new Map())
   const [emailDialogOpen, setEmailDialogOpen] = useState(false)
   const [emailApplicants, setEmailApplicants] = useState<Application[]>([])
+  const [waitlistEmailDialogOpen, setWaitlistEmailDialogOpen] = useState(false)
+  const [waitlistEmailApplicants, setWaitlistEmailApplicants] = useState<Application[]>([])
 
   const supabase = createClient()
 
@@ -160,6 +163,32 @@ export function ApplicationsTable({
     } catch (error) {
       console.error('Error approving application:', error)
       toast.error('Failed to approve application')
+    }
+  }
+
+  // Direct waitlist function (super admin only)
+  const directWaitlist = async (appId: string) => {
+    if (!isSuperAdmin) return
+
+    try {
+      const { error } = await supabase
+        .from('applications')
+        .update({
+          status: 'waitlisted',
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: currentUserId,
+        })
+        .eq('id', appId)
+
+      if (error) {
+        throw error
+      }
+
+      toast.success('Application added to waitlist')
+      refreshApplications()
+    } catch (error) {
+      console.error('Error waitlisting application:', error)
+      toast.error('Failed to add to waitlist')
     }
   }
 
@@ -326,6 +355,50 @@ export function ApplicationsTable({
     }
   }
 
+  // Send waitlist email to single applicant
+  const sendWaitlistEmail = async (applicant: Application) => {
+    try {
+      const response = await fetch('/api/emails/send-waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          applicationId: applicant.id,
+          applicantEmail: applicant.email,
+          applicantName: applicant.name,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to send email')
+      }
+
+      // Mark as sent in local state
+      setWaitlistEmailSentMap(prev => new Map(prev).set(applicant.id, true))
+      return true
+    } catch (error) {
+      console.error('Error sending waitlist email:', error)
+      throw error
+    }
+  }
+
+  // Send waitlist emails to multiple applicants
+  const sendBulkWaitlistEmails = async () => {
+    const results = await Promise.allSettled(
+      waitlistEmailApplicants
+        .filter(app => app.status === 'waitlisted')
+        .map(app => sendWaitlistEmail(app))
+    )
+
+    const successful = results.filter(r => r.status === 'fulfilled').length
+    const failed = results.filter(r => r.status === 'rejected').length
+
+    if (failed > 0) {
+      toast.warning(`Sent ${successful} waitlist email(s), ${failed} failed`)
+    } else {
+      toast.success(`Successfully sent ${successful} waitlist email(s)`)
+    }
+  }
+
   // Open email dialog for single applicant
   const openEmailDialog = (applicant: Application) => {
     setEmailApplicants([applicant])
@@ -337,6 +410,19 @@ export function ApplicationsTable({
     const selected = applications.filter(app => selectedIds.has(app.id))
     setEmailApplicants(selected)
     setEmailDialogOpen(true)
+  }
+
+  // Open waitlist email dialog for single applicant
+  const openWaitlistEmailDialog = (applicant: Application) => {
+    setWaitlistEmailApplicants([applicant])
+    setWaitlistEmailDialogOpen(true)
+  }
+
+  // Open waitlist email dialog for selected applicants
+  const openBulkWaitlistEmailDialog = () => {
+    const selected = applications.filter(app => selectedIds.has(app.id))
+    setWaitlistEmailApplicants(selected)
+    setWaitlistEmailDialogOpen(true)
   }
 
   // Export to CSV
@@ -502,6 +588,15 @@ export function ApplicationsTable({
                 <Send className="mr-2 h-4 w-4" />
                 Send Acceptance Emails
               </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={openBulkWaitlistEmailDialog}
+                className="border-amber-600 text-amber-600 hover:bg-amber-50"
+              >
+                <Send className="mr-2 h-4 w-4" />
+                Send Waitlist Emails
+              </Button>
             </div>
             <Button
               size="sm"
@@ -635,6 +730,16 @@ export function ApplicationsTable({
                           </DropdownMenuItem>
                         </>
                       )}
+                      {/* Super Admin: Direct Waitlist */}
+                      {isSuperAdmin && application.status !== 'waitlisted' && application.status !== 'accepted' && (
+                        <DropdownMenuItem
+                          onClick={() => directWaitlist(application.id)}
+                          className="text-amber-600 focus:text-amber-600 focus:bg-amber-50"
+                        >
+                          <Clock className="mr-2 h-4 w-4" />
+                          Direct Waitlist
+                        </DropdownMenuItem>
+                      )}
                       {/* Super Admin: Remove Application */}
                       {isSuperAdmin && (
                         <>
@@ -668,6 +773,26 @@ export function ApplicationsTable({
                           </DropdownMenuItem>
                         </>
                       )}
+                      {application.status === 'waitlisted' && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => openWaitlistEmailDialog(application)}
+                          >
+                            {waitlistEmailSentMap.get(application.id) ? (
+                              <>
+                                <RefreshCw className="mr-2 h-4 w-4 text-amber-600" />
+                                Resend Waitlist Email
+                              </>
+                            ) : (
+                              <>
+                                <Send className="mr-2 h-4 w-4 text-amber-600" />
+                                Send Waitlist Email
+                              </>
+                            )}
+                          </DropdownMenuItem>
+                        </>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
@@ -695,6 +820,17 @@ export function ApplicationsTable({
         applicants={emailApplicants}
         onSend={sendBulkAcceptanceEmails}
         isResend={emailApplicants.length === 1 && emailSentMap.get(emailApplicants[0]?.id) === true}
+        emailType="acceptance"
+      />
+
+      {/* Waitlist Email Confirmation Dialog */}
+      <SendEmailDialog
+        open={waitlistEmailDialogOpen}
+        onOpenChange={setWaitlistEmailDialogOpen}
+        applicants={waitlistEmailApplicants}
+        onSend={sendBulkWaitlistEmails}
+        isResend={waitlistEmailApplicants.length === 1 && waitlistEmailSentMap.get(waitlistEmailApplicants[0]?.id) === true}
+        emailType="waitlist"
       />
     </div>
   )
