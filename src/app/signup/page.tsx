@@ -82,9 +82,9 @@ function SignUpContent() {
 
     const supabase = createClient()
 
-    // Validate token again and mark as used
+    // Check token is still valid (read-only, does not mark as used)
     const { data: tokenData, error: tokenError } = await supabase.rpc(
-      'validate_invite_token',
+      'check_invite_token',
       { p_token: token, p_email: formData.email }
     )
 
@@ -102,7 +102,7 @@ function SignUpContent() {
         data: {
           name: formData.name,
           organization: formData.organization,
-          role: 'participant' // Set role to participant
+          role: 'participant'
         }
       }
     })
@@ -112,6 +112,12 @@ function SignUpContent() {
       setLoading(false)
       return
     }
+
+    // Only mark token as used after signup succeeds
+    await supabase.rpc('mark_invite_token_used', {
+      p_token: token,
+      p_email: formData.email,
+    })
 
     // Redirect to confirmation page (dashboard access will be enabled later)
     router.push('/confirmed')
