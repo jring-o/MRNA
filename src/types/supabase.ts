@@ -961,6 +961,14 @@ export type Database = {
         Args: { p_application_id: string }
         Returns: string
       }
+      check_invite_token: {
+        Args: { p_token: string; p_email: string }
+        Returns: boolean
+      }
+      mark_invite_token_used: {
+        Args: { p_token: string; p_email: string }
+        Returns: boolean
+      }
     }
     Enums: {
       application_status: "pending" | "accepted" | "rejected" | "waitlisted"
