@@ -547,44 +547,6 @@ export type Database = {
           },
         ]
       }
-      daily_reflections: {
-        Row: {
-          content: Json
-          created_at: string | null
-          id: string
-          reflection_type: Database["public"]["Enums"]["reflection_type"]
-          updated_at: string | null
-          user_id: string
-          workshop_day: number
-        }
-        Insert: {
-          content: Json
-          created_at?: string | null
-          id?: string
-          reflection_type: Database["public"]["Enums"]["reflection_type"]
-          updated_at?: string | null
-          user_id: string
-          workshop_day: number
-        }
-        Update: {
-          content?: Json
-          created_at?: string | null
-          id?: string
-          reflection_type?: Database["public"]["Enums"]["reflection_type"]
-          updated_at?: string | null
-          user_id?: string
-          workshop_day?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "daily_reflections_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       photo_gallery: {
         Row: {
           caption: string | null
@@ -830,6 +792,62 @@ export type Database = {
         }
         Relationships: []
       }
+      participant_profiles: {
+        Row: {
+          id: string
+          user_id: string
+          description: string | null
+          location: string | null
+          inspiring_moment: string | null
+          reading_list: Json
+          who_inspires_you: Json
+          best_sidequests: string | null
+          favorite_animal: string | null
+          undersung_roles: Json
+          cool_projects: Json
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          description?: string | null
+          location?: string | null
+          inspiring_moment?: string | null
+          reading_list?: Json
+          who_inspires_you?: Json
+          best_sidequests?: string | null
+          favorite_animal?: string | null
+          undersung_roles?: Json
+          cool_projects?: Json
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          description?: string | null
+          location?: string | null
+          inspiring_moment?: string | null
+          reading_list?: Json
+          who_inspires_you?: Json
+          best_sidequests?: string | null
+          favorite_animal?: string | null
+          undersung_roles?: Json
+          cool_projects?: Json
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participant_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       admin_todos_with_users: {
@@ -972,7 +990,6 @@ export type Database = {
     }
     Enums: {
       application_status: "pending" | "accepted" | "rejected" | "waitlisted"
-      reflection_type: "personal" | "group" | "prototype"
       task_priority: "low" | "medium" | "high"
       task_status: "pending" | "in_progress" | "completed"
       todo_priority: "low" | "medium" | "high" | "urgent"
@@ -1106,7 +1123,6 @@ export const Constants = {
   public: {
     Enums: {
       application_status: ["pending", "accepted", "rejected", "waitlisted"],
-      reflection_type: ["personal", "group", "prototype"],
       task_priority: ["low", "medium", "high"],
       task_status: ["pending", "in_progress", "completed"],
       todo_priority: ["low", "medium", "high", "urgent"],

@@ -1,58 +1,37 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Separator } from '@/components/ui/separator'
 import {
   Users,
   Calendar,
   MapPin,
   Plane,
-  Hotel,
-  Coffee,
   MessageSquare,
   CheckCircle2,
   Info,
-  Mail,
-  Globe,
-  BookOpen,
+  Clock,
+  ExternalLink,
+  Home,
   Utensils,
+  Presentation,
   Wifi,
-  Heart,
-  AlertCircle,
-  Sparkles,
-  Video,
-  FileText,
-  Download,
-  ExternalLink
+  Flame,
+  Coffee
 } from 'lucide-react'
+import { ParticipantProfileSheet } from './participant-profile-sheet'
 
 interface ParticipantProfile {
   id: string
   name: string | null
   email: string
   organization: string | null
-  bio?: string
-  research_interests?: string[]
-  linkedin?: string
-  twitter?: string
-}
-
-interface WorkshopSession {
-  id: string
-  day: number
-  time: string
-  title: string
-  description: string
-  type: 'plenary' | 'breakout' | 'social' | 'meal'
-  required: boolean
-  facilitator?: string
 }
 
 export function ParticipantDashboard({
@@ -64,47 +43,22 @@ export function ParticipantDashboard({
 }) {
   const [participants, setParticipants] = useState<ParticipantProfile[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedParticipant, setSelectedParticipant] = useState<ParticipantProfile | null>(null)
+  const [sheetOpen, setSheetOpen] = useState(false)
   const supabase = createClient()
 
   const loadParticipants = useCallback(async () => {
     try {
-      // Load all users who have created accounts from accepted applications
-      // This includes both regular participants and admins
-      const { data: acceptedApps, error: appError } = await supabase
-        .from('applications')
-        .select('email, name, organization, user_id')
-        .eq('status', 'accepted')
-        .not('user_id', 'is', null)
+      // Query users directly — the participants_view_other_participants
+      // RLS policy already filters to only participant-role users.
+      const { data: users, error } = await supabase
+        .from('users')
+        .select('id, name, email, organization')
+        .order('name')
 
-      if (appError) throw appError
+      if (error) throw error
 
-      // Get user details for all accepted participants
-      const userIds = acceptedApps
-        ?.map(app => app.user_id)
-        .filter((id): id is string => Boolean(id)) || []
-
-      if (userIds.length > 0) {
-        const { data: users, error: usersError } = await supabase
-          .from('users')
-          .select('*')
-          .in('id', userIds)
-          .order('name')
-
-        if (usersError) throw usersError
-
-        // Merge user data with application data for organization info
-        const participantList = users?.map(user => {
-          const app = acceptedApps?.find(a => a.user_id === user.id)
-          return {
-            ...user,
-            organization: user.organization || app?.organization || null
-          }
-        }) || []
-
-        setParticipants(participantList)
-      } else {
-        setParticipants([])
-      }
+      setParticipants(users || [])
     } catch (error) {
       console.error('Error loading participants:', error)
     } finally {
@@ -116,83 +70,14 @@ export function ParticipantDashboard({
     loadParticipants()
   }, [loadParticipants])
 
-  // Mock workshop schedule - in production, this would come from the database
-  const schedule: WorkshopSession[] = [
-    {
-      id: '1',
-      day: 1,
-      time: '8:00 AM',
-      title: 'Registration & Welcome Breakfast',
-      description: 'Check-in, receive workshop materials, and network over breakfast',
-      type: 'meal',
-      required: true
-    },
-    {
-      id: '2',
-      day: 1,
-      time: '9:00 AM',
-      title: 'Opening Keynote: The Future of Scientific Attribution',
-      description: 'Setting the vision for modular research and collaborative science',
-      type: 'plenary',
-      required: true,
-      facilitator: 'Dr. Sarah Chen'
-    },
-    {
-      id: '3',
-      day: 1,
-      time: '10:30 AM',
-      title: 'Lightning Talks: Current Attribution Challenges',
-      description: 'Participants share 5-minute perspectives on attribution problems in their fields',
-      type: 'plenary',
-      required: true
-    },
-    {
-      id: '4',
-      day: 1,
-      time: '12:00 PM',
-      title: 'Lunch & Networking',
-      description: 'Structured networking lunch with topic tables',
-      type: 'meal',
-      required: true
-    },
-    {
-      id: '5',
-      day: 1,
-      time: '2:00 PM',
-      title: 'Breakout: Technical Standards Working Group',
-      description: 'Deep dive into technical requirements for attribution protocols',
-      type: 'breakout',
-      required: false
-    },
-    {
-      id: '6',
-      day: 2,
-      time: '9:00 AM',
-      title: 'Design Sprint: Attribution Protocol MVP',
-      description: 'Hands-on session to prototype attribution mechanisms',
-      type: 'breakout',
-      required: true,
-      facilitator: 'Alex Rivera'
-    },
-    {
-      id: '7',
-      day: 2,
-      time: '6:00 PM',
-      title: 'Group Dinner',
-      description: 'Optional group dinner at a local restaurant',
-      type: 'social',
-      required: false
-    }
-  ]
-
-  const getSessionBadgeColor = (type: WorkshopSession['type']) => {
-    switch (type) {
-      case 'plenary': return 'bg-blue-100 text-blue-800'
-      case 'breakout': return 'bg-green-100 text-green-800'
-      case 'social': return 'bg-purple-100 text-purple-800'
-      case 'meal': return 'bg-orange-100 text-orange-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
+  function ComingSoonPlaceholder({ icon: Icon, title }: { icon: React.ComponentType<{ className?: string }>, title: string }) {
+    return (
+      <div className="text-center py-12">
+        <Icon className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+        <h3 className="text-lg font-medium text-gray-900 mb-1">{title}</h3>
+        <p className="text-sm text-gray-500">Coming soon</p>
+      </div>
+    )
   }
 
   return (
@@ -206,39 +91,30 @@ export function ParticipantDashboard({
               <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
                 <Calendar className="h-4 w-4 text-blue-600" />
                 <span className="font-medium">June 7-11, 2026</span>
-                <span className="text-gray-400">•</span>
+                <span className="text-gray-400">&bull;</span>
                 <MapPin className="h-4 w-4 text-blue-600" />
                 <span className="font-medium">The Deerstone Eco Hideaway, Ireland</span>
               </div>
             </div>
           </div>
-          <Badge className="bg-blue-600 text-white border-0 px-3 py-1">
-            Workshop Participant
-          </Badge>
         </div>
       </div>
 
-      {/* Important Pre-Workshop Tasks */}
-      <Alert className="border-amber-200 bg-amber-50">
-        <Sparkles className="h-4 w-4 text-amber-600" />
+      {/* Pre-Workshop Tasks */}
+      <Alert className="border-blue-200 bg-blue-50">
+        <Clock className="h-4 w-4 text-blue-600" />
         <AlertDescription>
-          <strong className="text-amber-900">Pre-Workshop Tasks:</strong>
-          <ul className="mt-2 space-y-1 text-sm">
-            <li>• Complete your participant profile (due 2 weeks before)</li>
-            <li>• Review pre-reading materials in the Resources tab</li>
-            <li>• Book your travel and accommodation</li>
-            <li>• Join the workshop Slack channel</li>
-          </ul>
+          <strong className="text-blue-900">Pre-Workshop Tasks:</strong>
+          <p className="mt-1 text-sm text-blue-800">Coming soon</p>
         </AlertDescription>
       </Alert>
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="participants" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="participants">Participants</TabsTrigger>
           <TabsTrigger value="schedule">Schedule</TabsTrigger>
           <TabsTrigger value="logistics">Logistics</TabsTrigger>
-          <TabsTrigger value="resources">Resources</TabsTrigger>
           <TabsTrigger value="connect">Connect</TabsTrigger>
         </TabsList>
 
@@ -251,7 +127,7 @@ export function ParticipantDashboard({
                 Workshop Participants
               </CardTitle>
               <CardDescription>
-                Connect with the 20 researchers joining you at the workshop
+                Meet the researchers and practitioners joining you at the workshop
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -262,7 +138,11 @@ export function ParticipantDashboard({
                   {participants.map((participant) => (
                     <div
                       key={participant.id}
-                      className="flex items-start space-x-3 p-4 rounded-lg border hover:bg-gray-50 transition-colors"
+                      className="flex items-start space-x-3 p-4 rounded-lg border hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => {
+                        setSelectedParticipant(participant)
+                        setSheetOpen(true)
+                      }}
                     >
                       <Avatar className="h-10 w-10">
                         <AvatarFallback className="bg-gradient-to-br from-blue-600 to-cyan-600 text-white">
@@ -273,11 +153,6 @@ export function ParticipantDashboard({
                         <p className="font-medium text-sm">{participant.name || 'Participant'}</p>
                         <p className="text-xs text-gray-600 truncate">{participant.organization}</p>
                       </div>
-                      {participant.id !== userId && (
-                        <Button size="sm" variant="ghost">
-                          <MessageSquare className="h-4 w-4" />
-                        </Button>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -301,63 +176,11 @@ export function ParticipantDashboard({
                 Workshop Schedule
               </CardTitle>
               <CardDescription>
-                5-day intensive workshop program
+                June 7-11, 2026
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                {[1, 2, 3, 4, 5].map((day) => (
-                  <div key={day}>
-                    <h3 className="font-semibold text-lg mb-3 flex items-center">
-                      <div className="h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold mr-3">
-                        {day}
-                      </div>
-                      Day {day}
-                    </h3>
-                    <div className="space-y-2 ml-11">
-                      {schedule
-                        .filter(session => session.day === day)
-                        .map((session) => (
-                          <div
-                            key={session.id}
-                            className="flex items-start space-x-3 p-3 rounded-lg border hover:bg-gray-50 transition-colors"
-                          >
-                            <div className="text-sm text-gray-500 font-medium w-20 pt-1">
-                              {session.time}
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2 mb-1">
-                                <p className="font-medium">{session.title}</p>
-                                <Badge className={`text-xs ${getSessionBadgeColor(session.type)}`}>
-                                  {session.type}
-                                </Badge>
-                                {session.required && (
-                                  <Badge variant="outline" className="text-xs">
-                                    Required
-                                  </Badge>
-                                )}
-                              </div>
-                              <p className="text-sm text-gray-600">{session.description}</p>
-                              {session.facilitator && (
-                                <p className="text-xs text-gray-500 mt-1">
-                                  Facilitated by {session.facilitator}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <Alert className="mt-6">
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Note:</strong> This is a preliminary schedule. Final timing and sessions
-                  will be confirmed 2 weeks before the workshop.
-                </AlertDescription>
-              </Alert>
+              <ComingSoonPlaceholder icon={Calendar} title="Schedule" />
             </CardContent>
           </Card>
         </TabsContent>
@@ -365,7 +188,7 @@ export function ParticipantDashboard({
         {/* Logistics Information */}
         <TabsContent value="logistics" className="space-y-4">
           <div className="grid gap-4">
-            {/* Location */}
+            {/* Venue */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center text-lg">
@@ -376,12 +199,13 @@ export function ParticipantDashboard({
               <CardContent className="space-y-3">
                 <div>
                   <p className="font-medium">The Deerstone Eco Hideaway</p>
-                  <p className="text-sm text-gray-600">Eco-friendly retreat venue</p>
                   <p className="text-sm text-gray-600">Ireland</p>
                 </div>
-                <Button variant="outline" className="w-full">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  View on Google Maps
+                <Button variant="outline" className="w-full" asChild>
+                  <a href="https://thedeerstone.ie/" target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    Visit Venue Website
+                  </a>
                 </Button>
               </CardContent>
             </Card>
@@ -399,28 +223,68 @@ export function ParticipantDashboard({
                   <div className="flex items-start space-x-2">
                     <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
                     <div className="text-sm">
-                      <strong>Airports:</strong> Dublin Airport (DUB), Cork Airport (ORK), or Shannon Airport (SNN)
+                      <strong>Airport:</strong> Dublin Airport (DUB)
                     </div>
                   </div>
                   <div className="flex items-start space-x-2">
                     <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
                     <div className="text-sm">
-                      <strong>Ground Transport:</strong> Details will be provided upon acceptance
+                      <strong>Arrival Date:</strong> June 7, 2026
                     </div>
                   </div>
                   <div className="flex items-start space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
-                    <div className="text-sm">
-                      <strong>Website:</strong> <a href="https://thedeerstone.ie/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">thedeerstone.ie</a>
+                    <Info className="h-4 w-4 text-gray-400 mt-0.5" />
+                    <div className="text-sm text-gray-500">
+                      <strong>Ground Transportation:</strong> Coming soon
                     </div>
                   </div>
                 </div>
-                <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertDescription className="text-sm">
-                    Travel stipends up to $500 are available for participants traveling internationally.
-                  </AlertDescription>
-                </Alert>
+              </CardContent>
+            </Card>
+
+            {/* Working Spaces */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center text-lg">
+                  <Presentation className="mr-2 h-5 w-5 text-indigo-600" />
+                  Working Spaces
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-6">
+                  <div className="flex-1 space-y-5 py-2">
+                    <div className="space-y-2">
+                      <p className="font-medium">The Roundhouse</p>
+                      <p className="text-sm text-gray-600">Our main workshop space. A circular room designed to foster open dialogue and collaboration, equipped with high-speed wifi, wireless projector, flipcharts, and flexible seating.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="font-medium">The Barn</p>
+                      <p className="text-sm text-gray-600">A relaxed space for breaks and informal conversations, with a firepit and refreshments.</p>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-500 pt-2 border-t">
+                      <Wifi className="h-4 w-4" />
+                      <span>All spaces have high-speed wifi, AV equipment, and indoor/outdoor breakout options.</span>
+                    </div>
+                  </div>
+                  <div className="relative w-80 h-72 flex-shrink-0">
+                    <div className="absolute bottom-0 left-0 w-64 h-44 rounded-lg overflow-hidden shadow-lg -rotate-2">
+                      <Image
+                        src="/images/venue/barn-interior.jpg"
+                        alt="The Barn — cozy social space"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="absolute top-0 right-0 w-64 h-44 rounded-lg overflow-hidden shadow-lg rotate-2">
+                      <Image
+                        src="/images/venue/roundhouse-interior.jpg"
+                        alt="The Roundhouse — circular workshop space"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
@@ -428,25 +292,51 @@ export function ParticipantDashboard({
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center text-lg">
-                  <Hotel className="mr-2 h-5 w-5 text-purple-600" />
+                  <Home className="mr-2 h-5 w-5 text-purple-600" />
                   Accommodation
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-3">
-                  <div className="p-3 rounded-lg border bg-blue-50">
-                    <p className="font-medium text-sm">Recommended Hotel</p>
-                    <p className="text-sm text-gray-600">The Aloft Harlem</p>
-                    <p className="text-xs text-gray-500">Special workshop rate: $189/night</p>
-                    <p className="text-xs text-gray-500">Booking code: MODRES2026</p>
+              <CardContent>
+                <div className="flex gap-6">
+                  <div className="flex-1 space-y-4 py-2">
+                    <p className="text-sm text-gray-600">
+                      All participants will stay on-site at The Deerstone in private ensuite bedrooms. The property has 22 bedrooms across three accommodation types:
+                    </p>
+                    <div className="space-y-3">
+                      <div className="p-3 rounded-lg border">
+                        <p className="font-medium text-sm">Cottages</p>
+                        <p className="text-sm text-gray-600">Three-bedroom retreats with shared living space, stove, kitchenette, outdoor patio, and hot tub. King ensuite bedrooms with VOYA organic toiletries, bathrobes, and spa towels.</p>
+                      </div>
+                      <div className="p-3 rounded-lg border">
+                        <p className="font-medium text-sm">Shepherd&apos;s Huts</p>
+                        <p className="text-sm text-gray-600">Standalone rustic hideaways with a private double ensuite, kitchenette, stove, and outdoor terrace.</p>
+                      </div>
+                      <div className="p-3 rounded-lg border">
+                        <p className="font-medium text-sm">Lodge Guest Rooms</p>
+                        <p className="text-sm text-gray-600">Ensuite bedrooms in the main lodge with super king beds, Irish linen, and natural wool bedding.</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      All rooms include private bathrooms, hairdryer, bathrobes, and eco-friendly amenities. Room assignments will be shared closer to the workshop.
+                    </p>
                   </div>
-                  <div className="space-y-1 text-sm">
-                    <p className="font-medium">Alternative Options:</p>
-                    <ul className="space-y-1 text-gray-600">
-                      <li>• Broadway Hotel and Hostel (budget)</li>
-                      <li>• The High Line Hotel (premium)</li>
-                      <li>• Airbnb options in Morningside Heights</li>
-                    </ul>
+                  <div className="relative w-80 h-72 flex-shrink-0">
+                    <div className="absolute top-0 left-0 w-64 h-44 rounded-lg overflow-hidden shadow-lg -rotate-1">
+                      <Image
+                        src="/images/venue/cottage-exterior.png"
+                        alt="Cottage exterior nestled in greenery"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="absolute bottom-0 right-0 w-64 h-44 rounded-lg overflow-hidden shadow-lg rotate-1">
+                      <Image
+                        src="/images/venue/bedroom.png"
+                        alt="Ensuite bedroom with cozy bedding"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -457,30 +347,50 @@ export function ParticipantDashboard({
               <CardHeader>
                 <CardTitle className="flex items-center text-lg">
                   <Utensils className="mr-2 h-5 w-5 text-green-600" />
-                  Meals & Dietary
+                  Meals &amp; Dietary
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-start space-x-2">
-                    <Coffee className="h-4 w-4 text-gray-600 mt-0.5" />
-                    <span>Breakfast and lunch provided all workshop days</span>
+              <CardContent>
+                <div className="flex gap-6">
+                  <div className="flex-1 space-y-4 py-2">
+                    <p className="text-sm text-gray-600">
+                      All meals are included and prepared on-site by The Deerstone&apos;s in-house chefs. Dining takes place in The Shed, a communal long-table space. Much of the food is grown in the venue&apos;s own polytunnels, herb gardens, and vegetable gardens.
+                    </p>
+                    <div className="space-y-2">
+                      <div className="flex items-start space-x-2">
+                        <Coffee className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                        <div className="text-sm">
+                          <strong>Breakfast</strong> — Fresh seasonal spreads including overnight oats, egg &amp; avocado bowls, sourdough, pastries, fresh-pressed juice, tea &amp; coffee
+                        </div>
+                      </div>
+                      <div className="flex items-start space-x-2">
+                        <Utensils className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <div className="text-sm">
+                          <strong>Lunch</strong> — Seasonal soups, salads, and mains
+                        </div>
+                      </div>
+                      <div className="flex items-start space-x-2">
+                        <Flame className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                        <div className="text-sm">
+                          <strong>Dinner</strong> — Multi-course chef&apos;s table or casual BBQ, featuring local Irish ingredients
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      Vegetarian and vegan options are available at every meal. If you have dietary restrictions or allergies, please let us know and the kitchen will accommodate you.
+                    </p>
                   </div>
-                  <div className="flex items-start space-x-2">
-                    <Utensils className="h-4 w-4 text-gray-600 mt-0.5" />
-                    <span>Group dinners on Days 1 and 3 (optional)</span>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <Heart className="h-4 w-4 text-gray-600 mt-0.5" />
-                    <span>All dietary restrictions accommodated</span>
+                  <div className="relative w-80 h-56 flex-shrink-0 self-center">
+                    <div className="absolute inset-0 rounded-lg overflow-hidden shadow-lg rotate-1">
+                      <Image
+                        src="/images/venue/the-shed.jpg"
+                        alt="The Shed — communal long-table dining space"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
                   </div>
                 </div>
-                <Alert>
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription className="text-sm">
-                    Please update your dietary preferences in your profile by March 1st.
-                  </AlertDescription>
-                </Alert>
               </CardContent>
             </Card>
 
@@ -488,120 +398,15 @@ export function ParticipantDashboard({
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center text-lg">
-                  <FileText className="mr-2 h-5 w-5 text-orange-600" />
+                  <MessageSquare className="mr-2 h-5 w-5 text-orange-600" />
                   What to Bring
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
-                    <span>Laptop for workshop activities</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
-                    <span>Business cards for networking</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
-                    <span>Comfortable attire (dress code: smart casual)</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
-                    <span>Reusable water bottle</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <Wifi className="h-4 w-4 text-blue-600 mt-0.5" />
-                    <span>WiFi provided at venue</span>
-                  </li>
-                </ul>
+                <ComingSoonPlaceholder icon={MessageSquare} title="Packing List" />
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
-
-        {/* Resources */}
-        <TabsContent value="resources" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <BookOpen className="mr-2 h-5 w-5" />
-                Workshop Resources
-              </CardTitle>
-              <CardDescription>
-                Materials and readings to prepare for the workshop
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium mb-3">Pre-Workshop Reading</h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center space-x-3">
-                        <FileText className="h-5 w-5 text-gray-400" />
-                        <div>
-                          <p className="text-sm font-medium">Attribution in Open Science</p>
-                          <p className="text-xs text-gray-500">White paper on current challenges</p>
-                        </div>
-                      </div>
-                      <Button size="sm" variant="ghost">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center space-x-3">
-                        <FileText className="h-5 w-5 text-gray-400" />
-                        <div>
-                          <p className="text-sm font-medium">Modular Research Framework</p>
-                          <p className="text-xs text-gray-500">Introduction to modular research concepts</p>
-                        </div>
-                      </div>
-                      <Button size="sm" variant="ghost">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center space-x-3">
-                        <FileText className="h-5 w-5 text-gray-400" />
-                        <div>
-                          <p className="text-sm font-medium">Case Studies Collection</p>
-                          <p className="text-xs text-gray-500">Examples from various fields</p>
-                        </div>
-                      </div>
-                      <Button size="sm" variant="ghost">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <h4 className="font-medium mb-3">Workshop Tools</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <Button variant="outline" className="justify-start">
-                      <Video className="mr-2 h-4 w-4" />
-                      Zoom Link for Remote Sessions
-                    </Button>
-                    <Button variant="outline" className="justify-start">
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      Slack Workspace
-                    </Button>
-                    <Button variant="outline" className="justify-start">
-                      <FileText className="mr-2 h-4 w-4" />
-                      Shared Google Drive
-                    </Button>
-                    <Button variant="outline" className="justify-start">
-                      <Globe className="mr-2 h-4 w-4" />
-                      Collaboration Platform
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* Connect */}
@@ -616,72 +421,20 @@ export function ParticipantDashboard({
                 Communication channels and important contacts
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h4 className="font-medium mb-3">Workshop Organizers</h4>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3 p-3 rounded-lg border">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback>WO</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="font-medium">Workshop Coordination Team</p>
-                      <p className="text-sm text-gray-600">workshop@modularresearch.org</p>
-                    </div>
-                    <Button size="sm" variant="outline">
-                      <Mail className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="flex items-center space-x-3 p-3 rounded-lg border">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback>SC</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="font-medium">Dr. Sarah Chen</p>
-                      <p className="text-sm text-gray-600">Lead Facilitator</p>
-                    </div>
-                    <Button size="sm" variant="outline">
-                      <Mail className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h4 className="font-medium mb-3">Quick Links</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <Button variant="outline" className="justify-start">
-                    <MessageSquare className="mr-2 h-4 w-4 text-purple-600" />
-                    Join Slack Channel
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    <Users className="mr-2 h-4 w-4 text-blue-600" />
-                    Participant Directory
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    <Calendar className="mr-2 h-4 w-4 text-green-600" />
-                    Add to Calendar
-                  </Button>
-                  <Button variant="outline" className="justify-start">
-                    <Globe className="mr-2 h-4 w-4 text-orange-600" />
-                    Workshop Website
-                  </Button>
-                </div>
-              </div>
-
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Emergency Contact:</strong> For urgent matters during the workshop,
-                  call +1 (555) 123-4567 (available 24/7 during workshop days).
-                </AlertDescription>
-              </Alert>
+            <CardContent>
+              <ComingSoonPlaceholder icon={MessageSquare} title="Contact & Communication Details" />
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+
+      <ParticipantProfileSheet
+        participant={selectedParticipant}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        currentUserId={userId}
+        onProfileUpdated={loadParticipants}
+      />
     </div>
   )
 }

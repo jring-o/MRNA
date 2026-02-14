@@ -175,3 +175,62 @@ export type TodoStatus = Database['public']['Enums']['todo_status']
 
 // Invite token types
 export type InviteToken = Tables<'invite_tokens'>
+
+// Participant profile types
+export type ParticipantProfile = Tables<'participant_profiles'>
+
+export interface ReadingListItem {
+  title: string
+  author: string
+}
+
+export interface InspirationItem {
+  name: string
+  reason: string
+}
+
+export function parseReadingList(json: unknown): ReadingListItem[] {
+  if (!json || !Array.isArray(json)) return []
+  return json.filter((item): item is ReadingListItem =>
+    typeof item === 'object' &&
+    item !== null &&
+    'title' in item &&
+    'author' in item &&
+    typeof item.title === 'string' &&
+    typeof item.author === 'string'
+  )
+}
+
+export function parseInspirations(json: unknown): InspirationItem[] {
+  if (!json || !Array.isArray(json)) return []
+  return json.filter((item): item is InspirationItem =>
+    typeof item === 'object' &&
+    item !== null &&
+    'name' in item &&
+    'reason' in item &&
+    typeof item.name === 'string' &&
+    typeof item.reason === 'string'
+  )
+}
+
+export function parseUnsungRoles(json: unknown): string[] {
+  if (!json || !Array.isArray(json)) return []
+  return json.filter((item): item is string => typeof item === 'string')
+}
+
+export interface CoolProject {
+  url: string
+  description: string
+}
+
+export function parseCoolProjects(json: unknown): CoolProject[] {
+  if (!json || !Array.isArray(json)) return []
+  return json.filter((item): item is CoolProject =>
+    typeof item === 'object' &&
+    item !== null &&
+    'url' in item &&
+    'description' in item &&
+    typeof item.url === 'string' &&
+    typeof item.description === 'string'
+  )
+}
