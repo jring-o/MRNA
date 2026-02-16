@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ParticipantSection } from './participant-section'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
@@ -61,9 +60,6 @@ export default async function DashboardPage() {
                   </Button>
                 </Link>
               )}
-              <Badge variant="secondary">
-                Participant {isAdmin && '(Admin)'}
-              </Badge>
               <Avatar>
                 <AvatarFallback className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white">
                   {initials}

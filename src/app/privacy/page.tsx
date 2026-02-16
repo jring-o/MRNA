@@ -338,6 +338,10 @@ export default function PrivacyPolicyPage() {
                   Check Status
                 </Link>
                 <span className="text-gray-400">•</span>
+                <Link href="/code-of-conduct" className="text-blue-600 hover:underline">
+                  Code of Conduct
+                </Link>
+                <span className="text-gray-400">•</span>
                 <a href="mailto:contact@scios.tech" className="text-blue-600 hover:underline">
                   Contact Us
                 </a>

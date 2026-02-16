@@ -294,6 +294,9 @@ export default function BlogPage() {
               <Link href="/blog" className="hover:text-white transition-colors">
                 Blog
               </Link>
+              <Link href="/code-of-conduct" className="hover:text-white transition-colors">
+                Code of Conduct
+              </Link>
               <Link href="/privacy" className="hover:text-white transition-colors">
                 Privacy Policy
               </Link>
