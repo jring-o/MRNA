@@ -54,11 +54,18 @@ export default async function DashboardPage() {
             </div>
             <div className="flex items-center space-x-4">
               {isAdmin && (
-                <Link href="/admin">
-                  <Button variant="outline" size="sm">
-                    Admin Dash
-                  </Button>
-                </Link>
+                <>
+                  <Link href="/messages">
+                    <Button variant="outline" size="sm">
+                      Messages
+                    </Button>
+                  </Link>
+                  <Link href="/admin">
+                    <Button variant="outline" size="sm">
+                      Admin Dash
+                    </Button>
+                  </Link>
+                </>
               )}
               <Avatar>
                 <AvatarFallback className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white">

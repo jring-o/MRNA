@@ -499,6 +499,188 @@ export type Database = {
         }
         Relationships: []
       }
+      message_comments: {
+        Row: {
+          id: string
+          message_id: string
+          author_id: string
+          content: string
+          created_at: string | null
+          edited_at: string | null
+        }
+        Insert: {
+          id?: string
+          message_id: string
+          author_id: string
+          content: string
+          created_at?: string | null
+          edited_at?: string | null
+        }
+        Update: {
+          id?: string
+          message_id?: string
+          author_id?: string
+          content?: string
+          created_at?: string | null
+          edited_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_comments_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_comments_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages_with_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_recipients: {
+        Row: {
+          message_id: string
+          user_id: string
+          created_at: string | null
+        }
+        Insert: {
+          message_id: string
+          user_id: string
+          created_at?: string | null
+        }
+        Update: {
+          message_id?: string
+          user_id?: string
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_recipients_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_recipients_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages_with_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_recipients_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_reactions: {
+        Row: {
+          id: string
+          message_id: string
+          user_id: string
+          reaction: Database["public"]["Enums"]["message_reaction_type"]
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          message_id: string
+          user_id: string
+          reaction: Database["public"]["Enums"]["message_reaction_type"]
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          message_id?: string
+          user_id?: string
+          reaction?: Database["public"]["Enums"]["message_reaction_type"]
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages_with_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          id: string
+          subject: string
+          content: string
+          content_plain: string | null
+          author_id: string
+          email_sent: boolean | null
+          email_sent_at: string | null
+          email_recipient_count: number | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          subject: string
+          content: string
+          content_plain?: string | null
+          author_id: string
+          email_sent?: boolean | null
+          email_sent_at?: string | null
+          email_recipient_count?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          subject?: string
+          content?: string
+          content_plain?: string | null
+          author_id?: string
+          email_sent?: boolean | null
+          email_sent_at?: string | null
+          email_recipient_count?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           content: string
@@ -895,6 +1077,33 @@ export type Database = {
           },
         ]
       }
+      messages_with_details: {
+        Row: {
+          id: string | null
+          subject: string | null
+          content: string | null
+          content_plain: string | null
+          author_id: string | null
+          email_sent: boolean | null
+          email_sent_at: string | null
+          email_recipient_count: number | null
+          created_at: string | null
+          updated_at: string | null
+          author_name: string | null
+          author_email: string | null
+          comment_count: number | null
+          reaction_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       application_voting_summary: {
         Row: {
           abstain_votes: number | null
@@ -917,6 +1126,10 @@ export type Database = {
       auth_role: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      can_see_message: {
+        Args: { p_message_id: string }
+        Returns: boolean
       }
       debug_jwt: {
         Args: Record<PropertyKey, never>
@@ -946,6 +1159,14 @@ export type Database = {
           id: string
           is_internal: boolean
           parent_id: string
+        }[]
+      }
+      get_participant_emails: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          user_id: string
+          email: string
+          name: string
         }[]
       }
       get_voting_statistics: {
@@ -990,6 +1211,7 @@ export type Database = {
     }
     Enums: {
       application_status: "pending" | "accepted" | "rejected" | "waitlisted"
+      message_reaction_type: "thumbs_up" | "heart" | "party" | "rocket" | "eyes" | "thumbs_down"
       task_priority: "low" | "medium" | "high"
       task_status: "pending" | "in_progress" | "completed"
       todo_priority: "low" | "medium" | "high" | "urgent"
@@ -1123,6 +1345,7 @@ export const Constants = {
   public: {
     Enums: {
       application_status: ["pending", "accepted", "rejected", "waitlisted"],
+      message_reaction_type: ["thumbs_up", "heart", "party", "rocket", "eyes", "thumbs_down"],
       task_priority: ["low", "medium", "high"],
       task_status: ["pending", "in_progress", "completed"],
       todo_priority: ["low", "medium", "high", "urgent"],

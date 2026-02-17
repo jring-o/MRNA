@@ -141,6 +141,13 @@ export function canEditComment(comment: ApplicationComment, currentUserId: strin
   return (now.getTime() - createdAt.getTime()) < fiveMinutesInMs
 }
 
+// Message types
+export type Message = Tables<'messages'>
+export type MessageRecipient = Tables<'message_recipients'>
+export type MessageReaction = Tables<'message_reactions'>
+export type MessageComment = Tables<'message_comments'>
+export type MessageReactionType = Database['public']['Enums']['message_reaction_type']
+
 // Todo types
 export type AdminTodo = Tables<'admin_todos'> & {
   created_by_user?: {

@@ -8,6 +8,7 @@ import {
   ClipboardList,
   CheckSquare,
   MessageSquare,
+  Mail,
   Settings,
   ArrowRight,
   UserCheck,
@@ -177,6 +178,26 @@ export default async function AdminDashboardPage() {
               <Link href="/admin/todos">
                 <Button className="w-full" variant="default">
                   View Todos
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <Mail className="h-8 w-8 text-indigo-600" />
+                <ArrowRight className="h-5 w-5 text-gray-400" />
+              </div>
+              <CardTitle className="mt-4">Messages</CardTitle>
+              <CardDescription>
+                Broadcast messages to all participants
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/messages">
+                <Button className="w-full" variant="default">
+                  View Messages
                 </Button>
               </Link>
             </CardContent>
