@@ -40,9 +40,10 @@ function StatusPageContent() {
       const supabase = createClient()
 
       // Query application directly by email (no account needed)
+      // Only select fields the applicant needs — never expose admin_notes
       const { data: applicationData, error: applicationError } = await supabase
         .from('applications')
-        .select('*')
+        .select('id, name, email, organization, role, status, submitted_at, reviewed_at')
         .eq('email', email)
         .single()
 

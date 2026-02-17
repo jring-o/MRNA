@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { createClient } from '@/lib/supabase/server'
 import { ApplicationReceivedEmail } from '@/emails/application-received'
 import { AdminNewApplicationEmail } from '@/emails/admin-new-application'
 
@@ -15,6 +16,18 @@ export async function POST(request: Request) {
   const resend = new Resend(process.env.RESEND_API_KEY)
 
   try {
+    // Verify the caller is an admin
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    if (user.app_metadata?.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden - Admin only' }, { status: 403 })
+    }
+
     const body = await request.json()
     const {
       applicationId,

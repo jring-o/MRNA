@@ -14,6 +14,17 @@ export async function POST(request: Request) {
 
     const supabase = await createClient()
 
+    // Verify the caller is authenticated
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Only allow users to delete their own application (email must match their account)
+    if (user.email !== email) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     // First, verify the email matches the application (security check)
     const { data: application, error: fetchError } = await supabase
       .from('applications')

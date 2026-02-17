@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
-const ALLOWED_EMAIL = 'jon@scios.tech'
-
 export async function POST(request: Request) {
   try {
     const supabase = await createClient()
@@ -13,9 +11,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check if user is the allowed admin
-    if (user.email !== ALLOWED_EMAIL) {
-      return NextResponse.json({ error: 'Forbidden - Only jon@scios.tech can use this feature' }, { status: 403 })
+    // Check if user is admin
+    if (user.app_metadata?.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden - Admin only' }, { status: 403 })
     }
 
     // Parse request body

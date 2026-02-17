@@ -31,7 +31,6 @@ import { ParticipantProfileSheet } from './participant-profile-sheet'
 interface ParticipantProfile {
   id: string
   name: string | null
-  email: string
   organization: string | null
 }
 
@@ -54,7 +53,7 @@ export function ParticipantDashboard({
       // RLS policy already filters to only participant-role users.
       const { data: users, error } = await supabase
         .from('users')
-        .select('id, name, email, organization')
+        .select('id, name, organization')
         .order('name')
 
       if (error) throw error

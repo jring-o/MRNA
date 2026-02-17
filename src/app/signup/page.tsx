@@ -119,8 +119,8 @@ function SignUpContent() {
       p_email: formData.email,
     })
 
-    // Redirect to confirmation page (dashboard access will be enabled later)
-    router.push('/confirmed')
+    // Redirect to Code of Conduct acceptance
+    router.push('/code-of-conduct')
     router.refresh()
   }
 

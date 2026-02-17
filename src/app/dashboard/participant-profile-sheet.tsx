@@ -47,7 +47,6 @@ import {
 interface ParticipantUser {
   id: string
   name: string | null
-  email: string
   organization: string | null
 }
 

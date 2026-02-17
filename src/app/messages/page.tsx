@@ -32,15 +32,17 @@ export default async function MessagesPage() {
     redirect('/code-of-conduct')
   }
 
-  // Fetch participants & admins via RPC (no service role key needed)
-  const { data: recipientData } = await supabase.rpc('get_participant_emails')
-
-  const users = (recipientData || []).map((r: { user_id: string; name: string; email: string; role: string }) => ({
-    id: r.user_id,
-    name: r.name,
-    email: r.email,
-    role: (r.role === 'admin' ? 'admin' : 'participant') as 'participant' | 'admin',
-  })).sort((a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name))
+  // Only fetch the full user list for admins (compose dialog needs it)
+  let users: { id: string; name: string; email: string; role: 'participant' | 'admin' }[] = []
+  if (role === 'admin') {
+    const { data: recipientData } = await supabase.rpc('get_participant_emails')
+    users = (recipientData || []).map((r: { user_id: string; name: string; email: string; role: string }) => ({
+      id: r.user_id,
+      name: r.name,
+      email: r.email,
+      role: (r.role === 'admin' ? 'admin' : 'participant') as 'participant' | 'admin',
+    })).sort((a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name))
+  }
 
   // Fetch messages with details
   const { data: messagesData } = await supabase
