@@ -1167,6 +1167,7 @@ export type Database = {
           user_id: string
           email: string
           name: string
+          role: string
         }[]
       }
       get_voting_statistics: {

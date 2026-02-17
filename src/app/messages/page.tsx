@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { MessagesPageClient } from '@/components/messages/messages-page-client'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
@@ -22,35 +21,15 @@ export default async function MessagesPage() {
     redirect('/dashboard')
   }
 
-  // Fetch all users with role info for recipient selection
-  const { data: usersData } = await supabase
-    .from('users')
-    .select('id, name, email')
-    .order('name')
+  // Fetch participants & admins via RPC (no service role key needed)
+  const { data: recipientData } = await supabase.rpc('get_participant_emails')
 
-  // Get role info from auth.users via service role client
-  let roleMap: Record<string, string> = {}
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (serviceKey) {
-    const adminClient = createServiceClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      serviceKey
-    )
-    const { data: { users: authUsers } } = await adminClient.auth.admin.listUsers({ perPage: 1000 })
-    roleMap = Object.fromEntries(
-      authUsers.map(u => [u.id, u.app_metadata?.role || 'applicant'])
-    )
-  }
-
-  const users = (usersData || [])
-    .filter(u => {
-      const r = roleMap[u.id]
-      return r === 'participant' || r === 'admin'
-    })
-    .map(u => ({
-      ...u,
-      role: (roleMap[u.id] || 'participant') as 'participant' | 'admin',
-    }))
+  const users = (recipientData || []).map((r: { user_id: string; name: string; email: string; role: string }) => ({
+    id: r.user_id,
+    name: r.name,
+    email: r.email,
+    role: (r.role === 'admin' ? 'admin' : 'participant') as 'participant' | 'admin',
+  })).sort((a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name))
 
   // Fetch messages with details
   const { data: messagesData } = await supabase
