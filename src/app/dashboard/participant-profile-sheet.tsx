@@ -66,7 +66,7 @@ const profileSchema = z.object({
   organization: z.string().optional(),
   description: z.string().optional(),
   location: z.string().optional(),
-  inspiring_moment: z.string().optional(),
+  schema_motivation: z.string().optional(),
   reading_list: z.array(z.object({
     title: z.string(),
     author: z.string(),
@@ -145,7 +145,7 @@ export function ParticipantProfileSheet({
       organization: '',
       description: '',
       location: '',
-      inspiring_moment: '',
+      schema_motivation: '',
       reading_list: [],
       who_inspires_you: [],
       best_sidequests: '',
@@ -204,7 +204,7 @@ export function ParticipantProfileSheet({
       organization: participant.organization || '',
       description: profile?.description || '',
       location: profile?.location || '',
-      inspiring_moment: profile?.inspiring_moment || '',
+      schema_motivation: profile?.schema_motivation || '',
       reading_list: readingList.length > 0 ? readingList : [],
       who_inspires_you: inspirations.length > 0 ? inspirations : [],
       best_sidequests: profile?.best_sidequests || '',
@@ -244,7 +244,7 @@ export function ParticipantProfileSheet({
         user_id: currentUserId,
         description: data.description?.trim() || null,
         location: data.location?.trim() || null,
-        inspiring_moment: data.inspiring_moment?.trim() || null,
+        schema_motivation: data.schema_motivation?.trim() || null,
         reading_list: data.reading_list.filter(r => r.title.trim() || r.author.trim()),
         who_inspires_you: data.who_inspires_you.filter(w => w.name.trim() || w.reason.trim()),
         best_sidequests: data.best_sidequests?.trim() || null,
@@ -420,11 +420,11 @@ export function ParticipantProfileSheet({
 
               {/* Inspiring Moment */}
               <div>
-                <Label htmlFor="edit-inspiring">What&apos;s the most inspiring moment of your career?</Label>
+                <Label htmlFor="edit-schema-motivation">Why in the world are you thinking about schemas all day?</Label>
                 <Textarea
-                  id="edit-inspiring"
-                  {...form.register('inspiring_moment')}
-                  placeholder="Share a moment that changed everything..."
+                  id="edit-schema-motivation"
+                  {...form.register('schema_motivation')}
+                  placeholder="What keeps you coming back to schemas..."
                   className="mt-1"
                   rows={3}
                 />
@@ -600,8 +600,8 @@ export function ParticipantProfileSheet({
                 ) : null}
               </ProfileField>
 
-              <ProfileField icon={Sparkles} label="Most inspiring career moment" isOwn={isOwnProfile}>
-                {profile?.inspiring_moment || null}
+              <ProfileField icon={Sparkles} label="Why in the world are you thinking about schemas all day?" isOwn={isOwnProfile}>
+                {profile?.schema_motivation || null}
               </ProfileField>
 
               <ProfileField icon={BookOpen} label="Reading list" isOwn={isOwnProfile}>

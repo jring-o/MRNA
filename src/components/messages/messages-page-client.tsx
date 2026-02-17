@@ -34,10 +34,11 @@ interface UserInfo {
 interface MessagesPageClientProps {
   initialMessages: MessageWithDetails[]
   currentUserId: string
+  currentUserRole: 'participant' | 'admin'
   users: UserInfo[]
 }
 
-export function MessagesPageClient({ initialMessages, currentUserId, users }: MessagesPageClientProps) {
+export function MessagesPageClient({ initialMessages, currentUserId, currentUserRole, users }: MessagesPageClientProps) {
   const [messages, setMessages] = useState<MessageWithDetails[]>(initialMessages)
   const [composeOpen, setComposeOpen] = useState(false)
 
@@ -78,13 +79,15 @@ export function MessagesPageClient({ initialMessages, currentUserId, users }: Me
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
           <p className="mt-1 text-gray-600">
-            Broadcast messages to all participants
+            {currentUserRole === 'admin' ? 'Broadcast messages to all participants' : 'Messages from the organizers'}
           </p>
         </div>
-        <Button onClick={() => setComposeOpen(true)}>
-          <PenSquare className="mr-2 h-4 w-4" />
-          Compose Message
-        </Button>
+        {currentUserRole === 'admin' && (
+          <Button onClick={() => setComposeOpen(true)}>
+            <PenSquare className="mr-2 h-4 w-4" />
+            Compose Message
+          </Button>
+        )}
       </div>
 
       {/* Messages list */}
@@ -93,12 +96,8 @@ export function MessagesPageClient({ initialMessages, currentUserId, users }: Me
           <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-4 text-lg font-medium text-gray-900">No messages yet</h3>
           <p className="mt-2 text-gray-500">
-            Compose your first message to get started.
+            No messages to display.
           </p>
-          <Button className="mt-4" onClick={() => setComposeOpen(true)}>
-            <PenSquare className="mr-2 h-4 w-4" />
-            Compose Message
-          </Button>
         </div>
       ) : (
         <div className="space-y-4">

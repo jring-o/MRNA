@@ -15,10 +15,21 @@ export default async function MessagesPage() {
     redirect('/login')
   }
 
-  // Check if user is admin
+  // Check if user is participant or admin
   const role = user.app_metadata?.role
-  if (role !== 'admin') {
+  if (role !== 'admin' && role !== 'participant') {
     redirect('/dashboard')
+  }
+
+  // Check CoC acceptance
+  const { data: profile } = await supabase
+    .from('users')
+    .select('coc_accepted_at')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.coc_accepted_at) {
+    redirect('/code-of-conduct')
   }
 
   // Fetch participants & admins via RPC (no service role key needed)
@@ -62,7 +73,7 @@ export default async function MessagesPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation */}
         <div className="flex items-center justify-between mb-6">
-          <Link href="/admin">
+          <Link href={role === 'admin' ? '/admin' : '/dashboard'}>
             <Button variant="ghost" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Dashboard
@@ -73,6 +84,7 @@ export default async function MessagesPage() {
         <MessagesPageClient
           initialMessages={messages}
           currentUserId={user.id}
+          currentUserRole={role === 'admin' ? 'admin' : 'participant'}
           users={users}
         />
       </div>

@@ -1,8 +1,29 @@
 import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { Heart, Shield, Users, Handshake, Hammer, AlertTriangle, Flag, Scale, Mail, BookOpen } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
+import { AcceptCocButton } from './accept-coc-button'
 
-export default function CodeOfConductPage() {
+export default async function CodeOfConductPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const role = user?.app_metadata?.role
+  const isParticipantOrAdmin = role === 'participant' || role === 'admin'
+
+  // Check if user has already accepted the CoC
+  let hasAccepted = false
+  if (user && isParticipantOrAdmin) {
+    const { data: profile } = await supabase
+      .from('users')
+      .select('coc_accepted_at')
+      .eq('id', user.id)
+      .single()
+    hasAccepted = !!profile?.coc_accepted_at
+  }
+
+  const showAcceptButton = user && isParticipantOrAdmin && !hasAccepted
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       <div className="max-w-4xl mx-auto py-12 px-4">
@@ -17,6 +38,11 @@ export default function CodeOfConductPage() {
           <p className="text-gray-600">
             MIRA Workshop - Building a safe and inclusive community
           </p>
+          {showAcceptButton && (
+            <p className="mt-4 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 inline-block">
+              Please read and accept the Code of Conduct to continue
+            </p>
+          )}
         </div>
 
         <Card className="shadow-xl">
@@ -290,6 +316,24 @@ export default function CodeOfConductPage() {
                 </p>
               </div>
             </section>
+
+            {/* Accept Button */}
+            {showAcceptButton && (
+              <section className="border-t pt-6 mt-8">
+                <AcceptCocButton userId={user.id} />
+              </section>
+            )}
+
+            {/* Already Accepted */}
+            {user && isParticipantOrAdmin && hasAccepted && (
+              <section className="border-t pt-6 mt-8">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                  <p className="text-sm text-green-800 font-medium">
+                    You have accepted the Code of Conduct. Thank you!
+                  </p>
+                </div>
+              </section>
+            )}
 
             {/* Quick Links */}
             <section className="border-t pt-6 mt-8">

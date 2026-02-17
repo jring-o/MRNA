@@ -23,7 +23,8 @@ import {
   Presentation,
   Wifi,
   Flame,
-  Coffee
+  Coffee,
+  Mail
 } from 'lucide-react'
 import { ParticipantProfileSheet } from './participant-profile-sheet'
 
@@ -101,21 +102,26 @@ export function ParticipantDashboard({
       </div>
 
       {/* Pre-Workshop Tasks */}
-      <Alert className="border-blue-200 bg-blue-50">
-        <Clock className="h-4 w-4 text-blue-600" />
+      <Alert className="border-amber-300 bg-amber-50">
+        <Clock className="h-4 w-4 text-amber-600" />
         <AlertDescription>
-          <strong className="text-blue-900">Pre-Workshop Tasks:</strong>
-          <p className="mt-1 text-sm text-blue-800">Coming soon</p>
+          <strong className="text-amber-900">Pre-Workshop Tasks:</strong>
+          <ul className="mt-2 space-y-1 text-sm text-amber-800 list-disc list-inside">
+            <li>Fill out your profile by clicking your name in the participants list</li>
+            <li>Review the Logistics and Expectations tabs</li>
+            <li>Complete the <a href="https://www.when2meet.com/?35097357-s1ivK" target="_blank" rel="noopener noreferrer" className="underline font-medium">When2Meet</a> for our Kickoff Call</li>
+          </ul>
         </AlertDescription>
       </Alert>
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="participants" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="participants">Participants</TabsTrigger>
           <TabsTrigger value="schedule">Schedule</TabsTrigger>
           <TabsTrigger value="logistics">Logistics</TabsTrigger>
-          <TabsTrigger value="connect">Connect</TabsTrigger>
+          <TabsTrigger value="expectations">Expectations</TabsTrigger>
+          <TabsTrigger value="support">Support</TabsTrigger>
         </TabsList>
 
         {/* Participants Directory */}
@@ -239,6 +245,9 @@ export function ParticipantDashboard({
                     </div>
                   </div>
                 </div>
+                <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-800">
+                  <strong>Please do not book flights yet.</strong> We are working with our fiscal sponsor to determine the best way to arrange air travel. We will share booking instructions with you soon.
+                </div>
               </CardContent>
             </Card>
 
@@ -318,6 +327,9 @@ export function ParticipantDashboard({
                     </div>
                     <p className="text-sm text-gray-500">
                       All rooms include private bathrooms, hairdryer, bathrobes, and eco-friendly amenities. Room assignments will be shared closer to the workshop.
+                    </p>
+                    <p className="text-sm text-gray-500 italic">
+                      We believe that this workshop experience will be most valuable for our attendees if they are fully present; hence, we are asking partners, families, and others not to join participants during the meeting, unless related to family care obligations or another special case, which you should discuss with us.
                     </p>
                   </div>
                   <div className="relative w-80 h-72 flex-shrink-0">
@@ -409,20 +421,87 @@ export function ParticipantDashboard({
           </div>
         </TabsContent>
 
-        {/* Connect */}
-        <TabsContent value="connect" className="space-y-4">
+        {/* Expectations */}
+        <TabsContent value="expectations" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <MessageSquare className="mr-2 h-5 w-5" />
-                Stay Connected
+                <CheckCircle2 className="mr-2 h-5 w-5" />
+                Workshop Expectations
               </CardTitle>
-              <CardDescription>
-                Communication channels and important contacts
-              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">This is a production-focused event</h4>
+                  <p className="text-sm text-gray-600">
+                    We will be participating in product development activities — things like user research, design exercises, and prototyping. Some of this may feel unfamiliar, and that&apos;s okay. The goal is to build something together, and we&apos;ll guide you through every step of the process.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">Professional environment</h4>
+                  <p className="text-sm text-gray-600">
+                    While we want everyone to have fun, get to know one another, and enjoy the setting, please remember that this is a professional event. We ask all participants to conduct themselves accordingly and to be respectful of one another at all times.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">Be present</h4>
+                  <p className="text-sm text-gray-600">
+                    We have brought together a small, carefully selected group because we believe each of you has something valuable to contribute. The workshop works best when everyone is fully engaged. We encourage you to minimize outside distractions and come ready to actively participate.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Support */}
+        <TabsContent value="support" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Mail className="mr-2 h-5 w-5" />
+                Contact Us
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <ComingSoonPlaceholder icon={MessageSquare} title="Contact & Communication Details" />
+              <p className="text-sm text-gray-600 mb-4">
+                If you ever need to reach out — whether it&apos;s a question about logistics, a special request, or anything else — don&apos;t hesitate to contact us.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3 p-3 rounded-lg border">
+                  <Mail className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                  <div className="text-sm">
+                    <span className="font-medium">All Organizers</span>
+                    <span className="text-gray-400 mx-2">&mdash;</span>
+                    <a href="mailto:contact@scios.tech" className="text-blue-600 hover:underline">contact@scios.tech</a>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3 p-3 rounded-lg border">
+                  <Mail className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                  <div className="text-sm">
+                    <span className="font-medium">Jon</span>
+                    <span className="text-gray-400 mx-2">&mdash;</span>
+                    <a href="mailto:jon@scios.tech" className="text-blue-600 hover:underline">jon@scios.tech</a>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3 p-3 rounded-lg border">
+                  <Mail className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                  <div className="text-sm">
+                    <span className="font-medium">Ellie</span>
+                    <span className="text-gray-400 mx-2">&mdash;</span>
+                    <a href="mailto:ellie@scios.tech" className="text-blue-600 hover:underline">ellie@scios.tech</a>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3 p-3 rounded-lg border">
+                  <Mail className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                  <div className="text-sm">
+                    <span className="font-medium">Matt</span>
+                    <span className="text-gray-400 mx-2">&mdash;</span>
+                    <a href="mailto:akamatsm@uw.edu" className="text-blue-600 hover:underline">akamatsm@uw.edu</a>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

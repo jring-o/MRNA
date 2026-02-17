@@ -14,6 +14,9 @@ async function signOut() {
 export async function AuthHeader() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  const role = user?.app_metadata?.role
+
+  const isParticipantOrAdmin = role === 'participant' || role === 'admin'
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -35,18 +38,28 @@ export async function AuthHeader() {
           >
             About
           </Link>
-          <Link
-            href="/code-of-conduct"
-            className="text-sm font-medium transition-colors hover:text-workshop-primary text-gray-600"
-          >
-            Code of Conduct
-          </Link>
           {user && (
             <Link
               href="/dashboard"
               className="text-sm font-medium transition-colors hover:text-workshop-primary text-gray-600"
             >
               Dashboard
+            </Link>
+          )}
+          {isParticipantOrAdmin && (
+            <Link
+              href="/messages"
+              className="text-sm font-medium transition-colors hover:text-workshop-primary text-gray-600"
+            >
+              Messages
+            </Link>
+          )}
+          {isParticipantOrAdmin && (
+            <Link
+              href="/code-of-conduct"
+              className="text-sm font-medium transition-colors hover:text-workshop-primary text-gray-600"
+            >
+              Code of Conduct
             </Link>
           )}
         </nav>

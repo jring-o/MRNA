@@ -7,7 +7,7 @@ CREATE TABLE public.participant_profiles (
   user_id UUID NOT NULL UNIQUE REFERENCES public.users(id) ON DELETE CASCADE,
   description TEXT,
   location TEXT,
-  inspiring_moment TEXT,
+  schema_motivation TEXT,
   reading_list JSONB DEFAULT '[]',       -- [{title, author}]
   who_inspires_you JSONB DEFAULT '[]',   -- [{name, reason}]
   best_sidequests TEXT,

@@ -19,14 +19,8 @@ export default async function DashboardPage() {
   const role = user.app_metadata?.role || 'applicant'
   const isAdmin = role === 'admin'
 
-  // Dashboard is only for admins until the platform is ready
-  // Participants are redirected to the confirmed page
-  if (role === 'participant') {
-    redirect('/confirmed')
-  }
-
-  // Applicants should be redirected to apply
-  if (role !== 'admin') {
+  // Only participants and admins can access the dashboard
+  if (role !== 'participant' && role !== 'admin') {
     redirect('/apply')
   }
 
@@ -36,6 +30,11 @@ export default async function DashboardPage() {
     .select('*')
     .eq('id', user.id)
     .single()
+
+  // Participants must accept the Code of Conduct before accessing the dashboard
+  if (!profile?.coc_accepted_at) {
+    redirect('/code-of-conduct')
+  }
 
   const initials = profile?.name
     ? profile.name.split(' ').map(n => n[0]).join('').toUpperCase()

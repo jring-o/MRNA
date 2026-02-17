@@ -910,9 +910,11 @@ export type Database = {
       }
       users: {
         Row: {
+          coc_accepted_at: string | null
           created_at: string | null
           email: string
           id: string
+          is_test_user: boolean
           last_login: string | null
           name: string
           organization: string | null
@@ -920,9 +922,11 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          coc_accepted_at?: string | null
           created_at?: string | null
           email: string
           id: string
+          is_test_user?: boolean
           last_login?: string | null
           name: string
           organization?: string | null
@@ -930,9 +934,11 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          coc_accepted_at?: string | null
           created_at?: string | null
           email?: string
           id?: string
+          is_test_user?: boolean
           last_login?: string | null
           name?: string
           organization?: string | null
@@ -980,7 +986,7 @@ export type Database = {
           user_id: string
           description: string | null
           location: string | null
-          inspiring_moment: string | null
+          schema_motivation: string | null
           reading_list: Json
           who_inspires_you: Json
           best_sidequests: string | null
@@ -995,7 +1001,7 @@ export type Database = {
           user_id: string
           description?: string | null
           location?: string | null
-          inspiring_moment?: string | null
+          schema_motivation?: string | null
           reading_list?: Json
           who_inspires_you?: Json
           best_sidequests?: string | null
@@ -1010,7 +1016,7 @@ export type Database = {
           user_id?: string
           description?: string | null
           location?: string | null
-          inspiring_moment?: string | null
+          schema_motivation?: string | null
           reading_list?: Json
           who_inspires_you?: Json
           best_sidequests?: string | null
