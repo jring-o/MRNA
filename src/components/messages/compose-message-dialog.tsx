@@ -39,6 +39,8 @@ function getUsersForMode(users: UserInfo[], mode: RecipientMode): UserInfo[] {
       return users.filter(u => u.role === 'participant')
     case 'admins':
       return users.filter(u => u.role === 'admin')
+    case 'custom':
+      return []
     default:
       return users
   }
@@ -213,11 +215,15 @@ export function ComposeMessageDialog({ open, onOpenChange, onMessageSent, users 
                 <Shield className="mr-1.5 h-3.5 w-3.5" />
                 Admins
               </Button>
-              {recipientMode === 'custom' && (
-                <Badge variant="secondary" className="self-center">
-                  Custom
-                </Badge>
-              )}
+              <Button
+                type="button"
+                size="sm"
+                variant={recipientMode === 'custom' ? 'default' : 'outline'}
+                onClick={() => handleGroupSelect('custom')}
+                disabled={sending}
+              >
+                Custom
+              </Button>
             </div>
 
             {/* Selected user badges */}
@@ -272,7 +278,7 @@ export function ComposeMessageDialog({ open, onOpenChange, onMessageSent, users 
                 />
               </div>
               {searchOpen && searchResults.length > 0 && (
-                <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg max-h-40 overflow-y-auto">
+                <div className="absolute z-50 mt-1 w-full rounded-md border bg-white shadow-lg max-h-40 overflow-y-auto">
                   {searchResults.map(user => (
                     <button
                       key={user.id}
