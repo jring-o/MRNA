@@ -75,7 +75,7 @@ const profileSchema = z.object({
     reason: z.string(),
   })),
   best_sidequests: z.string().optional(),
-  favorite_animal: z.string().optional(),
+  revolutionary_animal: z.string().optional(),
   undersung_roles: z.array(z.object({
     value: z.string(),
   })),
@@ -148,7 +148,7 @@ export function ParticipantProfileSheet({
       reading_list: [],
       who_inspires_you: [],
       best_sidequests: '',
-      favorite_animal: '',
+      revolutionary_animal: '',
       undersung_roles: [],
       cool_projects: [],
     },
@@ -207,7 +207,7 @@ export function ParticipantProfileSheet({
       reading_list: readingList.length > 0 ? readingList : [],
       who_inspires_you: inspirations.length > 0 ? inspirations : [],
       best_sidequests: profile?.best_sidequests || '',
-      favorite_animal: profile?.favorite_animal || '',
+      revolutionary_animal: profile?.revolutionary_animal || '',
       undersung_roles: unsungRoles.length > 0
         ? unsungRoles.map(r => ({ value: r }))
         : [],
@@ -247,7 +247,7 @@ export function ParticipantProfileSheet({
         reading_list: data.reading_list.filter(r => r.title.trim() || r.author.trim()),
         who_inspires_you: data.who_inspires_you.filter(w => w.name.trim() || w.reason.trim()),
         best_sidequests: data.best_sidequests?.trim() || null,
-        favorite_animal: data.favorite_animal?.trim() || null,
+        revolutionary_animal: data.revolutionary_animal?.trim() || null,
         undersung_roles: data.undersung_roles
           .map(r => r.value.trim())
           .filter(Boolean),
@@ -519,11 +519,11 @@ export function ParticipantProfileSheet({
 
               {/* Favorite Animal */}
               <div>
-                <Label htmlFor="edit-animal">What&apos;s your favorite animal?</Label>
+                <Label htmlFor="edit-animal">Which animal is most likely to revolutionize science?</Label>
                 <Input
                   id="edit-animal"
-                  {...form.register('favorite_animal')}
-                  placeholder="e.g. Red panda"
+                  {...form.register('revolutionary_animal')}
+                  placeholder="e.g. Octopus"
                   className="mt-1"
                 />
               </div>
@@ -634,8 +634,8 @@ export function ParticipantProfileSheet({
                 {profile?.best_sidequests || null}
               </ProfileField>
 
-              <ProfileField icon={PawPrint} label="Favorite animal" isOwn={isOwnProfile}>
-                {profile?.favorite_animal || null}
+              <ProfileField icon={PawPrint} label="Which animal is most likely to revolutionize science?" isOwn={isOwnProfile}>
+                {profile?.revolutionary_animal || null}
               </ProfileField>
 
               <ProfileField icon={Users} label="Undersung roles in research" isOwn={isOwnProfile}>

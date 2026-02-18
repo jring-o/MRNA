@@ -990,7 +990,7 @@ export type Database = {
           reading_list: Json
           who_inspires_you: Json
           best_sidequests: string | null
-          favorite_animal: string | null
+          revolutionary_animal: string | null
           undersung_roles: Json
           cool_projects: Json
           created_at: string | null
@@ -1005,7 +1005,7 @@ export type Database = {
           reading_list?: Json
           who_inspires_you?: Json
           best_sidequests?: string | null
-          favorite_animal?: string | null
+          revolutionary_animal?: string | null
           undersung_roles?: Json
           cool_projects?: Json
           created_at?: string | null
@@ -1020,7 +1020,7 @@ export type Database = {
           reading_list?: Json
           who_inspires_you?: Json
           best_sidequests?: string | null
-          favorite_animal?: string | null
+          revolutionary_animal?: string | null
           undersung_roles?: Json
           cool_projects?: Json
           created_at?: string | null
