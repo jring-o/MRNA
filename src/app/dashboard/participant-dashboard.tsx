@@ -108,7 +108,7 @@ export function ParticipantDashboard({
           <ul className="mt-2 space-y-1 text-sm text-amber-800 list-disc list-inside">
             <li>Fill out your profile by clicking your name in the participants list</li>
             <li>Review the Logistics and Expectations tabs</li>
-            <li>Complete the <a href="https://www.when2meet.com/?35097357-s1ivK" target="_blank" rel="noopener noreferrer" className="underline font-medium">When2Meet</a> for our Kickoff Call</li>
+            <li>Complete the <a href="https://www.when2meet.com/?35108657-bmVTY" target="_blank" rel="noopener noreferrer" className="underline font-medium">When2Meet</a> for our Kickoff Call</li>
           </ul>
         </AlertDescription>
       </Alert>
