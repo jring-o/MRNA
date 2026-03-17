@@ -908,6 +908,65 @@ export type Database = {
           },
         ]
       }
+      travel_info: {
+        Row: {
+          id: string
+          user_id: string
+          travel_budget: number | null
+          arrival_mode: string | null
+          arrival_date: string | null
+          arrival_flight_number: string | null
+          arrival_time: string | null
+          departure_mode: string | null
+          departure_date: string | null
+          departure_flight_number: string | null
+          departure_time: string | null
+          notes: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          travel_budget?: number | null
+          arrival_mode?: string | null
+          arrival_date?: string | null
+          arrival_flight_number?: string | null
+          arrival_time?: string | null
+          departure_mode?: string | null
+          departure_date?: string | null
+          departure_flight_number?: string | null
+          departure_time?: string | null
+          notes?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          travel_budget?: number | null
+          arrival_mode?: string | null
+          arrival_date?: string | null
+          arrival_flight_number?: string | null
+          arrival_time?: string | null
+          departure_mode?: string | null
+          departure_date?: string | null
+          departure_flight_number?: string | null
+          departure_time?: string | null
+          notes?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "travel_info_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           coc_accepted_at: string | null

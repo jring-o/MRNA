@@ -12,6 +12,7 @@ import {
   Settings,
   ArrowRight,
   UserCheck,
+  Plane,
 } from 'lucide-react'
 
 export default async function AdminDashboardPage() {
@@ -198,6 +199,26 @@ export default async function AdminDashboardPage() {
               <Link href="/messages">
                 <Button className="w-full" variant="default">
                   View Messages
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <Plane className="h-8 w-8 text-sky-600" />
+                <ArrowRight className="h-5 w-5 text-gray-400" />
+              </div>
+              <CardTitle className="mt-4">Travel Info</CardTitle>
+              <CardDescription>
+                View participant flight details and travel budgets
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/admin/travel">
+                <Button className="w-full" variant="default">
+                  View Travel Info
                 </Button>
               </Link>
             </CardContent>
