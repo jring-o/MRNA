@@ -103,23 +103,42 @@ export function CallResourcesTab({ isAdmin }: { isAdmin: boolean }) {
     try {
       let fileData = null
 
-      // Upload file first if one is selected
+      // Upload file directly to Supabase Storage via signed URL
       if (selectedFile) {
-        const uploadForm = new FormData()
-        uploadForm.append('file', selectedFile)
-
+        // 1. Get a signed upload URL from our API
         const uploadRes = await fetch('/api/call-resources/upload', {
           method: 'POST',
-          body: uploadForm,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileName: selectedFile.name,
+            contentType: selectedFile.type,
+          }),
         })
 
         if (!uploadRes.ok) {
           const err = await uploadRes.json()
-          throw new Error(err.error || 'Upload failed')
+          throw new Error(err.error || 'Failed to prepare upload')
         }
 
-        const { data } = await uploadRes.json()
-        fileData = data
+        const { data: uploadData } = await uploadRes.json()
+
+        // 2. Upload the file directly to Supabase Storage
+        const storageRes = await fetch(uploadData.signedUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': selectedFile.type },
+          body: selectedFile,
+        })
+
+        if (!storageRes.ok) {
+          throw new Error('Failed to upload file')
+        }
+
+        fileData = {
+          path: uploadData.path,
+          file_name: selectedFile.name,
+          file_size: selectedFile.size,
+          file_type: selectedFile.type,
+        }
       }
 
       // Create the resource record

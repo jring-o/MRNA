@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
-// POST: Upload a file to the call-resources storage bucket (admin only)
+// POST: Generate a signed upload URL so the client can upload directly to
+// Supabase Storage, bypassing the Next.js body-size limit.
 export async function POST(request: Request) {
   try {
     const supabase = await createClient()
@@ -11,47 +12,42 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check admin role server-side as an extra guard
     const role = user.app_metadata?.role
     if (role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const formData = await request.formData()
-    const file = formData.get('file') as File | null
+    const { fileName, contentType } = await request.json()
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+    if (!fileName) {
+      return NextResponse.json({ error: 'fileName is required' }, { status: 400 })
     }
 
-    // Create a unique path: YYYY-MM/uuid-filename
+    // Build a unique storage path: YYYY-MM/uuid-filename
     const now = new Date()
     const folder = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-    const uniqueName = `${crypto.randomUUID()}-${file.name}`
+    const uniqueName = `${crypto.randomUUID()}-${fileName}`
     const storagePath = `${folder}/${uniqueName}`
 
-    const { error: uploadError } = await supabase.storage
+    const { data, error } = await supabase.storage
       .from('call-resources')
-      .upload(storagePath, file, {
-        contentType: file.type,
-        upsert: false,
-      })
+      .createSignedUploadUrl(storagePath)
 
-    if (uploadError) {
-      console.error('Storage upload error:', uploadError)
-      return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 })
+    if (error) {
+      console.error('Signed upload URL error:', error)
+      return NextResponse.json({ error: 'Failed to create upload URL' }, { status: 500 })
     }
 
     return NextResponse.json({
       data: {
+        signedUrl: data.signedUrl,
+        token: data.token,
         path: storagePath,
-        file_name: file.name,
-        file_size: file.size,
-        file_type: file.type,
+        contentType: contentType || 'application/octet-stream',
       }
     })
   } catch (error) {
-    console.error('Upload error:', error)
+    console.error('Upload URL error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
