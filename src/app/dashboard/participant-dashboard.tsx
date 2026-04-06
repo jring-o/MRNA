@@ -47,6 +47,7 @@ import {
   Train
 } from 'lucide-react'
 import { ParticipantProfileSheet } from './participant-profile-sheet'
+import { CallResourcesTab } from './call-resources-tab'
 
 interface ParticipantProfile {
   id: string
@@ -56,10 +57,12 @@ interface ParticipantProfile {
 
 export function ParticipantDashboard({
   userId,
-  userName
+  userName,
+  isAdmin = false
 }: {
   userId: string
   userName: string
+  isAdmin?: boolean
 }) {
   const [participants, setParticipants] = useState<ParticipantProfile[]>([])
   const [loading, setLoading] = useState(true)
@@ -217,8 +220,9 @@ export function ParticipantDashboard({
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="participants" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="participants">Participants</TabsTrigger>
+          <TabsTrigger value="calls">Resources</TabsTrigger>
           <TabsTrigger value="schedule">Schedule</TabsTrigger>
           <TabsTrigger value="logistics">Logistics</TabsTrigger>
           <TabsTrigger value="expectations">Expectations</TabsTrigger>
@@ -272,6 +276,11 @@ export function ParticipantDashboard({
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Call Recordings & Notes */}
+        <TabsContent value="calls" className="space-y-4">
+          <CallResourcesTab isAdmin={isAdmin} />
         </TabsContent>
 
         {/* Workshop Schedule */}

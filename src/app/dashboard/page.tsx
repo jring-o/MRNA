@@ -78,7 +78,7 @@ export default async function DashboardPage() {
 
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Participant Dashboard - shown to all participants including admins */}
-        <ParticipantSection userId={user.id} userName={profile?.name || 'Participant'} />
+        <ParticipantSection userId={user.id} userName={profile?.name || 'Participant'} isAdmin={isAdmin} />
       </div>
     </div>
   )

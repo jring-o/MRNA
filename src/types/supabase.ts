@@ -132,6 +132,59 @@ export type Database = {
           },
         ]
       }
+      call_resources: {
+        Row: {
+          id: string
+          title: string
+          description: string | null
+          call_date: string | null
+          file_url: string | null
+          file_name: string | null
+          file_size: number | null
+          file_type: string | null
+          resource_type: string
+          uploaded_by: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          title: string
+          description?: string | null
+          call_date?: string | null
+          file_url?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          resource_type?: string
+          uploaded_by?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string | null
+          call_date?: string | null
+          file_url?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          resource_type?: string
+          uploaded_by?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_resources_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       application_comments: {
         Row: {
           application_id: string
