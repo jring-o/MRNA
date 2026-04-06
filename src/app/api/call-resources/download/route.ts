@@ -11,6 +11,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Only participants and admins can download call resources
+    const role = user.app_metadata?.role
+    if (role !== 'participant' && role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const { searchParams } = new URL(request.url)
     const path = searchParams.get('path')
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -105,7 +106,7 @@ export function CallResourcesTab({ isAdmin }: { isAdmin: boolean }) {
 
       // Upload file directly to Supabase Storage via signed URL
       if (selectedFile) {
-        // 1. Get a signed upload URL from our API
+        // 1. Get a signed upload URL + token from our API
         const uploadRes = await fetch('/api/call-resources/upload', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -122,15 +123,16 @@ export function CallResourcesTab({ isAdmin }: { isAdmin: boolean }) {
 
         const { data: uploadData } = await uploadRes.json()
 
-        // 2. Upload the file directly to Supabase Storage
-        const storageRes = await fetch(uploadData.signedUrl, {
-          method: 'PUT',
-          headers: { 'Content-Type': selectedFile.type },
-          body: selectedFile,
-        })
+        // 2. Upload via the Supabase client SDK
+        const supabase = createClient()
+        const { error: storageError } = await supabase.storage
+          .from('call-resources')
+          .uploadToSignedUrl(uploadData.path, uploadData.token, selectedFile, {
+            contentType: selectedFile.type,
+          })
 
-        if (!storageRes.ok) {
-          throw new Error('Failed to upload file')
+        if (storageError) {
+          throw new Error(storageError.message || 'Failed to upload file')
         }
 
         fileData = {
