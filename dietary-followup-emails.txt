@@ -1,0 +1,19 @@
+Accepted attendees with no dietary info on file
+================================================
+
+BCC list (comma-separated):
+
+antonmolina@bnext.bio, ellie@scios.tech, joelchan@umd.edu, jon@scios.tech, hyunokate.lee@utoronto.ca, maparent@conversence.com, akamatsm@uw.edu, shaobsh@gmail.com, sean.moore3@mail.mcgill.ca
+
+
+One per line:
+
+antonmolina@bnext.bio          Anton Molina
+ellie@scios.tech               Ellie DeSota
+joelchan@umd.edu               Joel Chan
+jon@scios.tech                 Jonathan Starr
+hyunokate.lee@utoronto.ca      Kate Lee
+maparent@conversence.com       Marc-Antoine Parent
+akamatsm@uw.edu                Matt Akamatsu
+shaobsh@gmail.com              Saif Haobsh
+sean.moore3@mail.mcgill.ca     Sean Moore

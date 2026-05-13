@@ -32,6 +32,7 @@ import {
   Users,
   FileText,
   ExternalLink,
+  Zap,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { ParticipantProfile } from '@/types/database'
@@ -83,6 +84,7 @@ const profileSchema = z.object({
     url: z.string(),
     description: z.string(),
   })),
+  lightning_talk_interest: z.boolean().nullable(),
 })
 
 type ProfileFormData = z.infer<typeof profileSchema>
@@ -151,6 +153,7 @@ export function ParticipantProfileSheet({
       revolutionary_animal: '',
       undersung_roles: [],
       cool_projects: [],
+      lightning_talk_interest: null,
     },
   })
 
@@ -212,6 +215,7 @@ export function ParticipantProfileSheet({
         ? unsungRoles.map(r => ({ value: r }))
         : [],
       cool_projects: coolProjects.length > 0 ? coolProjects : [],
+      lightning_talk_interest: profile?.lightning_talk_interest ?? null,
     })
     setIsEditing(true)
   }
@@ -252,6 +256,7 @@ export function ParticipantProfileSheet({
           .map(r => r.value.trim())
           .filter(Boolean),
         cool_projects: data.cool_projects.filter(p => p.url.trim() || p.description.trim()),
+        lightning_talk_interest: data.lightning_talk_interest,
       }
 
       const { error: profileError } = await supabase
@@ -561,6 +566,31 @@ export function ParticipantProfileSheet({
                 </Button>
               </div>
 
+              <Separator />
+
+              {/* Lightning Talk Interest */}
+              <div className="space-y-2">
+                <Label>If there&apos;s time, would you be interested in giving a 5-minute lightning talk?</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant={form.watch('lightning_talk_interest') === true ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => form.setValue('lightning_talk_interest', true, { shouldDirty: true })}
+                  >
+                    Yes
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={form.watch('lightning_talk_interest') === false ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => form.setValue('lightning_talk_interest', false, { shouldDirty: true })}
+                  >
+                    No
+                  </Button>
+                </div>
+              </div>
+
             </form>
           ) : profileLoading ? (
             <div className="flex items-center justify-center py-12">
@@ -651,6 +681,14 @@ export function ParticipantProfileSheet({
                     ))}
                   </div>
                 ) : null}
+              </ProfileField>
+
+              <ProfileField icon={Zap} label="Interested in giving a 5-minute lightning talk?" isOwn={isOwnProfile}>
+                {profile?.lightning_talk_interest === true
+                  ? 'Yes'
+                  : profile?.lightning_talk_interest === false
+                  ? 'No'
+                  : null}
               </ProfileField>
 
             </div>

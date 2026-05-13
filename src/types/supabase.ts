@@ -1105,6 +1105,7 @@ export type Database = {
           revolutionary_animal: string | null
           undersung_roles: Json
           cool_projects: Json
+          lightning_talk_interest: boolean | null
           created_at: string | null
           updated_at: string | null
         }
@@ -1120,6 +1121,7 @@ export type Database = {
           revolutionary_animal?: string | null
           undersung_roles?: Json
           cool_projects?: Json
+          lightning_talk_interest?: boolean | null
           created_at?: string | null
           updated_at?: string | null
         }
@@ -1135,6 +1137,7 @@ export type Database = {
           revolutionary_animal?: string | null
           undersung_roles?: Json
           cool_projects?: Json
+          lightning_talk_interest?: boolean | null
           created_at?: string | null
           updated_at?: string | null
         }
