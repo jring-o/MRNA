@@ -1,9 +1,11 @@
 'use client'
 
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEditor, EditorContent, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
-import { useCallback } from 'react'
+import { TableKit } from '@tiptap/extension-table'
+import { marked } from 'marked'
+import { useCallback, useRef } from 'react'
 import {
   Bold,
   Italic,
@@ -22,13 +24,30 @@ interface TiptapEditorProps {
   placeholder?: string
 }
 
+// Detects whether pasted plain text is markdown so we can convert it to rich
+// content. TipTap only converts inline marks (bold, links) on paste — block
+// syntax like headings and lists needs this handler to render correctly.
+function looksLikeMarkdown(text: string): boolean {
+  return (
+    /(^|\n)\s{0,3}#{1,6}\s/.test(text) ||   // headings
+    /(^|\n)\s*[-*+]\s+/.test(text) ||        // bullet lists
+    /(^|\n)\s*\d+\.\s+/.test(text) ||        // ordered lists
+    /(^|\n)\s*>\s+/.test(text) ||            // blockquotes
+    /(^|\n)\s*```/.test(text) ||             // code fences
+    /\*\*[^*\n]+\*\*/.test(text) ||          // bold
+    /\[[^\]]+\]\([^)\s]+\)/.test(text)       // links
+  )
+}
+
 export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorProps) {
+  const editorRef = useRef<Editor | null>(null)
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: {
-          levels: [2, 3],
+          levels: [1, 2, 3, 4],
         },
       }),
       Link.configure({
@@ -37,8 +56,14 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
           class: 'text-blue-600 underline',
         },
       }),
+      TableKit.configure({
+        table: { resizable: false },
+      }),
     ],
     content,
+    onCreate: ({ editor }) => {
+      editorRef.current = editor
+    },
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML())
     },
@@ -46,6 +71,29 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
       attributes: {
         class: 'prose prose-sm max-w-none min-h-[200px] p-3 focus:outline-none',
         ...(placeholder ? { 'data-placeholder': placeholder } : {}),
+      },
+      // Convert pasted markdown (headings, lists, etc.) into rich content.
+      handlePaste: (_view, event) => {
+        const clipboard = event.clipboardData
+        if (!clipboard) return false
+
+        // Let TipTap handle rich (HTML) pastes — e.g. copied from a web page.
+        const html = clipboard.getData('text/html')
+        if (html && html.trim()) return false
+
+        const text = clipboard.getData('text/plain')
+        if (!text || !looksLikeMarkdown(text)) return false
+
+        const rendered = marked.parse(text, { gfm: true, breaks: true }) as string
+        const ed = editorRef.current
+        if (!ed) return false
+
+        if (ed.isEmpty) {
+          ed.commands.setContent(rendered)
+        } else {
+          ed.commands.insertContent(rendered)
+        }
+        return true
       },
     },
   })

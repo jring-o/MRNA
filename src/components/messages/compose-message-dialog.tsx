@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { TiptapEditor } from './tiptap-editor'
 import { toast } from 'sonner'
-import { Loader2, Send, X, Search, Users, Shield, Globe } from 'lucide-react'
+import { Loader2, Send, X, Search, Users, Shield, Globe, Eye, Pencil } from 'lucide-react'
 
 interface UserInfo {
   id: string
@@ -49,6 +49,7 @@ function getUsersForMode(users: UserInfo[], mode: RecipientMode): UserInfo[] {
 export function ComposeMessageDialog({ open, onOpenChange, onMessageSent, users }: ComposeMessageDialogProps) {
   const [subject, setSubject] = useState('')
   const [content, setContent] = useState('')
+  const [preview, setPreview] = useState(false)
   const [sending, setSending] = useState(false)
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set(users.map(u => u.id)))
   const [recipientMode, setRecipientMode] = useState<RecipientMode>('all')
@@ -63,6 +64,7 @@ export function ComposeMessageDialog({ open, onOpenChange, onMessageSent, users 
       setRecipientMode('all')
       setSearchQuery('')
       setSearchOpen(false)
+      setPreview(false)
     }
   }, [open, users])
 
@@ -307,12 +309,58 @@ export function ComposeMessageDialog({ open, onOpenChange, onMessageSent, users 
           </div>
 
           <div className="space-y-2">
-            <Label>Message</Label>
-            <TiptapEditor
-              content={content}
-              onChange={setContent}
-              placeholder="Write your message..."
-            />
+            <div className="flex items-center justify-between">
+              <Label>Message</Label>
+              <div className="flex gap-1">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={!preview ? 'default' : 'outline'}
+                  onClick={() => setPreview(false)}
+                  disabled={sending}
+                >
+                  <Pencil className="mr-1.5 h-3.5 w-3.5" />
+                  Edit
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={preview ? 'default' : 'outline'}
+                  onClick={() => setPreview(true)}
+                  disabled={sending}
+                >
+                  <Eye className="mr-1.5 h-3.5 w-3.5" />
+                  Preview
+                </Button>
+              </div>
+            </div>
+
+            {preview ? (
+              <div className="rounded-md border">
+                <div className="border-b bg-gray-50 px-3 py-2">
+                  <p className="text-xs text-muted-foreground">
+                    Preview — how this will appear on the messages page
+                  </p>
+                  {subject.trim() && (
+                    <h3 className="mt-1 text-lg font-semibold text-gray-900">{subject}</h3>
+                  )}
+                </div>
+                {content && content !== '<p></p>' ? (
+                  <div
+                    className="prose prose-sm max-w-none p-3"
+                    dangerouslySetInnerHTML={{ __html: content }}
+                  />
+                ) : (
+                  <p className="p-3 text-sm text-muted-foreground">Nothing to preview yet.</p>
+                )}
+              </div>
+            ) : (
+              <TiptapEditor
+                content={content}
+                onChange={setContent}
+                placeholder="Write your message..."
+              />
+            )}
           </div>
         </div>
 
