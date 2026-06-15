@@ -12,7 +12,7 @@ CREATE TABLE public.surveys (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   slug TEXT NOT NULL UNIQUE,
   title TEXT NOT NULL,
-  event_label TEXT,                        -- e.g. 'MIRA Dublin 2026'
+  event_label TEXT,                        -- e.g. 'MIRA 2026'
   is_open BOOLEAN NOT NULL DEFAULT true,   -- accepting responses?
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -96,5 +96,5 @@ CREATE POLICY "survey_completions_select_own_or_admin" ON public.survey_completi
 -- Seed the MIRA Dublin 2026 post-event survey
 -- ==========================================
 INSERT INTO public.surveys (slug, title, event_label, is_open)
-VALUES ('mira-dublin-2026', 'MIRA Workshop Post-Event Survey', 'MIRA Dublin 2026', true)
+VALUES ('mira-dublin-2026', 'MIRA Workshop Post-Event Survey', 'MIRA 2026', true)
 ON CONFLICT (slug) DO NOTHING;
