@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5 Minute Timer</title>
+<style>
+  :root {
+    --bg: #0f1116;
+    --fg: #f5f7fa;
+    --muted: #7c8597;
+    --accent: #4f9dff;
+    --danger: #ff5a5a;
+    --ring: #232733;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    user-select: none;
+  }
+  .ring-wrap { position: relative; width: 320px; height: 320px; }
+  svg { transform: rotate(-90deg); }
+  .track { stroke: var(--ring); }
+  .progress {
+    stroke: var(--accent);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.2s linear, stroke 0.3s ease;
+  }
+  .center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+  .time {
+    font-size: 4rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    transition: color 0.2s ease;
+  }
+  .status { font-size: 0.95rem; color: var(--muted); letter-spacing: 0.05em; height: 1.2em; }
+
+  /* Final-10-seconds urgency */
+  .urgent .time { color: var(--danger); animation: pulse 1s ease-in-out infinite; }
+  .urgent .progress { stroke: var(--danger); }
+  .urgent .status { color: var(--danger); }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.08); }
+  }
+
+  /* Last 3 seconds — obnoxious panic state: flashing screen + frantic pulse */
+  body.panic { animation: flash 0.4s steps(1, end) infinite; }
+  body.panic .time { color: var(--danger); animation: pulse 0.26s ease-in-out infinite; }
+  @keyframes flash {
+    0%, 49.9%  { background: #5a0f0f; }
+    50%, 100%  { background: var(--bg); }
+  }
+
+  /* Speaker picker */
+  .picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.9rem;
+    text-align: center;
+  }
+  .picker-label { font-size: 0.85rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
+  .speaker {
+    font-size: 2rem;
+    font-weight: 600;
+    min-height: 1.3em;
+    min-width: 12ch;
+    transition: opacity 0.12s ease;
+  }
+  .speaker.rolling { opacity: 0.55; }
+  .speaker.placeholder { color: var(--muted); font-weight: 400; font-size: 1.4rem; }
+  .pick-count { font-size: 0.85rem; color: var(--muted); }
+
+  .controls { display: flex; gap: 1rem; }
+  button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 0.8rem 2.2rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.08s ease, opacity 0.15s ease;
+  }
+  button.secondary { background: #2a2f3a; color: var(--fg); }
+  button:active { transform: scale(0.96); }
+  button:disabled { opacity: 0.4; cursor: default; }
+</style>
+</head>
+<body>
+  <div class="picker">
+    <div class="picker-label">Next Speaker</div>
+    <div class="speaker placeholder" id="speaker">Press “Pick speaker”</div>
+    <div class="pick-count" id="pickCount"></div>
+    <div class="controls">
+      <button id="pickBtn">Pick speaker</button>
+      <button id="pickResetBtn" class="secondary">Reset list</button>
+    </div>
+  </div>
+
+  <div class="ring-wrap" id="ringWrap">
+    <svg width="320" height="320">
+      <circle class="track" cx="160" cy="160" r="145" fill="none" stroke-width="14"/>
+      <circle class="progress" id="progress" cx="160" cy="160" r="145" fill="none" stroke-width="14"/>
+    </svg>
+    <div class="center">
+      <div class="time" id="time">5:00</div>
+      <div class="status" id="status">Ready</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="startBtn">Start</button>
+    <button id="resetBtn" class="secondary" disabled>Reset</button>
+  </div>
+
+<script>
+  // ---- Speaker picker ------------------------------------------------------
+  // Names from lightning-talks.md (embedded — a double-clicked file:// page
+  // can't read the .md directly). Update here if the sign-up list changes.
+  const NAMES = [
+    "Chandrasekhar Ramakrishnan",
+    "Nokome Bentley",
+    "Jonathan Starr",
+    "Monica Granados",
+    "Mathïs Fédérico",
+    "Kate Lee",
+    "Luke Miller",
+    "Rodrigo Migueles Ramirez",
+    "Paul Reginato",
+    "Marc-Antoine Parent",
+    "Anton Molina",
+  ];
+
+  const speakerEl = document.getElementById('speaker');
+  const pickCountEl = document.getElementById('pickCount');
+  const pickBtn = document.getElementById('pickBtn');
+  const pickResetBtn = document.getElementById('pickResetBtn');
+
+  let remainingNames = NAMES.slice();
+  let rollTimer = null;
+
+  function updatePickCount() {
+    const picked = NAMES.length - remainingNames.length;
+    pickCountEl.textContent = picked + ' of ' + NAMES.length + ' picked';
+  }
+
+  function pickSpeaker() {
+    if (rollTimer) return; // already rolling
+    if (remainingNames.length === 0) return;
+
+    pickBtn.disabled = true;
+    speakerEl.classList.remove('placeholder');
+    speakerEl.classList.add('rolling');
+
+    // Quick shuffle animation, then settle on the chosen name.
+    let ticks = 0;
+    const totalTicks = 14;
+    rollTimer = setInterval(() => {
+      speakerEl.textContent = remainingNames[Math.floor(rng() * remainingNames.length)];
+      ticks++;
+      if (ticks >= totalTicks) {
+        clearInterval(rollTimer);
+        rollTimer = null;
+
+        const idx = Math.floor(rng() * remainingNames.length);
+        const chosen = remainingNames.splice(idx, 1)[0];
+        speakerEl.textContent = chosen;
+        speakerEl.classList.remove('rolling');
+        updatePickCount();
+
+        if (remainingNames.length === 0) {
+          pickBtn.textContent = 'All picked';
+        } else {
+          pickBtn.disabled = false;
+        }
+      }
+    }, 60);
+  }
+
+  // Lightweight non-seeded random (Math.random is unavailable in some harnesses
+  // but available in the browser at runtime).
+  function rng() { return Math.random(); }
+
+  function resetPicker() {
+    if (rollTimer) { clearInterval(rollTimer); rollTimer = null; }
+    remainingNames = NAMES.slice();
+    speakerEl.textContent = 'Press “Pick speaker”';
+    speakerEl.classList.add('placeholder');
+    speakerEl.classList.remove('rolling');
+    pickBtn.textContent = 'Pick speaker';
+    pickBtn.disabled = false;
+    updatePickCount();
+  }
+
+  pickBtn.addEventListener('click', pickSpeaker);
+  pickResetBtn.addEventListener('click', resetPicker);
+  updatePickCount();
+
+  // ---- 5-minute timer ------------------------------------------------------
+  const TOTAL_SECONDS = 300;   // 5 minutes
+  const BEEP_INTERVAL = 60;    // beep every 60s
+
+  const timeEl = document.getElementById('time');
+  const statusEl = document.getElementById('status');
+  const progressEl = document.getElementById('progress');
+  const startBtn = document.getElementById('startBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const ringWrap = document.getElementById('ringWrap');
+
+  // Progress ring geometry
+  const R = 145;
+  const CIRC = 2 * Math.PI * R;
+  progressEl.style.strokeDasharray = CIRC;
+  progressEl.style.strokeDashoffset = 0;
+
+  // ---- Beep schedule -------------------------------------------------------
+  // Each entry: { at } = seconds ELAPSED when it fires, plus tone settings.
+  // Volume ramps up over the course of the timer so each beep is louder than
+  // the ones before it, climaxing in the final-10-second rapid countdown.
+  function buildSchedule() {
+    const s = [];
+
+    // Every 60s (60, 120, 180, 240): soft sine, gently rising.
+    const minuteMarks = [];
+    for (let t = BEEP_INTERVAL; t < TOTAL_SECONDS - 30; t += BEEP_INTERVAL) minuteMarks.push(t);
+    minuteMarks.forEach((t, i) => {
+      const frac = minuteMarks.length > 1 ? i / (minuteMarks.length - 1) : 0;
+      s.push({ at: t, type: 'sine', gain: 0.12 + 0.16 * frac, freq: 880, dur: 0.7 });
+    });
+
+    // 30s & 15s warnings — louder, triangle gives a bit more bite than sine.
+    s.push({ at: TOTAL_SECONDS - 30, type: 'triangle', gain: 0.42, freq: 880, dur: 0.5 });
+    s.push({ at: TOTAL_SECONDS - 15, type: 'triangle', gain: 0.58, freq: 988, dur: 0.5 });
+
+    // 10s -> 6s: one per second, switch to harsh square, climbing hard.
+    for (let r = 10; r >= 6; r--) {
+      const frac = (10 - r) / 4;                 // 0 .. 1
+      s.push({ at: TOTAL_SECONDS - r, type: 'square', gain: 0.55 + 0.30 * frac, freq: 1100, dur: 0.16 });
+    }
+
+    // 5s -> 3s: rapid 4 beeps/sec, square, near full volume.
+    for (let r = 5; r > 3.001; r -= 0.25) {      // 250ms apart => 4/sec
+      const frac = (5 - r) / 2;                  // 0 .. 1 across 5 -> 3
+      s.push({ at: TOTAL_SECONDS - r, type: 'square', gain: 0.90 + 0.08 * frac, freq: 1175, dur: 0.10 });
+    }
+
+    // Last 3 seconds: OBNOXIOUS — 5 beeps/sec, dissonant dual-tone square buzzer,
+    // max volume, pitch creeping upward.
+    for (let r = 3; r > 0.001; r -= 0.20) {      // 200ms apart => 5/sec
+      const frac = (3 - r) / 3;                  // 0 .. 1
+      const f = 1245 + 160 * frac;
+      s.push({ at: TOTAL_SECONDS - r, type: 'square', gain: 1.0, freqs: [f, f * 1.06], dur: 0.13 });
+    }
+
+    // Final blast at 0:00 — longest, dissonant, full-volume.
+    s.push({ at: TOTAL_SECONDS, type: 'square', gain: 1.0, freqs: [1320, 1320 * 1.06, 660], dur: 1.3 });
+
+    s.sort((a, b) => a.at - b.at);
+    return s;
+  }
+
+  const schedule = buildSchedule();
+
+  let audioCtx = null;
+  let remaining = TOTAL_SECONDS;
+  let scheduleIndex = 0;
+  let intervalId = null;
+  let endTime = 0;
+
+  function fmt(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return m + ':' + String(s).padStart(2, '0');
+  }
+
+  // ev: { gain, dur, type?, freq?, freqs? }
+  //  - type:  oscillator waveform ('sine' soft ... 'square' harsh). Default 'sine'.
+  //  - freqs: array of frequencies layered together (dissonant intervals = piercing).
+  //           Falls back to [freq] for a single tone.
+  function playBeep(ev) {
+    if (!audioCtx) return;
+    const t = audioCtx.currentTime;
+    const type = ev.type || 'sine';
+    const dur = ev.dur;
+    const freqs = ev.freqs || [ev.freq];
+
+    // One shared envelope; layered oscillators sum into it (louder + harsher).
+    const master = audioCtx.createGain();
+    master.gain.setValueAtTime(0.0001, t);
+    master.gain.exponentialRampToValueAtTime(ev.gain, t + 0.008);
+    master.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    master.connect(audioCtx.destination);
+
+    freqs.forEach(f => {
+      const osc = audioCtx.createOscillator();
+      osc.type = type;
+      osc.frequency.setValueAtTime(f, t);
+      osc.connect(master);
+      osc.start(t);
+      osc.stop(t + dur + 0.05);
+    });
+  }
+
+  function updateDisplay() {
+    timeEl.textContent = fmt(remaining);
+    const elapsed = TOTAL_SECONDS - remaining;
+    progressEl.style.strokeDashoffset = CIRC * (elapsed / TOTAL_SECONDS);
+
+    // Urgent visual state for the final 10 seconds; full panic for the last 3.
+    ringWrap.classList.toggle('urgent', remaining > 0 && remaining <= 10);
+    document.body.classList.toggle('panic', intervalId !== null && remaining > 0 && remaining <= 3);
+
+    if (intervalId) {
+      if (remaining <= 10) statusEl.textContent = 'Final countdown!';
+      else if (remaining <= 30) statusEl.textContent = remaining + 's left';
+      else statusEl.textContent = 'Running';
+    }
+  }
+
+  function tick() {
+    const remMs = endTime - Date.now();
+    // Precise (fractional) elapsed time so sub-second beeps fire on schedule.
+    const elapsedPrecise = TOTAL_SECONDS - remMs / 1000;
+    // Shown countdown: ceil so the final second reads 0:01, then 0:00 at the end.
+    remaining = Math.max(0, Math.min(TOTAL_SECONDS, Math.ceil(remMs / 1000)));
+
+    // Fire every scheduled beep whose mark has passed (robust to tab throttling).
+    while (scheduleIndex < schedule.length && elapsedPrecise >= schedule[scheduleIndex].at) {
+      playBeep(schedule[scheduleIndex]);
+      scheduleIndex++;
+    }
+
+    updateDisplay();
+
+    if (remMs <= 0) {
+      clearInterval(intervalId);
+      intervalId = null;
+      ringWrap.classList.remove('urgent');
+      document.body.classList.remove('panic');
+      startBtn.textContent = 'Done';
+      startBtn.disabled = true;
+      statusEl.textContent = 'Finished';
+    }
+  }
+
+  function start() {
+    // Web Audio must be created/resumed from a user gesture.
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    endTime = Date.now() + remaining * 1000;
+    intervalId = setInterval(tick, 50);
+    startBtn.disabled = true;
+    resetBtn.disabled = false;
+    statusEl.textContent = 'Running';
+  }
+
+  function reset() {
+    if (intervalId) clearInterval(intervalId);
+    intervalId = null;
+    remaining = TOTAL_SECONDS;
+    scheduleIndex = 0;
+    ringWrap.classList.remove('urgent');
+    document.body.classList.remove('panic');
+    startBtn.textContent = 'Start';
+    startBtn.disabled = false;
+    resetBtn.disabled = true;
+    statusEl.textContent = 'Ready';
+    updateDisplay();
+  }
+
+  startBtn.addEventListener('click', start);
+  resetBtn.addEventListener('click', reset);
+
+  updateDisplay();
+</script>
+</body>
+</html>

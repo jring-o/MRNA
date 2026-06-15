@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { getOpenSurvey, hasCompleted } from '@/lib/survey/store'
 import { ParticipantSection } from './participant-section'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { ClipboardList } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -39,6 +41,10 @@ export default async function DashboardPage() {
   const initials = profile?.name
     ? profile.name.split(' ').map(n => n[0]).join('').toUpperCase()
     : user.email?.[0].toUpperCase() || 'U'
+
+  // Surface the post-event survey if one is open and the user hasn't responded.
+  const openSurvey = await getOpenSurvey()
+  const surveyPending = openSurvey ? !(await hasCompleted(openSurvey.id, user.id)) : false
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
@@ -77,6 +83,24 @@ export default async function DashboardPage() {
       </div>
 
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Post-event survey banner */}
+        {surveyPending && (
+          <div className="mb-6 flex flex-col gap-3 rounded-lg border border-blue-300 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <ClipboardList className="mt-0.5 h-5 w-5 text-blue-600" />
+              <div>
+                <p className="font-medium text-blue-900">The post-event survey is open</p>
+                <p className="text-sm text-blue-800">
+                  Help shape the next MIRA — it&apos;s anonymous and takes about 5–8 minutes.
+                </p>
+              </div>
+            </div>
+            <Link href="/survey">
+              <Button>Take the survey</Button>
+            </Link>
+          </div>
+        )}
+
         {/* Participant Dashboard - shown to all participants including admins */}
         <ParticipantSection userId={user.id} userName={profile?.name || 'Participant'} isAdmin={isAdmin} />
       </div>

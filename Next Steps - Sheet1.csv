@@ -1,0 +1,46 @@
+Heading,Task,Sub-task,Context,Priority,Point,Support,Deadline
+Tech,Node extraction,Convergence of method - how did u do it? ,,,Jon,Joel,
+Tech,Documentation ,,,,Marc-Antoine,Jon/Rodrigo,4 weeks
+,,Validation of Schema,,,,,
+Tech,Novel Metrics Dashboard,,,,Paul S,"Morgan, Jon, Mathis, rodrigo, kate, Ann, Ronen",
+Tech,Scoping / descoping schema,,,,Joel ,"Luke, Marc Antoine,Paul R",
+Tech,Tech Feature MIRA board,,,,Matt,"Sean, Rodrigo, Joel",
+Tech,Create + populate dropbox for data sources to mirafy,[Explore],,,Ellie,"Monica, Matt + Sean",
+Tech,Decision on Storage / computation / federation infra,,,,Morgan,"Marc Antoine, Luke, Jon",
+Tech,Maintain Lablab prototype,- Consolidate + solidify what has been built ,,,Luke,"Sean, Marc Antoine, Martin, Nokome",
+Tech,Evals for annotation,,,,Joel ,"Martin (w the lightweight traning/finetuning stuff!), Nokome",
+Tech,Rodrigo to share schema work that he has done,,,,Rodrigo,"Mathis, Jon, Joel, Ronen",
+Tech,Mathis Demo,,,,Mathis,,
+Adoption,Demo Video of this event stuff,,"We want 30-90 second videos of each ""project""
+We want recorded conversations with the lead of the ""project"" that can go with a blog post for each project
+We want a supercut of all demos with some inspriational music behind it
+Code needs to go to MIRA-science repo",,Jon,All the tech leads,
+Adoption,Written user stories,- In obsidian fault,,,Ellie D,"Ann, Sean, Joel, Elllie R, Matt, Anton, Paul R",
+Adoption,Landing page,Manifesto,,,Jon,"Paul S, Monica, Ronen, Rodrigo",
+Adoption,Write up of the event,,"CSF - quite nice models of how to do a writeup. Photos are really nice. Includes pointers to where we arrived. Audience -> potential future funders. More than ideas -> led to concrete working artifacts + prototypes. Check in w - Luke on koi inclusion, martin repositories + vid, Nokome repositories, Sekhar. Skills consolidation",,Ellie D,"Rodrigo, Ronen, Ellie R ??",
+Adoption,Clarifying Theory of Change ,L8R - Occuring at IOSP? ,,,,,
+Adoption,Lead sheet,,,,Ellie D,,
+Adoption,Participant map,Queries / Offers / Etc,,,Ellie D,Bumping everyone,
+Adoption,Problem story board,Value statement - Same as User Stories,,,,,
+Adoption,1 more lab using MIRA,,,,Matt,"Paul R, Jon, Rodrigo, Anton",
+Adoption,Participant dog food,DONneee,,,,,
+Adoption,Community Call,"bi weekly
+- ask who we open this to ",- potentially create a tech call 90 min coders around the table - coworking session. ,,Ellie D,,
+Funding Raising,1 pager,,,,Monica,"Paul S, Mathis, Joel, Jon, Frida, Ronen, Ellie, Paul R",
+Funding Raising,Org wrapper,- likely after 4 months,,,,"Rodrigo, Paul R",
+Funding Raising,Fundraiser CRM,"Funder list, Grants list
+Eventually beyond -> Legit CRM - Folk",,,Ellie D,"Joel, Paul R, Ronen, Paul S",
+Funding Raising,MIRAfy the dashboard for Ann,Same as metrics,,,Ann,Marc antoine,
+Funding Raising,,,,,,,
+Ethnography,Technical means for people to add to records,,,,,Luke,
+Ethnography,KOI sync updates to connect w schema,,,,Luke,,
+Ethnography,Produce outputs / write up,,,,Ellie R,,
+Ethnography,Ethnography folks to add their notes ,,,,Ellie R,"Ellie D, Rodrigo, Monica",
+Meta,Communication channel,,,,,,
+,,,,,,,
+,Exit Interviews,,,,Ellie D,"Jon, Rodrigo",
+,"Inclusivity User group
+Create a list of behaviors we shold/shouldn't contribute ",,,,Kate,"Matt, Rodrigo, Kate, MOrgan, Sean, Ellie R",
+,"inclusivity Charter/Code of Conduct, Embedded in everything",,,,,,
+,"Build a really inclusive group of users to audit - who should be included, these are all the possible side effects",,,,,,
+,Joel + Rowan Governance -> W3C method request for comment,,,,,,

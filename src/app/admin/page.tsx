@@ -13,6 +13,7 @@ import {
   ArrowRight,
   UserCheck,
   Plane,
+  BarChart3,
 } from 'lucide-react'
 
 export default async function AdminDashboardPage() {
@@ -239,6 +240,26 @@ export default async function AdminDashboardPage() {
               <Link href="/admin/applications">
                 <Button className="w-full" variant="outline">
                   View Discussions
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <BarChart3 className="h-8 w-8 text-rose-600" />
+                <ArrowRight className="h-5 w-5 text-gray-400" />
+              </div>
+              <CardTitle className="mt-4">Post-Event Survey</CardTitle>
+              <CardDescription>
+                View anonymous survey responses and results
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/admin/survey">
+                <Button className="w-full" variant="default">
+                  View Results
                 </Button>
               </Link>
             </CardContent>
