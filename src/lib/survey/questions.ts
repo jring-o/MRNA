@@ -117,7 +117,7 @@ export const SURVEY_SECTIONS: Section[] = [
         number: 'Q2b',
         kind: 'scale',
         title:
-          'How likely are you to keep contributing to MIRA after the workshop — schema PRs, tooling, user stories, graph data, or participating in the community?',
+          'How likely are you to keep contributing to MIRA after the workshop — schema PRs, tooling, user feedback, graph data, or participating in the community?',
         min: 0,
         max: 10,
         minLabel: 'Not likely',
@@ -128,7 +128,7 @@ export const SURVEY_SECTIONS: Section[] = [
         number: 'Q2c',
         kind: 'scale',
         title:
-          'How likely are you to bring others into MIRA — introduce a collaborator, lab, or platform to the schema or community?',
+          'How likely are you to introduce others to MIRA — share what we’re building with collaborators, labs, or others who might benefit?',
         min: 0,
         max: 10,
         minLabel: 'Not likely',
@@ -441,8 +441,17 @@ export const SURVEY_SECTIONS: Section[] = [
         ],
       },
       {
-        id: 'q23_iosp',
+        id: 'q_missing_voices',
         number: 'Q23',
+        kind: 'text',
+        title:
+          "Who wasn't in the room that should have been? Any people, roles, disciplines, or perspectives we were missing?",
+        long: true,
+        optional: true,
+      },
+      {
+        id: 'q23_iosp',
+        number: 'Q24',
         kind: 'multi',
         title: 'How would you like to be involved in IOSP 2026?',
         help: 'Select all that apply.',
@@ -465,7 +474,7 @@ export const SURVEY_SECTIONS: Section[] = [
     questions: [
       {
         id: 'q24_keep',
-        number: 'Q24',
+        number: 'Q25',
         kind: 'text',
         title: 'KEEP — what should we keep?',
         long: true,
@@ -487,7 +496,7 @@ export const SURVEY_SECTIONS: Section[] = [
       },
       {
         id: 'q25_anything',
-        number: 'Q25',
+        number: 'Q26',
         kind: 'text',
         title: "Anything we didn't ask that you'd like us to know?",
         long: true,
@@ -495,7 +504,7 @@ export const SURVEY_SECTIONS: Section[] = [
       },
       {
         id: 'q26_name',
-        number: 'Q26',
+        number: 'Q27',
         kind: 'text',
         title: 'Your name',
         help: "Optional — only if you'd like us to be able to follow up with you. Responses are otherwise anonymous.",

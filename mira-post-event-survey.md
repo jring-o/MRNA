@@ -28,13 +28,13 @@ Each question lists its **response type** and the **goal** — what decision or 
 - **Optional paired item:** "Compared to before the workshop, your confidence is: Higher / About the same / Lower." — measures whether the gathering itself built or eroded conviction (a direct workshop outcome).
 - **Optional follow-up (open text):** "What would most increase your confidence in MIRA?" — surfaces what's holding conviction back, and what MIRA needs to deliver to earn it.
 
-### Q2b. How likely are you to keep contributing to MIRA after the workshop — schema PRs, tooling, user stories, graph data, or participating in the community? ⭐
+### Q2b. How likely are you to keep contributing to MIRA after the workshop — schema PRs, tooling, user feedback, graph data, or participating in the community? ⭐
 - **Type:** 0–10 (or 1–5)
 - **Goal:** A standard and its community live or die on sustained contribution *between* gatherings. Distinguishes passive adopters from active builders and identifies the committed core to follow up with.
 
-### Q2c. How likely are you to bring others into MIRA — introduce a collaborator, lab, or platform to the schema or community? ⭐
+### Q2c. How likely are you to introduce others to MIRA — share what we're building with collaborators, labs, or others who might benefit? ⭐
 - **Type:** 0–10 (or 1–5)
-- **Goal:** Advocacy is how the standard spreads beyond the room. Adoption (Q2) grows depth; this grows *reach* — and getting *other* platforms to inherit the schema is MIRA's stated end goal.
+- **Goal:** Advocacy is how MIRA spreads beyond the room. Conviction (Q2) and contribution (Q2b) capture depth; this captures *reach*. Deliberately the **low-barrier** ask — telling people about the work, not recruiting co-creators (that higher-commitment ask lives in Q24's "help recruit"). More people can meaningfully answer, and it's the top of the outreach funnel.
 - **Optional follow-up (open text):** "Who or what would you introduce?" — seeds the next round of outreach.
 
 ### Q3. Did the workshop meet your expectations?
@@ -139,7 +139,11 @@ Each question lists its **response type** and the **goal** — what decision or 
 - **Type:** Single choice — Smaller (more intimate) / About the same / Somewhat larger / Much larger
 - **Goal:** Probes the core intimacy-vs-reach tradeoff. Anchored to the real number so answers are concrete. (Original organizer question.)
 
-### Q23. How would you like to be involved in [IOSP](https://iosp.science) 2026?
+### Q23. Who wasn't in the room that should have been?
+- **Type:** Open text
+- **Goal:** Surfaces gaps in the guest list — missing people, roles, disciplines, or perspectives. Feeds recruiting for the next gathering directly; pairs with the size question (Q22) and the "help recruit" option in Q24.
+
+### Q24. How would you like to be involved in [IOSP](https://iosp.science) 2026?
 - **Type:** Multi-select — Attend / Help organize or plan / Facilitate a session / Sponsor or help fund / Help recruit participants / Not sure yet / Probably won't participate
 - **Goal:** Gauges appetite and recruits volunteers, organizers, and funders for the next IOSP gathering. (Original organizer question, expanded from attend/organize/facilitate to include funding & recruiting.)
 - **Build note:** "IOSP" links to <https://iosp.science> so respondents who don't already know it can read what it is.
@@ -148,21 +152,21 @@ Each question lists its **response type** and the **goal** — what decision or 
 
 ## Section 7 — Closing
 
-### Q24. Keep / Change / Stop — one of each.
+### Q25. Keep / Change / Stop — one of each.
 - **Type:** Open text (three prompts: What should we **keep**? What should we **change**? What should we **stop**?)
 - **Goal:** The highest-yield open-ended in the survey — forces prioritized, actionable feedback across the whole gathering.
 
-### Q25. Anything we didn't ask that you'd like us to know?
+### Q26. Anything we didn't ask that you'd like us to know?
 - **Type:** Open text
 - **Goal:** Safety net for blind spots in the survey design.
 
-### Q26. (Optional) Your name
+### Q27. (Optional) Your name
 - **Type:** Open text
-- **Goal:** Lets willing participants attach their name for follow-up (e.g., on commitments from Q13 or volunteering from Q23), while keeping the survey anonymous by default.
+- **Goal:** Lets willing participants attach their name for follow-up (e.g., on commitments from Q13 or volunteering from Q24), while keeping the survey anonymous by default.
 
 ---
 
 ## Open design decisions
 1. **Delivery:** Build into the existing Next.js + Supabase dashboard (data tied to participants, fully owned) vs. Google Form / Typeform (zero-dev, fast).
-2. **Anonymity:** Recommended anonymous + optional name (Q26). Confirm.
-3. **Trim:** This is the full menu (28 questions) — longer than you'll likely ship. The irreducible core, if you want a short version: Q1 (overall), Q2 (confidence in MIRA's direction), Q14 (schema progress), Q9 (facilitation), Q12 (connections), Q18 (cadence), and Q24 (keep/change/stop). The Q2/Q2b/Q2c trio (confidence / contribute / advocate) together read the health of the standard and its community — keep all three if MIRA-the-standard is the priority.
+2. **Anonymity:** Recommended anonymous + optional name (Q27). Confirm.
+3. **Trim:** This is the full menu (29 questions) — longer than you'll likely ship. The irreducible core, if you want a short version: Q1 (overall), Q2 (confidence in MIRA's direction), Q14 (schema progress), Q9 (facilitation), Q12 (connections), Q18 (cadence), and Q25 (keep/change/stop). The Q2/Q2b/Q2c trio (confidence / contribute / advocate) together read the health of the standard and its community — keep all three if MIRA-the-standard is the priority.
