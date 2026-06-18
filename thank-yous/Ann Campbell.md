@@ -32,11 +32,15 @@ If you have expenses to claim, [here's the form](https://docs.google.com/forms/d
 ### Join Us on Slack
 This is where things happen between now and IOSP - [join the Slack](https://join.slack.com/t/mira-science/shared_invite/zt-40p1xihmp-Y3ET7dGoE7FVb7ktpHHR5w).
 
+### Register for IOSP
+[IOSP](https://www.iosp.science) is where this work continues - we'd love to have you there. [Register here](https://www.iosp.science/#cta-register).
+
 ### SciOS Newsletter
 Sign up to stay in the loop with all the things SciOS is building, helping to build, and organizing - [subscribe here](https://www.scios.tech/?newsletter=1).
 
-### The Calls
-We have a follow-up call on July 3 - the invite is already in your inbox. On that call we'll also settle on a cadence for future check-ins, so come with your availability.
+### Follow up call July 3rd
+We've scheduled a group sync on July 3rd. Hope to see you there!  
+To line up all our future repeating calls between now and IOSP, [add your availability here](https://www.when2meet.com/?37147949-8AMsZ).
 
 ### A Direct Debrief
 Ellie and I would love to do a short debrief with you, if you would. You can [schedule a call with us](https://scios.tech/schedule).

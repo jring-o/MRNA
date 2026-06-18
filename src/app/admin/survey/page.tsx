@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
@@ -10,8 +11,12 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
+import { ResultsTabs } from './results-tabs'
 
 type AnswerMap = Record<string, unknown>
+
+// The question whose answer (if any) is the respondent's self-provided name.
+const NAME_QUESTION_ID = 'q26_name'
 
 function num(v: unknown): number | null {
   return typeof v === 'number' && Number.isFinite(v) ? v : null
@@ -199,6 +204,118 @@ function QuestionResult({ q, answers }: { q: Question; answers: AnswerMap[] }) {
   )
 }
 
+// ── Individual responses ──────────────────────────────────────────────
+
+function hasAnswer(value: unknown): boolean {
+  if (value === undefined || value === null || value === '') return false
+  if (Array.isArray(value)) return value.length > 0
+  if (typeof value === 'object') return Object.keys(value as object).length > 0
+  return true
+}
+
+/** Render a single respondent's answer to one question, human-readable. */
+function formatAnswer(q: Question, value: unknown): ReactNode {
+  switch (q.kind) {
+    case 'scale': {
+      const v = num(value)
+      return v === null ? null : `${v} / ${q.max}`
+    }
+    case 'single': {
+      if (typeof value !== 'string') return null
+      return q.options.find((o) => o.value === value)?.label ?? value
+    }
+    case 'multi': {
+      if (!Array.isArray(value) || value.length === 0) return null
+      return value
+        .map((vv) => q.options.find((o) => o.value === vv)?.label ?? String(vv))
+        .join(', ')
+    }
+    case 'text': {
+      if (typeof value !== 'string' || !value.trim()) return null
+      return <span className="whitespace-pre-wrap">{value}</span>
+    }
+    case 'matrix': {
+      if (!value || typeof value !== 'object') return null
+      const obj = value as Record<string, unknown>
+      const rows = q.rows.filter((row) => obj[row.value] !== undefined)
+      if (rows.length === 0) return null
+      return (
+        <ul className="space-y-0.5">
+          {rows.map((row) => (
+            <li key={row.value}>
+              <span className="text-gray-500">{row.label}:</span>{' '}
+              <span className="font-medium">
+                {obj[row.value] === 'na' ? 'N/A' : `${obj[row.value]} / ${q.max}`}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  }
+}
+
+function IndividualResponses({
+  responses,
+}: {
+  responses: { answers: AnswerMap; submitted_at: string }[]
+}) {
+  // Oldest first, so "Response #1" is stable as new ones arrive.
+  const ordered = [...responses].sort((a, b) =>
+    a.submitted_at < b.submitted_at ? -1 : 1
+  )
+  return (
+    <div className="space-y-3">
+      {ordered.map((r, i) => {
+        const rawName = r.answers[NAME_QUESTION_ID]
+        const name = typeof rawName === 'string' ? rawName.trim() : ''
+        const date = new Date(r.submitted_at).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })
+        return (
+          <details key={i} className="rounded-md border bg-white">
+            <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3 hover:bg-gray-50">
+              <span className="text-sm font-medium text-gray-900">Response #{i + 1}</span>
+              {name ? (
+                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                  {name}
+                </span>
+              ) : (
+                <span className="text-xs italic text-gray-400">Anonymous</span>
+              )}
+              <span className="ml-auto text-xs text-gray-400">{date}</span>
+            </summary>
+            <div className="space-y-4 border-t px-4 py-4">
+              {SURVEY_SECTIONS.map((section) => {
+                const answered = section.questions.filter((q) => hasAnswer(r.answers[q.id]))
+                if (answered.length === 0) return null
+                return (
+                  <div key={section.title} className="space-y-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                      {section.title}
+                    </p>
+                    {answered.map((q) => (
+                      <div key={q.id} className="text-sm">
+                        <p className="text-gray-600">
+                          {q.number && <span className="text-gray-400">{q.number}. </span>}
+                          {q.title}
+                        </p>
+                        <div className="mt-0.5 text-gray-900">{formatAnswer(q, r.answers[q.id])}</div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })}
+            </div>
+          </details>
+        )
+      })}
+    </div>
+  )
+}
+
 export default async function AdminSurveyPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -282,20 +399,26 @@ export default async function AdminSurveyPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-6">
-            {SURVEY_SECTIONS.map((section) => (
-              <Card key={section.title}>
-                <CardHeader>
-                  <CardTitle className="text-lg">{section.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {section.questions.map((q) => (
-                    <QuestionResult key={q.id} q={q} answers={answers} />
-                  ))}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <ResultsTabs
+            responseCount={n}
+            summary={
+              <div className="space-y-6">
+                {SURVEY_SECTIONS.map((section) => (
+                  <Card key={section.title}>
+                    <CardHeader>
+                      <CardTitle className="text-lg">{section.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {section.questions.map((q) => (
+                        <QuestionResult key={q.id} q={q} answers={answers} />
+                      ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            }
+            individual={<IndividualResponses responses={responses} />}
+          />
         )}
       </div>
     </div>
