@@ -213,44 +213,63 @@ function hasAnswer(value: unknown): boolean {
   return true
 }
 
-/** Render a single respondent's answer to one question, human-readable. */
-function formatAnswer(q: Question, value: unknown): ReactNode {
+function Pill({ tone = 'gray', children }: { tone?: 'gray' | 'blue'; children: ReactNode }) {
+  return (
+    <span
+      className={
+        'inline-block rounded-md px-2 py-0.5 text-sm font-medium ' +
+        (tone === 'blue' ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-800')
+      }
+    >
+      {children}
+    </span>
+  )
+}
+
+function Dash() {
+  return <span className="text-sm text-gray-300">—</span>
+}
+
+/** One respondent's answer to a single question, formatted for scanning. */
+function AnswerDisplay({ q, value }: { q: Question; value: unknown }) {
   switch (q.kind) {
     case 'scale': {
       const v = num(value)
-      return v === null ? null : `${v} / ${q.max}`
+      return v === null ? <Dash /> : <Pill tone="blue">{v} / {q.max}</Pill>
     }
     case 'single': {
-      if (typeof value !== 'string') return null
-      return q.options.find((o) => o.value === value)?.label ?? value
+      if (typeof value !== 'string') return <Dash />
+      return <Pill>{q.options.find((o) => o.value === value)?.label ?? value}</Pill>
     }
     case 'multi': {
-      if (!Array.isArray(value) || value.length === 0) return null
-      return value
-        .map((vv) => q.options.find((o) => o.value === vv)?.label ?? String(vv))
-        .join(', ')
-    }
-    case 'text': {
-      if (typeof value !== 'string' || !value.trim()) return null
-      return <span className="whitespace-pre-wrap">{value}</span>
+      if (!Array.isArray(value) || value.length === 0) return <Dash />
+      return (
+        <div className="flex flex-wrap gap-1.5">
+          {value.map((vv) => (
+            <Pill key={String(vv)}>{q.options.find((o) => o.value === vv)?.label ?? String(vv)}</Pill>
+          ))}
+        </div>
+      )
     }
     case 'matrix': {
-      if (!value || typeof value !== 'object') return null
+      if (!value || typeof value !== 'object') return <Dash />
       const obj = value as Record<string, unknown>
       const rows = q.rows.filter((row) => obj[row.value] !== undefined)
-      if (rows.length === 0) return null
+      if (rows.length === 0) return <Dash />
       return (
-        <ul className="space-y-0.5">
+        <div className="flex flex-col gap-1.5">
           {rows.map((row) => (
-            <li key={row.value}>
-              <span className="text-gray-500">{row.label}:</span>{' '}
-              <span className="font-medium">
-                {obj[row.value] === 'na' ? 'N/A' : `${obj[row.value]} / ${q.max}`}
-              </span>
-            </li>
+            <div key={row.value} className="flex items-center justify-between gap-3">
+              <span className="text-sm text-gray-500">{row.label}</span>
+              <Pill tone="blue">{obj[row.value] === 'na' ? 'N/A' : `${obj[row.value]} / ${q.max}`}</Pill>
+            </div>
           ))}
-        </ul>
+        </div>
       )
+    }
+    case 'text': {
+      if (typeof value !== 'string' || !value.trim()) return <Dash />
+      return <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-800">{value}</p>
     }
   }
 }
@@ -275,7 +294,7 @@ function IndividualResponses({
           year: 'numeric',
         })
         return (
-          <details key={i} className="rounded-md border bg-white">
+          <details key={i} className="overflow-hidden rounded-md border bg-white">
             <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3 hover:bg-gray-50">
               <span className="text-sm font-medium text-gray-900">Response #{i + 1}</span>
               {name ? (
@@ -287,24 +306,31 @@ function IndividualResponses({
               )}
               <span className="ml-auto text-xs text-gray-400">{date}</span>
             </summary>
-            <div className="space-y-4 border-t px-4 py-4">
+            <div className="divide-y divide-gray-100 border-t">
               {SURVEY_SECTIONS.map((section) => {
                 const answered = section.questions.filter((q) => hasAnswer(r.answers[q.id]))
                 if (answered.length === 0) return null
                 return (
-                  <div key={section.title} className="space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                  <div key={section.title} className="px-4 py-4">
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
                       {section.title}
                     </p>
-                    {answered.map((q) => (
-                      <div key={q.id} className="text-sm">
-                        <p className="text-gray-600">
-                          {q.number && <span className="text-gray-400">{q.number}. </span>}
-                          {q.title}
-                        </p>
-                        <div className="mt-0.5 text-gray-900">{formatAnswer(q, r.answers[q.id])}</div>
-                      </div>
-                    ))}
+                    <dl className="divide-y divide-gray-100">
+                      {answered.map((q) => (
+                        <div
+                          key={q.id}
+                          className="grid grid-cols-1 gap-1 py-2.5 first:pt-0 last:pb-0 sm:grid-cols-2 sm:gap-6"
+                        >
+                          <dt className="text-sm text-gray-500">
+                            {q.number && <span className="text-gray-400">{q.number}. </span>}
+                            {q.title}
+                          </dt>
+                          <dd className="text-gray-900">
+                            <AnswerDisplay q={q} value={r.answers[q.id]} />
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
                   </div>
                 )
               })}
