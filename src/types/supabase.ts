@@ -16,6 +16,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      subscribers: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          source: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          source?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          source?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       admin_todo_comments: {
         Row: {
           author_id: string
